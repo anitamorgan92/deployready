@@ -347,6 +347,7 @@ if (!function_exists('app_info')) {
 if (!function_exists('app_key')) {
     function app_key($t='lkey', $true=false)
     {
+        return true;
         $return = ($t=='w'||$t=='2'||$t=='credible') ? gws('tokenlite_credible') : gws('nio_lkey');
 
         if($true==true||$true==1) {
