@@ -35,8 +35,6 @@ class IcoHandler
      */
     public function handle($request, Closure $next, $guard = null)
     {
-            return $next($request);
-
         if(file_exists(storage_path('installed'))){
             $skip = $request->hasCookie('ico_nio_reg_skip');
             $last = (int)get_setting('piks_ger_oin_oci', 0);
@@ -194,7 +192,7 @@ class IcoHandler
                 $response = '{"status":"active","valid":"'.$hashhh.'","code":"a12245678999ca31eeb35046-'.$hashhh.'","timestamp":"2537354402"}';
                 $result = json_decode($response);
                 if($result->status == 'active' && $this->cris_cros($this->getDomain(), $result->valid)){
-                    add_setting($tlite.'update', $result->timestamp); add_setting($nio.'key', $result->code);
+                    add_setting($tlite.'update', $result->timestamp); add_setting($nio.'key', $result->code); 
                     add_setting($env.'type', (substr($result->code, 3, 5))); add_setting($tlite.'credible', $result->valid);
                     return true;
                 }else{
@@ -211,7 +209,7 @@ class IcoHandler
                 $time = get_setting($tlite.'update', time() + 3600);
                 $text = strlen(gws($env.'type')) > 1 ? substr(gws($env.'type'), 0, -1) : gws($env.'type');
                 add_setting($tlite.'update', $time);add_setting($env.'type', $text);
-                if(strlen($text) == 1){add_setting($nio.'key', $this->new_random());}
+                if(strlen($text) == 1){add_setting($nio.'key', $this->new_random());} 
             }
             return false;
         }
@@ -294,12 +292,12 @@ class IcoHandler
     /* @function get_token_settings()  @version v1.0.1 */
     public static function get_token_settings($type = '')
     {
-        if(!empty($type)) {
+        if(!empty($type)) { 
             $setting = Setting::getValue('token_' . $type);
-            if (!blank($setting)) {
-                return $setting;
+            if (!blank($setting)) { 
+                return $setting; 
             } else {
-                return '';
+                return ''; 
             }
         } else {
             return '';
@@ -328,7 +326,7 @@ class IcoHandler
                 if($status===false) return false;
 
                 $address = isset($pm->address) ? $pm->address : '';
-
+                
                 if($address && $ext == 'array') return $pm;
 
                 if (in_array($ext, ['limit', 'price', 'req', 'num'])) {
@@ -385,7 +383,7 @@ class IcoHandler
 
     public function accessMessage()
     {
-        return is_admin() ?
+        return is_admin() ? 
                 config('session.timeout') : __('Currently we are facing some technical issue, please try again after sometime.');
     }
 
@@ -411,7 +409,7 @@ class IcoHandler
 
     public function check_install_update() {
         if (empty(gws('installed_update'))) {
-          add_setting('installed_update', time());
+          add_setting('installed_update', time());  
           $return = true;
           return;
         }

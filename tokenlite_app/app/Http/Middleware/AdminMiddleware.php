@@ -59,7 +59,7 @@ class AdminMiddleware
     public function check_access($request)
     {
         $access = $this->has_user_access($request);
-        if($access===true) return true;
+        if($access===true) return true;        
 
         $currentAction = \Route::currentRouteAction();
         $namespace1 = "App\Http\Controllers\\";

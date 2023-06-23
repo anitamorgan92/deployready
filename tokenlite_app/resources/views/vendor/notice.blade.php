@@ -8,5 +8,8 @@
 	<div class="gaps-1x mgb-0-5x d-lg-none d-none d-sm-block"></div>
 @endif
 
-@if(is_super_admin())
+@if(is_super_admin() && admin_notice())
+	<div class="alert alert-danger-alt text-center">
+        <p>Your application must be registered to active full features. Please <a href="{{ route('admin.niolite') }}">register with your purchase code</a> and active your application.</p>
+    </div>
 @endif

@@ -238,7 +238,7 @@ if (!function_exists('site_whitelabel')) {
         $whitelabel = ($nio_cool=='cool' && env_file(3, 2)) ? $whitelabel_none : $whitelabel_exten;
 
         $return = (isset($whitelabel[$type]) && $whitelabel[$type]) ? $whitelabel[$type] : '';
-
+        
         return $return;
     }
 }
@@ -313,8 +313,8 @@ if (!function_exists('token_wallet')) {
         $wallets = array();
         $wallet = field_value_text('token_wallet_opt', 'wallet_opt');
         if($wallet) {
-            foreach ($wallet as $wal) {
-                $wallets[$wal] = ucfirst($wal);
+            foreach ($wallet as $wal) { 
+                $wallets[$wal] = ucfirst($wal); 
             }
         }
 
@@ -359,7 +359,7 @@ if (!function_exists('app_key')) {
 /* @function env_file()  @version v1.0  @since 1.1.0 */
 if (!function_exists('env_file')) {
     function env_file($et='code', $comp=null)
-    {
+    {   
         $pcode = gws('env_pcode');
         $uname = gws('env_uname');
         $ptype = gws('env_ptype');
@@ -618,7 +618,7 @@ if (!function_exists('admin_notice')) {
     {
         $abc = new AddressValidation(app_key(2));
         $check = $abc->nioValidation();
-
+        
         if(!$check) return true;
 
         return false;
@@ -764,7 +764,7 @@ if (!function_exists('get_gmeta')) {
             $pid = auth()->check() ? auth()->id() : null;
         }
         $get_gmeta = ($extra) ? GlobalMeta::get_value($name, $pid, 'extra') : GlobalMeta::get_value($name, $pid, 'value');
-
+        
         return ($get_gmeta != null ? $get_gmeta : $if_null);
     }
 }
@@ -848,12 +848,12 @@ if (!function_exists('have_permission')) {
     function have_permission($type) {
         $permission = true;
         if(gws('site_admin_management', 0)) {
-            $check = (starts_with($type, 'user') || starts_with($type, 'tranx') || starts_with($type, 'kyc') ||
-                      starts_with($type, 'stage') || starts_with($type, 'setting') || starts_with($type, 'withdraw')) ? 'manage_'.$type : $type;
+            $check = (starts_with($type, 'user') || starts_with($type, 'tranx') || starts_with($type, 'kyc') || 
+                      starts_with($type, 'stage') || starts_with($type, 'setting') || starts_with($type, 'withdraw')) ? 'manage_'.$type : $type; 
             $access = GlobalMeta::has_access($check);
             $permission = (!empty($access)) ? $access : false;
         }
-        return $permission;
+        return $permission; 
     }
 }
 
@@ -1052,7 +1052,7 @@ if (!function_exists('__status')) {
                 'status' => 'danger',
                 'null' => null,
             ],
-            // New
+            // New 
             'deposit' => (object) [
                 'icon' => 'deposit',
                 'text' => 'Deposit',
@@ -1162,12 +1162,12 @@ if (!function_exists('active_stage_status')) {
     function active_stage_status($stage='')
     {
         $stage = (empty($stage)) ? active_stage() : $stage;
-        $status     = false;
-        $start_date = strtotime( $stage->start_date );
+        $status     = false; 
+        $start_date = strtotime( $stage->start_date ); 
         $end_date   = strtotime( $stage->end_date );
         $today_date = time();
 
-        if ($today_date >= $start_date && $today_date <= $end_date)
+        if ($today_date >= $start_date && $today_date <= $end_date) 
         {
             if ($stage->soldout >= $stage->total_tokens) {
                 $status = 'completed';
@@ -1176,12 +1176,12 @@ if (!function_exists('active_stage_status')) {
             } else {
                 $status = 'running';
             }
-        }
-        elseif ($today_date < $start_date)
+        } 
+        elseif ($today_date < $start_date) 
         {
             $status = 'upcoming';
         }
-        elseif ($today_date > $end_date)
+        elseif ($today_date > $end_date) 
         {
             if ($stage->soldout > 0) {
                 $status = 'completed';
@@ -1408,7 +1408,7 @@ if (!function_exists('is_payment_method_exist')) {
         }
 
         $data = PaymentMethod::get_data();
-        if($method == 'array') return $data;
+        if($method == 'array') return $data; 
         if(!isset($data->manual) ) return false;
 
         $manual = $data->manual;
@@ -1429,7 +1429,7 @@ if (!function_exists('is_payment_method_exist')) {
             $is_pm_dash = isset($manual->secret->dash) && ($manual->secret->dash->address != null && $manual->secret->dash->status == 'active') ? true : false;
             $is_pm_waves = isset($manual->secret->waves) && ($manual->secret->waves->address != null && $manual->secret->waves->status == 'active') ? true : false;
             $is_pm_xmr = isset($manual->secret->xmr) && ($manual->secret->xmr->address != null && $manual->secret->xmr->status == 'active') ? true : false;
-
+            
             if($is_pm_eth||$is_pm_btc||$is_pm_ltc||$is_pm_xrp||$is_pm_xlm||$is_pm_bch||$is_pm_bnb||$is_pm_trx||$is_pm_usdt||$is_pm_usdc||$is_pm_dash||$is_pm_waves||$is_pm_xmr) {
                 $is_active_mm = true;
             }
@@ -1466,8 +1466,8 @@ if (!function_exists('short_to_full')) {
     {
         $name = strtolower($name);
         $all_abrv =  array(
-            'usd' => 'US Dollar',
-            'eur' => 'Euro',
+            'usd' => 'US Dollar', 
+            'eur' => 'Euro', 
             'gbp' => 'Pound Sterling',
             'cad' => 'Canadian Dollar',
             'aud' => 'Australian Dollar',
@@ -1475,9 +1475,9 @@ if (!function_exists('short_to_full')) {
             'rub' => 'Russian Ruble',
             'inr' => 'Indian Rupee',
             'ngn' => 'Nigerian Naira',
-            'eth' => 'Ethereum',
-            'btc' => 'Bitcoin',
-            'ltc' => 'Litecoin',
+            'eth' => 'Ethereum', 
+            'btc' => 'Bitcoin', 
+            'ltc' => 'Litecoin', 
             'xrp' => 'Ripple',
             'xlm' => 'Stellar',
             'bch' => 'Bitcoin Cash',
@@ -1527,9 +1527,9 @@ if (!function_exists('wallet_to_currency')) {
         $name = str_replace(' ', '-', strtolower($wallet));
 
         $all_cur =  array(
-            'ethereum' => 'eth',
-            'bitcoin' => 'btc',
-            'litecoin' => 'ltc',
+            'ethereum' => 'eth', 
+            'bitcoin' => 'btc', 
+            'litecoin' => 'ltc', 
             'ripple' => 'xrp',
             'stellar' => 'xlm',
             'bitcoin-cash' => 'bch',
@@ -1694,7 +1694,7 @@ if (!function_exists('is_active_referral_system')) {
 
 /* @function referral_bonus  @version v1.1  @since 1.0.3 */
 if (!function_exists('referral_bonus')) {
-    function referral_bonus($user, $type='refer')
+    function referral_bonus($user, $type='refer') 
     {
         $bonus = 0;
         $tranx = Transaction::get_by_own(['tnx_type' => 'referral'])->get();
@@ -1713,7 +1713,7 @@ if (!function_exists('referral_bonus')) {
 
 /* @function referral_info  @version v1.0  @since 1.0.3 */
 if (!function_exists('referral_info')) {
-    function referral_info($user, $out='name')
+    function referral_info($user, $out='name') 
     {
         $user_id = (is_json($user) ? get_meta($user, 'who') : $user);
         $get_user = User::where('id', $user_id)->first();
@@ -1729,7 +1729,7 @@ if (!function_exists('referral_info')) {
 
 /* @function referral_name  @version v1.0  @since 1.0.3 */
 if (!function_exists('referral_name')) {
-    function referral_name($user)
+    function referral_name($user) 
     {
         $user_id = (is_json($user) ? get_meta($user, 'who') : $user);
         $get_user = User::where('id', $user_id)->first();
@@ -1739,7 +1739,7 @@ if (!function_exists('referral_name')) {
 
 /* @function get_refer_id  @version v1.0.1  @since 1.1.0 */
 if (!function_exists('get_refer_id')) {
-    function get_refer_id($prefix=true)
+    function get_refer_id($prefix=true) 
     {
         $ref_by = (empty(request()->cookie('ico_nio_ref_by')) ? null : request()->cookie('ico_nio_ref_by'));
         $usr_id = ($ref_by) ? set_id($ref_by) : '';
@@ -1766,12 +1766,12 @@ if (!function_exists('get_whitepaper')) {
             if ($out=='link') {
                 $return = '<a href="'.$wpaper_link.'" target="_blank">'. __('Download Whitepaper') .'</a>';
             } elseif ($out=='button') {
-                $return = '<a href="'.$wpaper_link.'" target="_blank" class="btn btn-primary"><em class="fas fa-download mr-3"></em>'. __('Download Whitepaper') .'</a>';
+                $return = '<a href="'.$wpaper_link.'" target="_blank" class="btn btn-primary"><em class="fas fa-download mr-3"></em>'. __('Download Whitepaper') .'</a>'; 
             } else {
                 $return = $wpaper_link;
             }
         }
-
+        
         return $return;
     }
 }
@@ -1781,7 +1781,7 @@ if (!function_exists('replace_shortcode')) {
     function replace_shortcode($string)
     {
         $whitepaper = get_whitepaper();
-
+        
         $shortcode = array(
             '[[token_name]]',
             '[[token_symbol]]',
@@ -2266,7 +2266,7 @@ if (!function_exists('is_show_social')) {
 
         $is_exist = UserPanel::social_links('exists');
 
-        $onsite = (isset($social->onsite) && $social->onsite && $is_exist==true) ? true : false;
+        $onsite = (isset($social->onsite) && $social->onsite && $is_exist==true) ? true : false; 
         $onlogin = (isset($social->onlogin) && $social->onlogin && $is_exist==true) ? true : false;
 
         if ($where=='site') {
@@ -2283,7 +2283,7 @@ if (!function_exists('is_show_social')) {
 if (!function_exists('site_copyrights')) {
     function site_copyrights() {
         $is_env = (env_file(3, 1) && !empty(env_file('p')));
-        $year = '&copy; '.date('Y ');
+        $year = '&copy; '.date('Y '); 
         $app_info = app_info('name').' v'.app_info('version');
         $copyright = $year.site_info('name') . '. ' . gws('site_copyright');
 
@@ -2301,7 +2301,7 @@ if (!function_exists('style_theme')) {
         $a_sheet = ($to_extend) ? gws('theme_admin', 'style') : 'style';
         $u_sheet = gws('theme_user','style');
         $admin_color = '#7D70FC';
-
+        
         if ($a_sheet=='style-green' || $a_sheet=='style-watermelon') {
             $admin_color = '#8eff8b';
         } elseif($a_sheet=='style-coral') {
@@ -2390,14 +2390,14 @@ if (!function_exists('getApiSecret()')) {
         if( $name == 'secret' ){
             return get_setting('site_api_secret', str_random(16));
         }
-        return get_setting('site_api_key');
+        return get_setting('site_api_key'); 
     }
 }
 
 /* @function api_route()  @version v1.0  @since 1.0.6 */
 if (!function_exists('api_route')) {
     function api_route($name='') {
-        $url = route('api.'.$name, ['secret' => getApiSecret('key')]);
+        $url = route('api.'.$name, ['secret' => getApiSecret('key')]); 
         return $url;
     }
 }

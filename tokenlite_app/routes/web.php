@@ -33,7 +33,7 @@ Route::get('verify/{id}/{token}', 'Auth\VerifyController@verify')->name('verify.
 Route::get('verify/success', 'Auth\LoginController@verified')->name('verified');
 Route::get('register/success', 'Auth\LoginController@registered')->name('registered');
 Route::any('log-out', 'Auth\LoginController@logout')->name('log-out');
-// Google 2FA Routes
+// Google 2FA Routes 
 Route::get('/login/2fa', 'Auth\SocialAuthController@show_2fa_form')->middleware('auth')->name('auth.2fa');
 Route::get('/login/2fa/reset', 'Auth\SocialAuthController@show_2fa_reset_form')->name('auth.2fa.reset');
 Route::post('/login/2fa/reset', 'Auth\SocialAuthController@reset_2fa');
@@ -145,7 +145,7 @@ Route::prefix('admin')->middleware(['auth', 'admin', 'g2fa', 'ico'])->name('admi
         Route::post('/pages/update', 'Admin\PageController@update')->name('pages.update')->middleware('demo_user');
         Route::post('/settings/update', 'Admin\SettingController@update')->middleware(['super_admin','demo_user'])->name('settings.update');
         // Settings UpdateMeta v1.1.0
-        Route::post('/settings/meta/update', 'Admin\SettingController@update_meta')->middleware(['super_admin','demo_user'])->name('settings.meta.update');
+        Route::post('/settings/meta/update', 'Admin\SettingController@update_meta')->middleware(['super_admin','demo_user'])->name('settings.meta.update'); 
         Route::post('/settings/email/update', 'Admin\EmailSettingController@update')->middleware(['super_admin', 'demo_user'])->name('settings.email.update');
         Route::post('/settings/email/template/update', 'Admin\EmailSettingController@update_template')->middleware(['super_admin', 'demo_user'])->name('settings.email.template.update');
         Route::post('/languages', 'Admin\LanguageController@language_action')->middleware(['ico', 'demo_user'])->name('lang.action'); // v1.1.3

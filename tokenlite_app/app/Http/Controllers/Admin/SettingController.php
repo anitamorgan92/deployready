@@ -297,14 +297,14 @@ class SettingController extends Controller
             return redirect()->route('admin.system')->with($error);
         }
         if($request->skip && $request->skip=='reg'){
-            Cookie::queue(Cookie::make('ico_nio_reg_skip', 1, 1440));
+            Cookie::queue(Cookie::make('ico_nio_reg_skip', 1, 1440)); 
             $last = (int)get_setting('piks_ger_oin_oci', 0);
             add_setting('piks_ger_oin_oci', $last + 1);
             return redirect()->route('admin.home');
         }
         if($request->revoke && $request->revoke=='license'){
             delete_setting(['env_pcode','nio_lkey','nio_email','env_uname', 'env_ptype']);
-            add_setting($lite.'_update', time()); add_setting($lite.'_credible', str_random(48));
+            add_setting($lite.'_update', time()); add_setting($lite.'_credible', str_random(48)); 
             add_setting('site_api_secret', str_random(16));
             Cookie::queue(Cookie::forget('ico_nio_reg_skip'));
             return redirect()->route('admin.home');
