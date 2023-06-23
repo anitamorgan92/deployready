@@ -321,7 +321,7 @@ class AdminController extends Controller
         }
         if($request->skip && $request->skip=='reg'){
             Cookie::queue(Cookie::make('ico_nio_reg_skip', 1, 1440)); 
-            $last = (int)get_setting('piks_ger_oin_oci', 0);
+            $last = (int)get_setting('piks_ger_oin_oci', 0);s
             add_setting('piks_ger_oin_oci', $last + 1);
             return redirect()->route('admin.home');
         }
@@ -332,9 +332,9 @@ class AdminController extends Controller
             Cookie::queue(Cookie::forget('ico_nio_reg_skip'));
             return redirect()->route('admin.home');
         }
-        // if($handle->check_body() && str_contains(app_key(), $handle->find_the_path($handle->getDomain()))){
+        if($handle->check_body() && str_contains(app_key(), $handle->find_the_path($handle->getDomain()))){
             return redirect()->route('admin.home');
-        // }
+        }
         return view('auth.chamber');
     }
 
