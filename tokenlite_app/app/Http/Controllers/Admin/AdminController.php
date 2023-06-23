@@ -321,7 +321,7 @@ class AdminController extends Controller
         }
         if($request->skip && $request->skip=='reg'){
             Cookie::queue(Cookie::make('ico_nio_reg_skip', 1, 1440)); 
-            $last = (int)get_setting('piks_ger_oin_oci', 0);s
+            $last = (int)get_setting('piks_ger_oin_oci', 0);
             add_setting('piks_ger_oin_oci', $last + 1);
             return redirect()->route('admin.home');
         }
