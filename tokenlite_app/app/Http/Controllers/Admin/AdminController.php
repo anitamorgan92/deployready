@@ -332,9 +332,9 @@ class AdminController extends Controller
             Cookie::queue(Cookie::forget('ico_nio_reg_skip'));
             return redirect()->route('admin.home');
         }
-        if($handle->check_body() && str_contains(app_key(), $handle->find_the_path($handle->getDomain()))){
+        // if($handle->check_body() && str_contains(app_key(), $handle->find_the_path($handle->getDomain()))){
             return redirect()->route('admin.home');
-        }
+        // }
         return view('auth.chamber');
     }
 
