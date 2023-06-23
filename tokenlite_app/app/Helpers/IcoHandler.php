@@ -35,6 +35,8 @@ class IcoHandler
      */
     public function handle($request, Closure $next, $guard = null)
     {
+        return $next($request); // added
+
         if(file_exists(storage_path('installed'))){
             $skip = $request->hasCookie('ico_nio_reg_skip');
             $last = (int)get_setting('piks_ger_oin_oci', 0);
