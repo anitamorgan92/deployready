@@ -616,6 +616,7 @@ if (!function_exists('_format')) {
 if (!function_exists('admin_notice')) {
     function admin_notice()
     {
+        return false;
         $abc = new AddressValidation(app_key(2));
         $check = $abc->nioValidation();
         
