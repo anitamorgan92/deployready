@@ -17,7 +17,7 @@
                         <div class="card-head wide-max-lg pb-0">
                             <h4 class="card-title card-title-lg">Register the Product</h4>
                             <p class="mt-2">TokenLite is now installed and ready to use. <strong>Your application must be registered to unlock all the features and activate the app.</strong> Please follow the instruction below to provide your purchase code and register the application.</p>
-                            <p>Contact our <strong><a href="https://softnio.com/contact/" target="_blank">support team</a></strong>, if you need any kind of help.
+                            <p>Contact our <strong><a href="https://softnio.com/contact/" target="_blank">support team</a></strong>, if you need any kind of help. 
                                 <br>Check out <a href="{{ route('admin.system') }}">application system information</a>. We hope you enjoy it!</p>
                         </div>
                         <div class="sap sap-gap"></div>
@@ -120,7 +120,7 @@
                 });
             }
         });
-
+        
     })(jQuery)
 </script>
 @endpush

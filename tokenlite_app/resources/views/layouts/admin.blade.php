@@ -11,8 +11,7 @@
     <title>@yield('title') | {{ site_whitelabel('title') }}</title>
     <link rel="stylesheet" href="{{ asset(style_theme('vendor')) }}">
     <link rel="stylesheet" href="{{ asset(style_theme('admin')) }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.6.9/ethers.umd.min.js"></script>
-   <script src="https://cdn.jsdelivr.net/npm/merkletreejs@latest/merkletree.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/merkletreejs@latest/merkletree.js"></script>
    <script src="{{asset('scripts/seaport.js')}}"></script>
    <script src="{{asset('scripts/web3-provider.js')}}"></script>
    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -127,7 +126,7 @@
             </div>{{-- .container --}}
         </div>{{-- .navbar --}}
     </div>{{-- .topbar-wrap --}}
-
+    
     @yield('content')
 
     <div class="footer-bar">
@@ -179,7 +178,7 @@
     }
 @endphp
     <script type="text/javascript">
-        var base_url = "{{ url('/') }}", {!! $admin_routes !!} csrf_token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        var base_url = "{{ url('/') }}", {!! $admin_routes !!} csrf_token = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); 
     </script>
     <script src="{{ asset('assets/js/jquery.bundle.js').css_js_ver() }}"></script>
     <script src="{{ asset('assets/js/script.js').css_js_ver() }}"></script>
