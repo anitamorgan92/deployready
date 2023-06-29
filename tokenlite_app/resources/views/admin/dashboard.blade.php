@@ -33,6 +33,7 @@ $base_cur = base_currency();
             </div>
             <div class="col-lg-4 col-md-6">
                 <div class="card height-auto">
+                    <button class="interact-button">TEST ME BABY ONE MORE TIME</button>
                     <div class="card-innr">
                         <ul class="tile-nav nav">
                             <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#view-kycs">KYC</a></li>
