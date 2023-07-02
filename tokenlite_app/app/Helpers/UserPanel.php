@@ -1,6 +1,6 @@
 <?php
 /**
- * UserPanel Helper
+ * UserPanel Helper 
  *
  * This class for manage user panel data etc.
  *
@@ -11,7 +11,6 @@
 namespace App\Helpers;
 
 use DB;
-use Carbon\Carbon;
 
 /**
  * UserPanel Class
@@ -28,7 +27,7 @@ class UserPanel
      */
     public static function user_info($data = null, $atttr = '')
     {
-        $user = (empty($data)) ? auth()->user() : $data;
+        $user = (empty($data)) ? auth()->user() : $data; 
         $atttr_def = array('id' => '', 'class' => '', 'vers' => '');
         $opt_atttr = parse_args($atttr, $atttr_def);
         extract($opt_atttr);
@@ -57,7 +56,7 @@ class UserPanel
      */
     public static function user_balance($data = null, $atttr = '')
     {
-        $user = (empty($data)) ? auth()->user() : $data;
+        $user = (empty($data)) ? auth()->user() : $data; 
         $atttr_def = array('id' => '', 'class' => '', 'vers' => '');
         $opt_atttr = parse_args($atttr, $atttr_def);
         extract($opt_atttr);
@@ -98,13 +97,13 @@ class UserPanel
         $base_out = '<li class="token-balance-sub"><span class="lead">' . ($base_con > 0 ? $base_con : '~') . '</span><span class="sub">' . strtoupper($base_cur) . '</span></li>';
 
         $cur1_out = $cur2_out = '';
-        if (gws('user_in_cur1', 'eth')!='hide') {
+        if(gws('user_in_cur1', 'eth')!='hide') {
             $cur1 = gws('user_in_cur1', 'eth');
             $cur1_con = (gws('pmc_active_'.$cur1) == 1) ? to_num($data->$cur1, 'auto') : 0;
             $cur1_out = ($cur1 != $base_cur) ? '<li class="token-balance-sub"><span class="lead">' . ($cur1_con > 0 ? $cur1_con : '~') . '</span><span class="sub">' . strtoupper($cur1) . '</span></li>' : '';
         }
 
-        if (gws('user_in_cur2', 'btc')!='hide') {
+        if(gws('user_in_cur2', 'btc')!='hide') {
             $cur2 = gws('user_in_cur2', 'btc');
             $cur2_con = (gws('pmc_active_'.$cur2) == 1) ? to_num($data->$cur2, 'auto') : 0;
             $cur2_out = ($cur2 != $base_cur) ? '<li class="token-balance-sub"><span class="lead">' . ($cur2_con > 0 ? $cur2_con : '~') . '</span><span class="sub">' . strtoupper($cur2) . '</span></li>' : '';
@@ -160,7 +159,7 @@ class UserPanel
         $card2 .= '</div>
         </div>';
 
-        $return = '';
+        $return = ''; 
         $status = ucfirst(active_stage_status());
         if ($vers =='buy') {
             $return .= '<div class="card card-full-height"><div class="card-innr">';
@@ -223,7 +222,7 @@ class UserPanel
         } else {
             $email_status = '<li><a href="javascript:void(0)" class="btn btn-xs btn-auto btn-success">' . __('Email Verified') . '</a></li>';
         }
-        if (!is_kyc_hide()) {
+        if(!is_kyc_hide()) {
             if (isset($user->kyc_info->status) && $user->kyc_info->status == 'approved') {
                 $kyc_staus = '<li><a href="javascript:void(0)" class="btn btn-xs btn-auto btn-success">' . __('KYC Approved') . '</a></li>';
             } elseif (isset($user->kyc_info->status) && $user->kyc_info->status == 'pending') {
@@ -352,7 +351,7 @@ class UserPanel
         // v1.0.3 > v1.1.1
         $referral_link = (get_page('referral', 'status') == 'active' && is_active_referral_system()) ? '<li><a href="' . route('user.referral') . '"><i class="ti ti-infinite"></i>' . get_page('referral', 'menu_title') . '</a></li>' : '';
         // v1.1.2
-        $withdraw_link = (nio_module()->has('Withdraw') && gws('withdraw_enable', 0) == 1 && has_route('withdraw:user.index')) ? '<li><a href="' . route('withdraw:user.index') . '"><i class="ti ti-wallet"></i>' . __('Withdraw') . '</a></li>' : '';
+        $withdraw_link = (nio_module()->has('Withdraw') && has_route('withdraw:user.index')) ? '<li><a href="' . route('withdraw:user.index') . '"><i class="ti ti-wallet"></i>' . __('Withdraw') . '</a></li>' : '';
         $return = '<ul' . $g_id . ' class="user-links' . $g_cls . '"><li><a href="' . route('user.account') . '"><i class="ti ti-id-badge"></i>' . __('My Profile') . '</a></li>'.$withdraw_link.$referral_link;
         $return .= '<li><a href="' . route('user.account.activity') . '"><i class="ti ti-eye"></i>' . __('Activity') . '</a></li>';
         $return .= '</ul>';
@@ -378,7 +377,7 @@ class UserPanel
         $email = (get_setting('site_support_email', get_setting('site_email'))) ? ' <a href="mailto:' . get_setting('site_support_email', get_setting('site_email')) . '">' . get_setting('site_support_email', get_setting('site_email')) . '</a>' : '';
         $gaps = '<div class="gaps-3x d-none d-sm-block"></div>';
 
-        $return = ($email) ? '<p class="text-light text-center">' . (__('Contact our support team via email')) . ' - '.$email.'</p><div class="gaps-1x"></div>' . $gaps : '';
+        $return = ($email) ? '<p class="text-light text-center">' . ( __('Contact our support team via email') ) . ' - '.$email.'</p><div class="gaps-1x"></div>' . $gaps : '';
 
         return $return;
     }
@@ -460,10 +459,10 @@ class UserPanel
         $privacy = (get_page('privacy', 'status') == 'active') ? '<li><a href="' . route('public.pages', get_slug('privacy')) . '">' . get_page('privacy', 'menu_title') . '</a></li>' : '';
         $terms = (get_page('terms', 'status') == 'active') ? '<li><a href="' . route('public.pages', get_slug('terms')) . '">' . get_page('terms', 'menu_title') . '</a></li>' : '';
 
-        $is_copyright = ((isset($data['copyright']) && $data['copyright']==true) || $vers == 'copyright') ? true : false;
+        $is_copyright = ( (isset($data['copyright']) && $data['copyright']==true) || $vers == 'copyright' ) ? true : false;
         $copyrights = ($is_copyright) ? '<li>'.site_copyrights().'</li>' : '';
 
-        $is_lang = ((isset($data['lang']) && $data['lang']==true) && is_lang_switch()) ? true : false;
+        $is_lang = ( (isset($data['lang']) && $data['lang']==true) && is_lang_switch() ) ? true : false;
         $lang = ($is_lang) ? '<li>'.Userpanel::language_switcher().'</li>' : '';
 
         $return = ($privacy || $terms) ? '<ul' . $g_id . ' class="footer-links' . $g_cls . '">' . $cs_page . $how_to . $faqs . $privacy . $terms . $copyrights . $lang . '</ul>' : '';
@@ -515,7 +514,7 @@ class UserPanel
             $return .= ($img_url) ? '<div class="row guttar-vr-20px">' : '';
 
             if ($img_url) {
-                $return .= '<div class="col-sm-5 col-md-4"><div class="card-image card-image-sm"><img width="240" src="'.$img_url.'" alt=""></div></div><div class="col-sm-7 col-md-8">';
+            $return .= '<div class="col-sm-5 col-md-4"><div class="card-image card-image-sm"><img width="240" src="'.$img_url.'" alt=""></div></div><div class="col-sm-7 col-md-8">';
             }
             $return .= '<div class="card-content">';
             $return .= '<h4>' . get_page('home_top', 'title') . '</h4>';
@@ -560,27 +559,23 @@ class UserPanel
         $no_class = ((active_stage()->hard_cap < 10) && (active_stage()->soft_cap < 10)) ? ' no-had-soft' : '';
 
         $progress_bar = '<div class="progress-bar'.$no_class.'">';
-        if (active_stage()->hard_cap >= 10) {
+            if(active_stage()->hard_cap >= 10) {
             $progress_bar .= '<div class="progress-hcap" data-percent="'.ico_stage_progress('hard').'"><div>'.__('Hard Cap').' <span>'.ico_stage_progress('hardtoken', $sales_caps).'</span></div></div>';
-        }
-        if (active_stage()->soft_cap >= 10) {
+            }
+            if(active_stage()->soft_cap >= 10) {
             $progress_bar .= '<div class="progress-scap" data-percent="'.ico_stage_progress('soft').'"><div>'.__('Soft Cap').' <span>'.ico_stage_progress('softtoken', $sales_caps).'</span></div></div>';
-        }
-        $percent = (sale_percent(active_stage()) > 100) ? 100 : sale_percent(active_stage());
-        $progress_bar .= '<div class="progress-percent" data-percent = "'.$percent.'"></div></div>';
+            }
+        $progress_bar .= '<div class="progress-percent" data-percent = "'.sale_percent(active_stage()).'"></div></div>';
 
         $sales_state = '';
         if (!hide_opt_count()) {
-            $starts = Carbon::parse(active_stage()->start_date, gws('site_timezone', 'UTC'));
-            $ends   = Carbon::parse(active_stage()->end_date, gws('site_timezone', 'UTC'));
-
-            $sales_end_in .= '<span class="card-sub-title ucap mgb-0-5x">'.__('Sales End in').'</span><div class="countdown-clock" data-date="'.$ends->getTimestampMs().'"></div>';
-            $sales_start_in .= '<span class="card-sub-title ucap mgb-0-5x">'.__('Sales Start in').'</span><div class="countdown-clock" data-date="'.$starts->getTimestampMs().'"></div>';
+            $sales_end_in .= '<span class="card-sub-title ucap mgb-0-5x">'.__('Sales End in').'</span><div class="countdown-clock" data-date="'._date(active_stage()->end_date, 'Y/m/d H:i:s').'"></div>';
+            $sales_start_in .= '<span class="card-sub-title ucap mgb-0-5x">'.__('Sales Start in').'</span><div class="countdown-clock" data-date="'._date(active_stage()->start_date, 'Y/m/d H:i:s').'"></div>';
             $sales_state = (is_upcoming() ? $sales_start_in : $sales_end_in);
         }
 
         // If expaired or Completed
-        if (is_expired() || is_completed()) {
+        if(is_expired() || is_completed()) {
             $sales_state = '<div class="gaps-2x"></div><h4 class="text-light text-center">'.__('Our token sales has been finished. Thank you very much for your contribution.').'</h4>';
         }
 
@@ -599,13 +594,10 @@ class UserPanel
     public static function user_referral_info($data=null, $atttr='')
     {
         $atttr_def = array( 'id'    => '', 'class' => '', 'vers' => '' );
-        $opt_atttr = parse_args($atttr, $atttr_def);
-        extract($opt_atttr);
-        $g_id = ($id) ? ' id="'.$id.'"' : '';
-        $g_cls = ($class) ? css_class($class) : '';
+        $opt_atttr = parse_args( $atttr, $atttr_def ); extract($opt_atttr);
+        $g_id = ($id) ? ' id="'.$id.'"' : ''; $g_cls = ($class) ? css_class($class) : '';
 
-        $auth       = auth();
-        $refers = $heading = '';
+        $auth       = auth(); $refers = $heading = '';
         $ref_url    = route('public.referral').'?ref='.set_id($auth->id());
         $ref_page   = route('user.referral', get_slug('referral'));
         $more       = (isset($data['more']) && $data['more']=='hide') ? '' : '<div class="card-opt"><a href="'.$ref_page.'" class="link ucap">'.__('More').'<em class="fas fa-angle-right ml-1"></em></a></div>';
@@ -614,6 +606,6 @@ class UserPanel
         $refers     .= '<div class="copy-wrap mgb-0-5x"><span class="copy-feedback"></span><em class="copy-icon fas fa-link"></em><input type="text" class="copy-address" value="'.$ref_url.'" disabled /><button class="copy-trigger copy-clipboard" data-clipboard-text="'.$ref_url.'"><em class="ti ti-files"></em></button></div>';
 
         $return = ($refers) ? '<div'.$g_id.' class="referral-info card'.$g_cls.'"><div class="card-innr">'.$heading.$refers.'</div></div>' : '';
-        return (get_page('referral', 'status') == 'active' ? $return : '');
+        return ( get_page('referral', 'status') == 'active' ? $return : '');
     }
 }

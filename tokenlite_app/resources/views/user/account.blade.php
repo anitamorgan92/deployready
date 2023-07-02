@@ -54,7 +54,7 @@
                             <div class="input-item input-with-label">
                                 <label for="date-of-birth" class="input-item-label">{{__('Date of Birth')}}</label>
                                 <div class="input-wrap">
-                                    <input class="input-bordered date-picker-dob" type="text" id="date-of-birth" name="dateOfBirth" required="required" placeholder="mm/dd/yyyy" value="{{ ($user->dateOfBirth != NULL ? _date2sz($user->dateOfBirth, 'm/d/Y') : '') }}">
+                                    <input class="input-bordered date-picker-dob" type="text" id="date-of-birth" name="dateOfBirth" required="required" placeholder="mm/dd/yyyy" value="{{ ($user->dateOfBirth != NULL ? _date($user->dateOfBirth, 'm/d/Y') : '') }}">
                                 </div>
                             </div>{{-- .input-item --}}
                         </div>{{-- .col --}}

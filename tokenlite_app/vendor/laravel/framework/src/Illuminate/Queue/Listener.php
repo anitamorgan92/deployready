@@ -3,8 +3,8 @@
 namespace Illuminate\Queue;
 
 use Closure;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 class Listener
 {
@@ -126,7 +126,7 @@ class Listener
     /**
      * Add the environment option to the given command.
      *
-     * @param  array  $command
+     * @param  string  $command
      * @param  \Illuminate\Queue\ListenerOptions  $options
      * @return array
      */
@@ -151,9 +151,8 @@ class Listener
             'queue:work',
             $connection,
             '--once',
-            "--name={$options->name}",
             "--queue={$queue}",
-            "--backoff={$options->backoff}",
+            "--delay={$options->delay}",
             "--memory={$options->memory}",
             "--sleep={$options->sleep}",
             "--tries={$options->maxTries}",
@@ -215,7 +214,7 @@ class Listener
      */
     public function stop()
     {
-        exit;
+        die;
     }
 
     /**

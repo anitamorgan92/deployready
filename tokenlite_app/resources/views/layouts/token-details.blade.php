@@ -35,7 +35,7 @@
 <ul class="data-details-list">
     <li>
         <div class="data-details-head">{{__('Types')}}</div>
-        <div class="data-details-des">{{ __(ucfirst($transaction->tnx_type)) }}</div>
+        <div class="data-details-des">{{ ucfirst($transaction->tnx_type) }}</div>
     </li>
     @if(!empty($transaction->ico_stage))
     <li>
@@ -56,7 +56,7 @@
         <div class="data-details-head">{{__('Bonus Token (B)')}}</div>
         <div class="data-details-des">
             <span>{{ to_num($transaction->total_bonus, 'zero', '', false) }} {{ token_symbol() }}</span>
-            <span>({{ to_num($transaction->bonus_on_token) }} + {{ to_num($transaction->bonus_on_base) }})</span>
+            <span>({{ $transaction->bonus_on_token }} + {{ $transaction->bonus_on_base }})</span>
         </div>
     </li>
     <li>
@@ -70,7 +70,7 @@
         <div class="data-details-head">{{__('Total Payment')}}</div>
         <div class="data-details-des">
             <span><strong>{{ to_num($transaction->receive_amount, 'max') }} {{ strtoupper($transaction->receive_currency) }}</strong></span>
-            <span><em class="fas fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="1 {{ token('symbol') }} = {{ to_num($transaction->base_currency_rate, 'max').' '.strtoupper($transaction->base_currency) }}"></em> {{ to_num($transaction->base_amount, 'auto') }} {{ strtoupper($transaction->base_currency) }}</span>
+            <span><em class="fas fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="1 {{ token('symbol') }} = {{ $transaction->base_currency_rate.' '.strtoupper($transaction->base_currency) }}"></em> {{ to_num($transaction->base_amount, 'auto') }} {{ strtoupper($transaction->base_currency) }}</span>
         </div>
     </li>
     @endif
@@ -78,14 +78,14 @@
     <li>
         <div class="data-details-head">{{__('Refunded Token')}}</div>
         <div class="data-details-des">
-            <span><strong class="text-danger">{{ '-'.to_num(abs($transaction->total_tokens), 'max') }} {{ token_symbol() }}</strong></span>
+            <span><strong class="text-danger">{{ round($transaction->total_tokens, min_decimal()) }} {{ token_symbol() }}</strong></span>
         </div>
     </li>
     <li>
         <div class="data-details-head">{{__('Refunded Amount')}}</div>
         <div class="data-details-des">
-            <span><strong class="text-danger">{{ '-'.to_num(abs($transaction->receive_amount), 'max') }} {{ strtoupper($transaction->receive_currency) }}</strong></span>
-            <span><em class="fas fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="1 {{ token('symbol') }} = {{ to_num($transaction->base_currency_rate, 'max').' '.strtoupper($transaction->base_currency) }}"></em> {{ to_num(abs($transaction->base_amount), 'max') }} {{ base_currency(true) }}</span>
+            <span><strong class="text-danger">{{ round($transaction->receive_amount, max_decimal()) }} {{ strtoupper($transaction->receive_currency) }}</strong></span>
+            <span><em class="fas fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="1 {{ token('symbol') }} = {{ $transaction->base_currency_rate.' '.strtoupper($transaction->base_currency) }}"></em> {{ to_num($transaction->base_amount, 'auto') }} {{ base_currency(true) }}</span>
         </div>
     </li>
     @endif
@@ -101,7 +101,7 @@
     <li>
         <div class="data-details-head">{{ ($transaction->tnx_type=='refund' || $transaction->tnx_type=='transfer') ? __('Notes') : __('Details') }}</div>
         <div class="data-details-des">
-            <span>{{ __($transaction->details) }}
+            <span>{{ $transaction->details }}
         </div>
     </li>
     @endif

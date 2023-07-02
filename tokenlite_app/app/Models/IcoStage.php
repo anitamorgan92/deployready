@@ -49,7 +49,7 @@ class IcoStage extends Model
     {
         return $this->hasMany(Transaction::class, 'stage', 'id')
                     ->where(['refund' => null])->whereNotIn('status', ['deleted', 'new'])->orderBy('id', 'DESC');
-        // ->select('id', 'status', 'tnx_id', 'tnx_type', 'user', 'stage', 'tokens', 'total_tokens', 'total_bonus', 'amount', 'currency', 'base_currency', 'base_amount', 'payment_method', 'tnx_time', 'added_by')
+                    // ->select('id', 'status', 'tnx_id', 'tnx_type', 'user', 'stage', 'tokens', 'total_tokens', 'total_bonus', 'amount', 'currency', 'base_currency', 'base_amount', 'payment_method', 'tnx_time', 'added_by')
     }
 
     /**
@@ -139,6 +139,7 @@ class IcoStage extends Model
             }
             return $meta;
         }
+
     }
 
     /**
@@ -230,13 +231,6 @@ class IcoStage extends Model
                 'dash' => Transaction::amount_count('dash', ['stage' => $ico->id]),
                 'waves' => Transaction::amount_count('waves', ['stage' => $ico->id]),
                 'xmr' => Transaction::amount_count('xmr', ['stage' => $ico->id]),
-                'busd' => Transaction::amount_count('busd', ['stage' => $ico->id]),
-                'ada' => Transaction::amount_count('ada', ['stage' => $ico->id]),
-                'doge' => Transaction::amount_count('doge', ['stage' => $ico->id]),
-                'sol' => Transaction::amount_count('sol', ['stage' => $ico->id]),
-                'uni' => Transaction::amount_count('uni', ['stage' => $ico->id]),
-                'link' => Transaction::amount_count('link', ['stage' => $ico->id]),
-                'cake' => Transaction::amount_count('cake', ['stage' => $ico->id]),
             ];
             array_push($data, $ico);
         }
@@ -282,7 +276,7 @@ class IcoStage extends Model
         $stages = (!empty($stg)) ? self::where('id', $stg)->whereNotIn('status', ['deleted'])->get() : self::whereNotIn('status', ['deleted'])->get();
         $data = [];
 
-        if ($stages) {
+        if($stages) {
             foreach ($stages as $stage) {
                 $tnxStage = $stage->tnx_any->where('status', 'approved')->whereNotIn('tnx_type', ['refund']);
                 $tnxPurchase = $stage->tnx_purchase->where('status', 'approved');
@@ -327,6 +321,7 @@ class IcoStage extends Model
      */
     public static function check_stage($stageId)
     {
+
         Carbon::setWeekStartsAt(Carbon::MONDAY);
         Carbon::setWeekEndsAt(Carbon::SUNDAY);
         $trnxs = Transaction::where(['stage' => $stageId, 'status' => 'approved'])->get();
@@ -359,22 +354,18 @@ class IcoStage extends Model
     {
         $stage = IcoStage::where('id', $trnx->stage)->first();
         $user = User::where('id', $trnx->user)->first();
-        if (!$stage) {
-            return false;
-        }
-        if (!$user) {
-            return false;
-        }
+        if (!$stage) { return false; }
+        if (!$user) { return false; }
         $tnx_tokens = (double) $trnx->total_tokens;
         $tnx_amount = (double) $trnx->base_amount;
 
         if ($stage_action == 'add' || $stage_action == 'sub') {
             if ($stage_action == 'add') {
-                $stage->sales_token = number_format(((double) $stage->sales_token + $tnx_tokens), min_decimal(), '.', '');
+                $stage->sales_token = number_format(((double) $stage->sales_token + $tnx_tokens), min_decimal(), '.', ''); 
                 $stage->sales_amount = number_format(((double) $stage->sales_amount + $tnx_amount), max_decimal(), '.', '');
             } else {
                 $stage->sales_token = number_format(((double) $stage->sales_token - $tnx_tokens), min_decimal(), '.', '');
-                $stage->sales_amount = number_format(((double) $stage->sales_amount - $tnx_amount), max_decimal(), '.', '');
+                $stage->sales_amount = number_format(((double) $stage->sales_amount - $tnx_amount), max_decimal(), '.', ''); 
             }
             $stage->save();
             return true;
@@ -382,8 +373,8 @@ class IcoStage extends Model
 
         if ($user_action == 'add' || $user_action == 'sub') {
             if ($user_action == 'add') {
-                $user->tokenBalance = number_format(((double) $user->tokenBalance + $tnx_tokens), min_decimal(), '.', '');
-                $user->contributed = number_format(((double) $user->contributed + $tnx_amount), max_decimal(), '.', '');
+                $user->tokenBalance = number_format(((double) $user->tokenBalance + $tnx_tokens), min_decimal(), '.', ''); 
+                $user->contributed = number_format(((double) $user->contributed + $tnx_amount), max_decimal(), '.', ''); 
             } else {
                 $user->tokenBalance = number_format(((double) $user->tokenBalance - $tnx_tokens), min_decimal(), '.', '');
                 $user->contributed = number_format(((double) $user->contributed - $tnx_amount), max_decimal(), '.', '');
@@ -427,7 +418,7 @@ class IcoStage extends Model
 
     /**
      *
-     * Transaction in Sumation
+     * Transaction in Sumation 
      *
      * @version 1.0
      * @since 1.1.2
@@ -436,7 +427,7 @@ class IcoStage extends Model
     public static function in_currency($all_tnx, $sum='amount')
     {
         $amounts = [];
-        if (!empty($all_tnx) && $all_tnx->count() > 0) {
+        if(!empty($all_tnx) && $all_tnx->count() > 0){
             $currencies = $all_tnx->unique('currency')->pluck('currency');
             foreach ($currencies as $cur) {
                 $amounts[$cur] = $all_tnx->where('currency', $cur)->sum($sum);

@@ -15,8 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'TokenLite'),
     'corename' => 'TokenLite',
-    'version' => '1.5.0',
-    'update' => '20220421',
+    'version' => '1.3.0',
+    'update' => '20210714',
     'author' => 'Softnio',
 
     /*
@@ -69,7 +69,7 @@ return [
     |
      */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'Asia/Dhaka'),
 
     /*
     |--------------------------------------------------------------------------
@@ -178,9 +178,9 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         // Custom Service Provider or Override Provider
-        App\Providers\MailConfigServiceProvider::class,
+        App\Providers\EMailServiceProvider::class,
         // Override the Translation System
-        // App\Providers\NioTranslationServiceProvider::class,
+        App\Providers\NioTranslationServiceProvider::class,
     ],
 
     /*
@@ -225,7 +225,6 @@ return [
         'Route' => Illuminate\Support\Facades\Route::class,
         'Schema' => Illuminate\Support\Facades\Schema::class,
         'Session' => Illuminate\Support\Facades\Session::class,
-        'Str' => Illuminate\Support\Str::class,
         'IcoHandler' => App\Helpers\IcoHandler::class,
         'Storage' => Illuminate\Support\Facades\Storage::class,
         'URL' => Illuminate\Support\Facades\URL::class,

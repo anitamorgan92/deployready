@@ -61,9 +61,9 @@ class ConfirmEmail extends Notification
         $regards = $et->regards != '' ? replace_shortcode($et->regards) : null;
 
         $et->message = replace_with($et->message, '[[user_name]]', "<strong>".$this->user->name."</strong>");
-        $message = ($et->message != '') ? str_replace("\n", "<br>", replace_shortcode($et->message)) : $et->message;
+        $message = ($et->message != '') ? str_replace("\n", "<br>",replace_shortcode($et->message)) : $et->message;
 
-        if ($this->user->meta->email_token == null) {
+        if ($this->user->meta->email_token == NULL) {
             $this->user->meta->email_token = str_random(65);
             $this->user->meta->email_expire = now()->addMinutes(75);
             $this->user->meta->save();

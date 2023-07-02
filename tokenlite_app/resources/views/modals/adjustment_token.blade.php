@@ -11,7 +11,7 @@
                     <input class="input-bordered" type="hidden" name="req_type" value="approved">
                     <div class="row">
                         <div class="col-12">
-                             <p>User requested to purchase <strong>{{ to_num_token($trnx->total_tokens).' '.token_symbol() }}</strong> Token and payment amount <strong>{{ to_num($trnx->amount, 'max').' '.strtoupper($trnx->currency) }}</strong>. Please update received amount accrodingly if you received less or more than payment amount.</p>
+                             <p>User requested to purchase <strong>{{$trnx->total_tokens.' '.token_symbol()}}</strong> Token and payment amount <strong>{{ to_num($trnx->amount, 'max').' '.strtoupper($trnx->currency) }}</strong>. Please update received amount accrodingly if you received less or more than payment amount.</p>
                              <div class="gaps-1-5x"></div>  
                          </div>
                          <div class="col-sm-6">

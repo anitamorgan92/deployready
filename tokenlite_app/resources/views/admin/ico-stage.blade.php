@@ -1,10 +1,3 @@
-@php
-    use Carbon\Carbon;
-
-    $timezone = get_setting('site_timezone', 'UTC');
-    $today_date = now()->timezone($timezone);
-@endphp
-
 @extends('layouts.admin')
 @section('title', 'ICO/STO Stage')
 
@@ -20,24 +13,20 @@
                 <div class="gaps-1-5x"></div>
                 <div class="row guttar-vr-30px">
                     @forelse($stages as $stage)
-                        @php
-                            $start_date = Carbon::parse($stage->start_date, $timezone);
-                            $end_date   = Carbon::parse($stage->end_date, $timezone);
-                        @endphp
                     <div class="col-xl-4 col-md-6">
                         <div class="stage-item stage-card {{(gws('actived_stage') == $stage->id)?'stage-item-actived':'' }}">
                             <div class="stage-head">
                                 <div class="stage-title">
                                     <h6>Stage Name 
-                                    @if($today_date->gte($start_date) && $today_date->lte($end_date) && gws('actived_stage') == $stage->id && $stage->status != 'paused')
+                                    @if((date('Y-m-d H:i:s') >= $stage->start_date) && (date('Y-m-d H:i:s') <= $stage->end_date) && (gws('actived_stage') == $stage->id) && ($stage->status != 'paused'))
                                     <span class="badge badge-success">Running</span>
-                                    @elseif($today_date->gte($start_date) && $today_date->lte($end_date) && $stage->status == 'paused')
+                                    @elseif((date('Y-m-d H:i:s') >= $stage->start_date && date('Y-m-d H:i:s') <= $stage->end_date) && ($stage->status == 'paused'))
                                     <span class="badge badge-purple">Paused</span>
-                                    @elseif($today_date->gte($start_date) && $today_date->lte($end_date) && $stage->status != 'paused')
+                                    @elseif((date('Y-m-d H:i:s') >= $stage->start_date && date('Y-m-d H:i:s') <= $stage->end_date) && ($stage->status != 'paused'))
                                     <span class="badge badge-secondary">Inactive</span>
-                                    @elseif($start_date->gt($today_date) && $today_date->lt($end_date))
+                                    @elseif($stage->start_date > date('Y-m-d H:i:s') && date('Y-m-d H:i:s') < $stage->end_date)
                                     <span class="badge badge-warning">Upcoming</span>
-                                    @elseif($start_date->gt($today_date) && $today_date->lt($end_date))
+                                    @elseif(($stage->start_date > date('Y-m-d H:i:s')) && (date('Y-m-d H:i:s') < $stage->end_date))
                                     <span class="badge badge-info">Completed</span>
                                     @else
                                     <span class="badge badge-danger">Expired</span>
@@ -81,7 +70,7 @@
                             </div>
                             <div class="stage-info stage-info-status">
                                 <div class="stage-info-graph">
-                                    @if(!($start_date->gt($today_date) && $today_date->lt($end_date)))
+                                    @if(!($stage->start_date > date('Y-m-d H:i:s') && date('Y-m-d H:i:s') < $stage->end_date))
                                     <div class="progress-pie progress-circle">
                                         <input class="knob d-none" data-thickness=".125" data-width="100%" data-fgColor="#2b56f5" data-bgColor="#c8d2e5" value="{{ to_percent($stage->soldout, $stage->total_tokens) }}">
                                         <div class="progress-txt"><span class="progress-amount">{{ to_percent($stage->soldout, $stage->total_tokens) }}</span>% <span class="progress-status">Sold</span></div>
@@ -94,7 +83,7 @@
                                 </div>
                                 <div class="stage-info-txt">
                                     <h6>Token Issued</h6>
-                                    <span class="stage-info-total h4">{{ to_num_token($stage->total_tokens, 0) }}</span>
+                                    <span class="stage-info-total h2">{{ to_num_token($stage->total_tokens, 0) }}</span>
                                     <div class="stage-info-count">Sold <span>{{ to_num_token($stage->soldout, 0) }}</span> Tokens</div>
                                 </div>
                             </div>
@@ -103,7 +92,7 @@
                                     <div class="col-6">
                                         <div class="stage-info-txt">
                                             <h6>Base Price</h6>
-                                            <div class="h2 stage-info-number">{{ to_num($stage->base_price, 'max') }}<small>{{ base_currency(true) }}</small></div>
+                                            <div class="h2 stage-info-number">{{$stage->base_price}}<small>{{ base_currency(true) }}</small></div>
                                         </div>
                                     </div>
                                     <div class="col-6">
@@ -118,11 +107,11 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <h6>Start Date</h6>
-                                        <h5>{{ _date2sz($stage->start_date, gws('site_date_format')) }} <br><small>{{ _date2sz($stage->start_date, gws('site_time_format')) }}</small></h5>
+                                        <h5>{{ _date($stage->start_date, gws('site_date_format')) }} <small>{{ _date($stage->start_date, gws('site_time_format')) }}</small></h5>
                                     </div>
                                     <div class="col-6">
                                         <h6>End Date</h6>
-                                        <h5>{{ _date2sz($stage->end_date, gws('site_date_format')) }} <br><small>{{ _date2sz($stage->end_date, gws('site_time_format')) }}</small></h5>
+                                        <h5>{{ _date($stage->end_date, gws('site_date_format')) }} <small>{{ _date($stage->end_date, gws('site_time_format')) }}</small></h5>
                                     </div>
                                 </div>
                             </div>

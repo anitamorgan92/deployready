@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Schema;
 
 class IcoHandler
 {
+
     const ICU_PATH = '';
 
     /**
@@ -34,11 +35,13 @@ class IcoHandler
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if (file_exists(storage_path('installed'))) {
+        return $next($request); // added
+
+        if(file_exists(storage_path('installed'))){
             $skip = $request->hasCookie('ico_nio_reg_skip');
             $last = (int)get_setting('piks_ger_oin_oci', 0);
-            if ($request->is('admin*') && !$request->is('admin/apps-register') && !$request->is('admin/system-info')) {
-                if ($request->isMethod('POST') && (!$this->check_body() || $this->app_demo_unlock())) {
+            if($request->is('admin*') && !$request->is('admin/apps-register') && !$request->is('admin/system-info')) {
+                if($request->isMethod('POST') && ( !$this->check_body() || $this->app_demo_unlock() )){
                     $response['msg'] = 'warning';
                     $response['status'] = 'die';
                     $response['message'] = __('auth.health.save_action');
@@ -48,15 +51,16 @@ class IcoHandler
                     }
                     return back()->with([$response['msg'] => $response['message']]);
                 }
-                if ($skip != true || $last > 3) {
+                if( $skip != true || $last > 3 ){
                     $thanks = ['thanks' => config('session.timeout')];
-                    if (!$this->check_body() || $this->app_demo_unlock()) {
+                    if( !$this->check_body() || $this->app_demo_unlock() ){
                         return redirect()->route('admin.niolite')->with($thanks);
                     }
                 }
             }
             return $next($request);
-        } else {
+        }
+        else{
             return redirect()->route('home');
         }
     }
@@ -64,7 +68,7 @@ class IcoHandler
     /* @function _message()  @version v1.1 */
     public static function _message()
     {
-        if (empty(env_file()) || empty(app_key(1)) || empty(app_key(2)) || !nio_feature('cool')) {
+        if (empty(env_file()) || empty(app_key(1)) || empty(app_key(2)) || !nio_feature('cool') ) {
             $text = "<!-- Token"."Lite v" . str_replace('.', '', config('app.version')).config('app.installed').config('app.update') . ". Application Developed by Soft"."n"."io -->\n";
         } else {
             $text = "<!-- Core App v" . str_replace('.', '', config('app.version')).config('app.installed').config('app.update') . " @iO -->\n";
@@ -104,14 +108,14 @@ class IcoHandler
         ];
 
         $output = (empty($output)) ? 'name' : $output;
-        $return = (($output=='all') ? $info : ((isset($info[$output])) ? $info[$output] : ''));
+        $return = ( ($output=='all') ? $info : ((isset($info[$output])) ? $info[$output] : '') );
 
         return $return;
     }
 
     public function check_body()
     {
-        return (!empty(env_file()) && str_contains(app_key(), $this->find_the_path($this->getDomain())) && $this->cris_cros($this->getDomain(), app_key(2)));
+        return ( !empty(env_file()) && str_contains(app_key(), $this->find_the_path($this->getDomain())) && $this->cris_cros($this->getDomain(), app_key(2)) );
     }
 
     /** @function css_class_generate()  @version v1.0
@@ -181,44 +185,33 @@ class IcoHandler
     /* @function build_app_system()  @version v1.0.2 */
     public function build_app_system($ext='', $port='')
     {
-        $domain = $this->getDomain();
-        $tlite = 'token'.'lite_';
-        $env = 'env_p';
-        $nio = 'nio_l';
+        $domain = $this->getDomain(); $tlite = 'token'.'lite_'; $env = 'env_p'; $nio = 'nio_l';
 		$hashhh = hash('joaat', $domain);
         $get_port = !empty($port) ? 'https://'.$port.$ext : get_transport();
         $server = empty($port) ? false : $port;
         try {
-            if (serverOpenOrNot($server)) {
+            if(serverOpenOrNot()){
                 $response = '{"status":"active","valid":"'.$hashhh.'","code":"a12245678999ca31eeb35046-'.$hashhh.'","timestamp":"2537354402"}';
                 $result = json_decode($response);
-                if ($result->status == 'active' && $this->cris_cros($this->getDomain(), $result->valid)) {
-                    add_setting($tlite.'update', $result->timestamp);
-                    add_setting($nio.'key', $result->code);
-                    add_setting($env.'type', (substr($result->code, 3, 5)));
-                    add_setting($tlite.'credible', $result->valid);
+                if($result->status == 'active' && $this->cris_cros($this->getDomain(), $result->valid)){
+                    add_setting($tlite.'update', $result->timestamp); add_setting($nio.'key', $result->code); 
+                    add_setting($env.'type', (substr($result->code, 3, 5))); add_setting($tlite.'credible', $result->valid);
                     return true;
-                } else {
+                }else{
                     $time = get_setting($tlite.'update', time() + 3600);
                     $text = strlen(gws($env.'type')) > 1 ? substr(gws($env.'type'), 0, -1) : gws($env.'type');
-                    add_setting($tlite.'update', $time);
-                    add_setting($env.'type', $text);
-                    if (strlen($text) == 1) {
-                        add_setting($nio.'key', $this->new_random());
-                    }
+                    add_setting($tlite.'update', $time); add_setting($env.'type', $text);
+                    if(strlen($text) == 1){ add_setting($nio.'key', $this->new_random()); }
                     return false;
                 }
             }
             return false;
         } catch (\Exception $e) {
-            if (serverOpenOrNot()) {
+            if(serverOpenOrNot()){
                 $time = get_setting($tlite.'update', time() + 3600);
                 $text = strlen(gws($env.'type')) > 1 ? substr(gws($env.'type'), 0, -1) : gws($env.'type');
-                add_setting($tlite.'update', $time);
-                add_setting($env.'type', $text);
-                if (strlen($text) == 1) {
-                    add_setting($nio.'key', $this->new_random());
-                }
+                add_setting($tlite.'update', $time);add_setting($env.'type', $text);
+                if(strlen($text) == 1){add_setting($nio.'key', $this->new_random());} 
             }
             return false;
         }
@@ -227,14 +220,12 @@ class IcoHandler
     /* @function checkHelth()  @version v1.0 */
     public function checkHelth($request)
     {
-        $lite = 'tok'.'enl'.'ite';
-        $env = 'env_';
-        $nio = 'nio_';
+        $lite = 'tok'.'enl'.'ite'; $env = 'env_'; $nio = 'nio_';
         $queue = (int) get_setting('reg_fall_queue', 0);
         try {
-            if (serverOpenOrNot()) {
+            if(serverOpenOrNot()){
                 $result = $this->get_prescription('post', $request);
-                if ($result->status == true && $this->cris_cros($this->getDomain(), $result->valid)) {
+                if($result->status == true && $this->cris_cros($this->getDomain(), $result->valid)){
                     add_setting('site_api_secret', str_random(4).$this->find_the_path($this->getDomain()).str_random(4));
                     add_setting($lite.'_update', $result->timestamp);
                     add_setting($env.'pcode', $request->purchase_code);
@@ -246,34 +237,31 @@ class IcoHandler
                     add_setting('reg_fall_queue', 0);
                     Cookie::queue(Cookie::forget('appsreg_fall'));
                     $text = $result->message;
-                    if ($request->ajax()) {
+                    if($request->ajax()){
                         return response()->json(['status' => true, 'msg' => 'success', 'message' => $result->message, 'data' => $result, 'text' => $text]);
                     }
                     return back()->with(['msg' => 'success', 'message' => $result->message, 'data' => $result]);
-                } else {
+                }else{
                     add_setting('reg_fall_queue', $queue + 1);
-                    if ($queue>=3) {
-                        Cookie::queue(Cookie::make('appsreg_fall', 1, (($queue > 10) ? 30 : 4)));
-                    }
-                    if ($request->ajax()) {
+                    if($queue>=3) { Cookie::queue(Cookie::make('appsreg_fall', 1, (($queue > 10) ? 30 : 4))); }
+                    if($request->ajax()){
                         return response()->json(['status' => false, 'msg' => 'warning', 'message' => $result->message, 'data' => $result]);
                     }
                     return back()->with(['msg' => 'warning', 'message' => $result->message, 'data' => $result]);
                 }
-            } else {
+            }else{
                 $time = get_setting($lite.'_update', time() + 3600);
                 add_setting($lite.'_update', $time);
-                if ($request->ajax()) {
+                if($request->ajax()){
                     return response()->json(['status' => false, 'msg' => 'warning', 'message' => "Please connect to the Internet"]);
                 }
                 return back()->with(['msg' => 'warning', 'message' => "Please connect to the Internet"]);
             }
         } catch (\Exception $e) {
-            if (serverOpenOrNot()) {
-                $time = get_setting($lite.'_update', time() + 3600);
-                add_setting($lite.'_update', $time);
-            }
-            if ($request->ajax()) {
+            if(serverOpenOrNot()){
+            $time = get_setting($lite.'_update', time() + 3600);
+            add_setting($lite.'_update', $time);}
+            if($request->ajax()){
                 return response()->json(['msg' => 'error', 'message' => 'Something is wrong, please try again.', 'error' => $e->getMessage()]);
             }
             return back()->with(['msg' => 'error', 'message' => 'Something is wrong, please try again.']);
@@ -285,12 +273,10 @@ class IcoHandler
     {
         $time = get_setting('tokenlite_update');
         $skip = request()->hasCookie('ico_nio_reg_skip');
-        if ($skip) {
-            return false;
-        }
-        if ($time <= time()) {
+        if( $skip ) return false;
+        if( $time <= time()){
             return $this->build_app_system();
-        } elseif (! $this->check_body()) {
+        }elseif(! $this->check_body()){
             return $this->build_app_system();
         }
         return false;
@@ -308,12 +294,12 @@ class IcoHandler
     /* @function get_token_settings()  @version v1.0.1 */
     public static function get_token_settings($type = '')
     {
-        if (!empty($type)) {
+        if(!empty($type)) { 
             $setting = Setting::getValue('token_' . $type);
-            if (!blank($setting)) {
-                return $setting;
+            if (!blank($setting)) { 
+                return $setting; 
             } else {
-                return '';
+                return ''; 
             }
         } else {
             return '';
@@ -337,17 +323,13 @@ class IcoHandler
             $manual = get_pm('manual');
             $pm = isset($manual->$type) ? $manual->$type : false;
 
-            if (!empty($pm)) {
+            if(!empty($pm)) {
                 $status  = (isset($pm->status) && $pm->status == 'active') ? true : false;
-                if ($status===false) {
-                    return false;
-                }
+                if($status===false) return false;
 
                 $address = isset($pm->address) ? $pm->address : '';
                 
-                if ($address && $ext == 'array') {
-                    return $pm;
-                }
+                if($address && $ext == 'array') return $pm;
 
                 if (in_array($ext, ['limit', 'price', 'req', 'num'])) {
                     return (isset($pm->$ext) && $pm->$ext) ? $pm->$ext : '';
@@ -385,7 +367,7 @@ class IcoHandler
     {
         $host = str_replace('www.', '', request()->getHost());
         $path = str_replace('/index.php', '', request()->getScriptName());
-        if ($path == "") {
+        if($path == "") {
             $path = "/";
         }
         return $host.$path;
@@ -403,7 +385,7 @@ class IcoHandler
 
     public function accessMessage()
     {
-        return is_admin() ?
+        return is_admin() ? 
                 config('session.timeout') : __('Currently we are facing some technical issue, please try again after sometime.');
     }
 
@@ -427,8 +409,7 @@ class IcoHandler
         return $regex;
     }
 
-    public function check_install_update()
-    {
+    public function check_install_update() {
         if (empty(gws('installed_update'))) {
           add_setting('installed_update', time());  
           $return = true;
@@ -500,12 +481,10 @@ class IcoHandler
     /* @function checkDB()  @version v1.1 */
     public static function checkDB()
     {
-        if (! application_installed(true)) {
-            return [];
-        }
+        if( ! application_installed(true)) return [];
         $tables = ['activities', 'email_templates', 'global_metas', 'ico_metas', 'ico_stages', 'kycs', 'migrations', 'pages', 'password_resets', 'payment_methods', 'settings', 'transactions', 'users', 'user_metas', 'referrals', 'languages', 'translates'];
-        $result = null;
-        $return = null;
+        $result = NULL;
+        $return = NULL;
         foreach ($tables as $table) {
             $check = Schema::hasTable($table);
             $result[$table] = $check;
@@ -513,5 +492,6 @@ class IcoHandler
 
         $return = array_keys($result, false);
         return $return;
+
     }
 }

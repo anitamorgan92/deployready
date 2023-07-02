@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-
 /**
  * Email Settings Controller
  *
@@ -9,12 +8,10 @@ namespace App\Http\Controllers\Admin;
  * @author Softnio
  * @version 1.0.0
  */
-use Mail;
 use Validator;
 use App\Models\User;
 use App\Models\Setting;
 use App\Models\EmailTemplate;
-use App\Mail\SendTestEmail;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -178,48 +175,5 @@ class EmailSettingController extends Controller
         ];
 
         return $data;
-    }
-
-    public function sendTestEmail(Request $request)
-    {
-        $ret['msg'] = 'info';
-        $ret['message'] = __('messages.nothing');
-
-        $validator = Validator::make($request->all(), [
-            'send_to' => 'nullable|email'
-        ], [
-            'send_to.email' => __("Enter valid email.")
-        ]);
-
-        if ($validator->fails()) {
-            $msg = '';
-            if ($validator->errors()->has('send_to')) {
-                $msg = $validator->errors()->first();
-            } else {
-                $msg = __('messages.nothing');
-            }
-
-            $ret['msg'] = 'warning';
-            $ret['message'] = $msg;
-        } else {
-            try {
-                $user = auth()->user();
-                $sendTo = $request->input('send_to') ?? $user->email;
-                $slug = 'welcome-email';
-    
-                Mail::to($sendTo)->send(new SendTestEmail($user, $slug));
-                $ret['msg'] = 'success';
-                $ret['message'] = __('messages.mail.send');
-            } catch (\Exception $e) {
-                $ret['errors'] = $e->getMessage();
-                $ret['msg'] = 'warning';
-                $ret['message'] = __('messages.mail.failed');
-            }
-        }
-
-        if ($request->ajax()) {
-            return response()->json($ret);
-        }
-        return back()->with([$ret['msg'] => $ret['message']]);
     }
 }

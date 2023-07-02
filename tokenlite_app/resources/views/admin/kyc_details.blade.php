@@ -65,7 +65,7 @@ $space = "&nbsp;";
                     <div class="fake-class">
                         <span class="badge badge-md badge-{{ __status($kyc->status,'status')}} ucap">{{ __status($kyc->status,'text') }}</span>
                     </div>
-                    @if($kyc->notes != NULL)
+                    @if($kyc->notes !== NULL)
                     <div class="gaps-2x w-100 d-none d-md-block"></div>
                     <div class="w-100">
                         <span class="data-details-title">Admin Note</span>
@@ -94,7 +94,7 @@ $space = "&nbsp;";
                     </li>{{-- li --}}
                     <li>
                         <div class="data-details-head">Date of Birth</div>
-                        <div class="data-details-des">{!! ($kyc->dob) ? _date2sz($kyc->dob, get_setting('site_date_format')) : $space !!}</div>
+                        <div class="data-details-des">{!! ($kyc->dob) ? _date($kyc->dob, get_setting('site_date_format')) : $space !!}</div>
                     </li>{{-- li --}}
                     <li>
                         <div class="data-details-head">Full Address</div>

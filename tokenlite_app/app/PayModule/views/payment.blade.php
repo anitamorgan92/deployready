@@ -1,10 +1,9 @@
-@php
+@php 
 $pm_check = (!empty($methods) ? true : false);
 $dot_1 =  '.'; $dot_2 = '';
 if ($data->total_bonus > 0) {
     $dot_1 =  ''; $dot_2 = '.';
 }
-$activeMethods = data_get(get_defined_vars(), "activeMethods", []);
 @endphp
 <a href="#" class="modal-close" data-dismiss="modal"><em class="ti ti-close"></em></a>
 <div class="popup-body">
@@ -14,8 +13,8 @@ $activeMethods = data_get(get_defined_vars(), "activeMethods", []);
             <input type="hidden" name="pp_token" id="token_amount" value="{{ $data->token }}">
             <input type="hidden" name="pp_currency" id="pay_currency" value="{{ $data->currency }}">
             <h4 class="popup-title">{{ __('Payment Process')}}</h4>
-            <p class="lead">{!! ($data->total_bonus > 0) ? __('Please make payment of :amount to receive :token_amount token including bonus :token_bonus token.', ['amount' => '<strong>'.to_num($data->amount, 'max').' <span class="pay-currency ucap">'.$data->currency.'</span></strong>', 'token_amount'=> '<strong><span class="token-total">'.to_num_token($data->total_tokens).' '.token('symbol').'</span></strong>', 'token_bonus'=> '<strong><span class="token-bonuses">'.to_num_token($data->total_bonus).' '.token('symbol').'</span></strong>']) : __('Please make payment of :amount to receive :token_amount token.', ['amount' => '<strong>'.to_num($data->amount, 'max').' <span class="pay-currency ucap">'.$data->currency.'</span></strong>', 'token_amount'=> '<strong><span class="token-total">'.to_num_token($data->total_tokens).' '.token('symbol').'</span></strong>']) !!}
-            </p>
+            <p class="lead">{!! ($data->total_bonus > 0) ? __('Please make payment of :amount to receive :token_amount token including bonus :token_bonus token.', ['amount' => '<strong>'.to_num($data->amount, 'max').' <span class="pay-currency ucap">'.$data->currency.'</span></strong>', 'token_amount'=> '<strong><span class="token-total">'.$data->total_tokens.' '.token('symbol').'</span></strong>', 'token_bonus'=> '<strong><span class="token-bonuses">'.$data->total_bonus.' '.token('symbol').'</span></strong>']) : __('Please make payment of :amount to receive :token_amount token.', ['amount' => '<strong>'.to_num($data->amount, 'max').' <span class="pay-currency ucap">'.$data->currency.'</span></strong>', 'token_amount'=> '<strong><span class="token-total">'.$data->total_tokens.' '.token('symbol').'</span></strong>']) !!}
+            </p> 
             @if($pm_check)
                 <p>{{__('You can choose any of following payment method to make your payment. The token balance will appear in your account after successful payment.')}}</p>
                 <h5 class="mgt-1-5x font-mid">{{__('Select payment method:')}}</h5>
@@ -44,13 +43,10 @@ $activeMethods = data_get(get_defined_vars(), "activeMethods", []);
                 <div class="alert alert-danger text-center">{{ __('Sorry! There is no payment method available for this currency. Please choose another currency or contact our support team.') }}</div>
                 <div class="gaps-5x"></div>
             @endif
-
+            
         </form>
     </div>
 </div>
-@if(in_array("Stripe", $activeMethods))
-<script src="https://js.stripe.com/v3/"></script>
-@endif
 <script type="text/javascript">
     (function($) {
         var $_p_form = $('form#online_payment');

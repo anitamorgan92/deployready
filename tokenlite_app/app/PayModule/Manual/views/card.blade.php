@@ -1,15 +1,3 @@
-@php
-    $connected = true;
-    $text = '';
-    foreach ($currencies as $key => $currency) {
-        if (isset($pmData->secret->$currency->address)) {
-            $connected = false;
-        }
-        $text .= ($pmData->secret->$currency->status == 'active') ? ' '.strtoupper($currency).',' : '';
-    }
-    $active_cur = substr($text, 0, -1);
-    $active = (strlen($active_cur) > 19) ? substr($active_cur, 0, 18).'...' : $active_cur;
-@endphp
 <div class="payment-card">
     <div class="payment-head">
         <div class="payment-logo">
@@ -28,7 +16,7 @@
     <div class="payment-body">
         <h5 class="payment-title">Manual Wallet Payment</h5>
         <p class="payment-text">Accept manual payment (ETH, BTC, LTC, etc) from contributors.</p>
-        @if($connected)
+        @if($pmData->secret->eth->address == null && $pmData->secret->btc->address == null && $pmData->secret->ltc->address == null)
         <div class="payment-status payment-status-connect">
             <a class="payment-status-icon" href="{{ route('admin.payments.setup.edit', $name) }}" ><em class="ti ti-plus"></em></a>
             <div class="payment-status-text">Connect your account</div>
@@ -46,11 +34,11 @@
         @endif
     </div>
     <div class="payment-footer">
-        @if($connected)
+        @if($pmData->secret->eth->address == null && $pmData->secret->btc->address == null && $pmData->secret->ltc->address == null)
         <span class="payment-not-conected">You have not connected yet.</span>
         @else
         <span class="payment-id-title">Active Currency</span>
-        <span class="payment-id">{{ $active }}</span>
+        <span class="payment-id">{{ substr(($pmData->secret->eth->status == 'active' ? ' ETH,' : '').($pmData->secret->btc->status == 'active' ? ' BTC,' : '').($pmData->secret->ltc->status == 'active' ? ' LTC,' : ''), 0, -1 ) }} </span>
         @endif
     </div>
 </div>

@@ -15,7 +15,7 @@ return [
     |
     */
     'core' => [
-        'minPhpVersion' => '7.3.0'
+        'minPhpVersion' => '7.2.0'
     ],
     'final' => [
         'key' => true,
@@ -69,16 +69,16 @@ return [
                 'environment_custom'    => 'required_if:environment,other|max:50',
                 'app_debug'             => [
                     'required',
-                    'in:true,false',
+                    Rule::in(['true', 'false']),
                 ],
                 'app_log_level'         => 'required|string|max:50',
                 'app_url'               => 'required|url',
                 'database_connection'   => 'required|string|max:50',
-                'database_hostname'     => 'required|string|max:190',
+                'database_hostname'     => 'required|string|max:50',
                 'database_port'         => 'required|numeric',
-                'database_name'         => 'required|string|max:190',
-                'database_username'     => 'required|string|max:190',
-                'database_password'     => 'nullable|string|max:190',
+                'database_name'         => 'required|string|max:50',
+                'database_username'     => 'required|string|max:50',
+                'database_password'     => 'required|string|max:50',
                 'broadcast_driver'      => 'required|string|max:50',
                 'cache_driver'          => 'required|string|max:50',
                 'session_driver'        => 'required|string|max:50',

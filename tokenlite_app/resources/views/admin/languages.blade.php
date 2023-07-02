@@ -49,13 +49,9 @@
                                         </td>                                        
                                         <td class="data-col">
                                             <span class="sub">
-                                                @if (!empty(gws('lang_last_generate_'.$lang->code)))
-                                                    {{ gmdate('M d, Y h:iA', gws('lang_last_generate_'.$lang->code)) }}
-                                                    @if(gws('lang_last_generate_'.$lang->code) <= gws('lang_last_update_'.$lang->code))
-                                                    <em class="fas fa-info-circle fs-11 text-warning" data-toggle="tooltip" data-placement="right" title="Seems translation has been updated, Please generate your language again."></em>
-                                                    @endif
-                                                @else
-                                                    <span>{{ __("Not yet") }}</span>
+                                                {{ gmdate('M d, Y h:iA', gws('lang_last_generate_'.$lang->code)) }}
+                                                @if(gws('lang_last_generate_'.$lang->code) <= gws('lang_last_update_'.$lang->code))
+                                                 <em class="fas fa-info-circle fs-11 text-warning" data-toggle="tooltip" data-placement="right" title="Seems translation has been updated, Please generate your language again."></em>
                                                 @endif
                                             </span>
                                         </td>

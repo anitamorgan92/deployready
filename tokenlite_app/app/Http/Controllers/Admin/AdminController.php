@@ -1,6 +1,5 @@
 <?php
 namespace App\Http\Controllers\Admin;
-
 /**
  * Admin Controller
  *
@@ -38,14 +37,14 @@ class AdminController extends Controller
         $users = User::dashboard($get_user);
         $trnxs = \App\Models\Transaction::dashboard($get_tnx);
 
-        if (isset($request->user)) {
+        if(isset($request->user)){
             $data = $users;
-        } elseif (isset($request->chart)) {
+        }elseif(isset($request->chart)){
             $data = $trnxs;
-        } else {
+        }else{
             $data = null;
         }
-        if ($request->ajax()) {
+        if($request->ajax()){
             return response()->json((empty($data) ? [] : $data));
         }
 
@@ -151,6 +150,7 @@ class AdminController extends Controller
             }
         }
         if ($type == 'security') {
+
             $save_activity = $mail_pwd = 'FALSE';
             $unusual = $notify_admin = 0;
 
@@ -220,13 +220,13 @@ class AdminController extends Controller
                         $userMeta->email_expire = $cd->copy()->addMinutes(60);
                         $userMeta->email_token = str_random(65);
                         if ($userMeta->save()) {
-                            try {
+                           try {
                                 $user->notify(new PasswordChange($user, $userMeta));
                                 $ret['msg'] = 'success';
                                 $ret['message'] = __('messages.password.changed');
                             } catch (\Exception $e) {
                                 $ret['msg'] = 'warning';
-                                $ret['message'] = __('messages.email.password_change', ['email' => get_setting('site_email')]);
+                                $ret['message'] = __('messages.email.password_change',['email' => get_setting('site_email')]);
                             }
                         } else {
                             $ret['msg'] = 'error';
@@ -240,31 +240,31 @@ class AdminController extends Controller
             }
         }
 
-        if ($type == 'google2fa_setup') {
+        if($type == 'google2fa_setup'){
             $google2fa = $request->input('google2fa', 0);
             $user = User::FindOrFail(Auth::id());
-            if ($user) {
+            if($user){
                 // Google 2FA
                 $ret['link'] = route('user.account');
-                if (!empty($request->google2fa_code)) {
+                if(!empty($request->google2fa_code)){
                     $g2fa = new Google2FA();
-                    if ($google2fa == 1) {
+                    if($google2fa == 1){
                         $verify = $g2fa->verifyKey($request->google2fa_secret, $request->google2fa_code);
-                    } else {
+                    }else{
                         $verify = $g2fa->verify($request->google2fa_code, $user->google2fa_secret);
                     }
 
-                    if ($verify) {
+                    if($verify){
                         $user->google2fa = $google2fa;
                         $user->google2fa_secret = ($google2fa == 1 ? $request->google2fa_secret : null);
                         $user->save();
                         $ret['msg'] = 'success';
                         $ret['message'] = __('Successfully '.($google2fa == 1 ? 'enable' : 'disable').' 2FA security in your account.');
-                    } else {
+                    }else{
                         $ret['msg'] = 'error';
                         $ret['message'] = __('You provided a invalid 2FA authentication code!');
                     }
-                } else {
+                }else{
                     $ret['msg'] = 'warning';
                     $ret['message'] = __('Please enter a valid authentication code!');
                 }
@@ -293,7 +293,7 @@ class AdminController extends Controller
     public function treatment(Request $request)
     {
         $handle = (new IcoHandler());
-        if ($request->isMethod('POST')) {
+        if($request->isMethod('POST')){
             $validator = Validator::make($request->all(), [
                 'name' => 'required',
                 'email' => 'required|email',
@@ -315,25 +315,24 @@ class AdminController extends Controller
             }
             return $handle->checkHelth($request);
         }
-        if (is_demo_user() || is_demo_preview()) {
+        if(is_demo_user() || is_demo_preview()) {
             $error['warning'] = (is_demo_preview()) ? __('messages.demo_preview') : __('messages.demo_user');
             return redirect()->route('admin.system')->with($error);
         }
-        if ($request->skip && $request->skip=='reg') {
-            Cookie::queue(Cookie::make('ico_nio_reg_skip', 1, 1440));
+        if($request->skip && $request->skip=='reg'){
+            Cookie::queue(Cookie::make('ico_nio_reg_skip', 1, 1440)); 
             $last = (int)get_setting('piks_ger_oin_oci', 0);
             add_setting('piks_ger_oin_oci', $last + 1);
             return redirect()->route('admin.home');
         }
-        if ($request->revoke && $request->revoke=='license') {
+        if($request->revoke && $request->revoke=='license'){
             delete_setting(['env_pcode','nio_lkey','nio_email','env_uname', 'env_ptype']);
-            add_setting('tokenlite_update', time());
-            add_setting('tokenlite_credible', str_random(48));
+            add_setting('tokenlite_update', time()); add_setting('tokenlite_credible', str_random(48)); 
             add_setting('site_api_secret', str_random(16));
             Cookie::queue(Cookie::forget('ico_nio_reg_skip'));
             return redirect()->route('admin.home');
         }
-        if ($handle->check_body() && str_contains(app_key(), $handle->find_the_path($handle->getDomain()))) {
+        if($handle->check_body() && str_contains(app_key(), $handle->find_the_path($handle->getDomain()))){
             return redirect()->route('admin.home');
         }
         return view('auth.chamber');

@@ -13,9 +13,9 @@ use App\Http\Controllers\Controller;
 
 class ManualController extends Controller
 {
-    public function update_transaction(Request $request)
-    {
-        $response['msg'] = 'info';
+	public function update_transaction(Request $request)
+	{
+		$response['msg'] = 'info';
         $response['message'] = __('messages.nothing');
         if ($request->input('action') == 'confirm') {
             $validator = Validator::make($request->all(), [
@@ -47,24 +47,14 @@ class ManualController extends Controller
         } else {
             $action = $request->input('action');
             $address = $request->input('payment_address');
-            $tnxns = Transaction::where('id', $request->input('trnx_id'))->where('user', auth()->user()->id)->first();
-
-            if (empty($tnxns)) {
-                $response['msg'] = 'error';
-                $response['message'] = __("messages.trnx.notfound");
-                if ($request->ajax()) {
-                    return response()->json($response);
-                }
-                return back()->with([$response['msg'] => $response['message']]);
-            }
-
+            $tnxns = Transaction::where('id', $request->input('trnx_id'))->first();
             $_old_status = $tnxns->status;
             $is_valid = IcoHandler::validate_address($address, $tnxns->currency);
             $need = (manual_payment(strtolower($tnxns->currency), 'req') == 'yes' ? true : false);
-            if ($need && empty($address) && $is_valid == false) {
+            if( $need && empty($address) && $is_valid == false ){
                 $response['msg'] = 'error';
                 $response['message'] = __('messages.invalid.address');
-            } else {
+            }else{
                 if ($_old_status == 'canceled' || $_old_status == 'deleted') {
                     $response['msg'] = 'warning';
                     $response['message'] = __("Your transaction is already " . $_old_status . ". Sorry, we're unable to proceed the transaction.");
@@ -77,15 +67,7 @@ class ManualController extends Controller
                     if ($action == 'confirm' && $is_valid == true && $address != null) {
                         $tnxns->payment_id = $address;
                         $tnxns->wallet_address = $address;
-
-                        if (empty($tnxns->extra)) {
-                            $tnxns->extra = json_encode(['address' => $address]);
-                        } else {
-                            $extra = json_decode($tnxns->extra, true);
-                            $data = array_merge($extra, ['address' => $address]);
-                            $tnxns->extra = json_encode($data);
-                        }
-
+                        $tnxns->extra = json_encode(['address' => $address]);
                         $tnxns->status = 'onhold';
                         $tnxns->save();
                         if ($tnxns) {
@@ -93,7 +75,8 @@ class ManualController extends Controller
                             $response['message'] = __('messages.trnx.reviewing');
                             $response['modal'] = view('modals.payment-review', compact('tnxns'))->render();
                         }
-                    } else {
+                    } 
+                    else {
                         $response['msg'] = 'warning';
                         $response['message'] = __('messages.invalid.address');
                     }
@@ -123,18 +106,15 @@ class ManualController extends Controller
             return response()->json($response);
         }
         return back()->with([$response['msg'] => $response['message']]);
-    }
+	}
 
-    public function email_notify(Request $request)
-    {
+    public function email_notify(Request $request) {
         $tnx_id = isset($request->tnx) ? $request->tnx : false;
         $mail_type = isset($request->notify) ? $request->notify : false;
 
-        if ($tnx_id && $mail_type) {
-            $tnx = Transaction::where('id', $tnx_id)->where('user', auth()->user()->id)->first();
-            if (empty($tnx)) {
-                return false;
-            }
+        if($tnx_id && $mail_type) {
+            $tnx = Transaction::where('id', $tnx_id)->first();
+            if(empty($tnx)) return false;
             return ModuleHelper::enotify($tnx, $mail_type, $request);
         }
         return false;

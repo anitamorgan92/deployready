@@ -38,7 +38,7 @@
                                     <label class="input-item-label cap">Currency Exchange</label>
                                     <select class="select select-block select-bordered" id="exchange_method" name="exchange_method">
                                         <option {{ get_setting('pm_exchange_method') == 'manual' ? 'selected' : '' }} value="manual">Manual / Own price</option>
-                                        <option {{ get_setting('pm_exchange_method') == 'automatic' ? 'selected' : '' }} value="automatic">Automatic (via ExRatesAPI)</option>
+                                        <option {{ get_setting('pm_exchange_method') == 'automatic' ? 'selected' : '' }} value="automatic">Automatic via CryptoCompare</option>
                                     </select>
                                     <span class="input-note">Set how exchange rate calculate</span>
                                 </div>
@@ -58,7 +58,7 @@
                                 $current_value = (strtolower(get_setting('site_base_currency')) == $g) ? 1 : get_setting('pmc_rate_'.$g);
                                 @endphp
                                 @if(get_setting('pmc_active_'.$g) == 1)
-                                <div class="col-md-3 col-6 pdb-1x">
+                                <div class="col-md-3 col-6 pdb-2x">
                                     <div class="relative">
                                         <input class="input-bordered currency-rate currency-{{ $g }}" type="text" name="pmc_rate_{{ $g }}" value="{{ $current_value }}" required{{ $current }}>
                                         <span class="input-hint">{{ strtoupper($g) }}</span>
@@ -71,14 +71,11 @@
                         <div class="input-item input-with-label {{ get_setting('pm_exchange_method') == 'automatic' ? 'd-block' : 'd-none' }}" id="automatic_rate">
                             <label class="input-item-label cap pdb-0-5x">Automatic Exchange Rate (read only)</label>
                             <div class="row">
-                                @php 
-                                $exrates = json_decode(get_setting('pmc_fx_exrates'), true);
-                                @endphp
                                 @foreach($gateway as $g=>$v)
                                 @if(get_setting('pmc_active_'.$g) == 1)
-                                <div class="col-md-3 col-6 pdb-1x">
+                                <div class="col-md-3 col-6 pdb-2x">
                                     <div class="relative">
-                                        <input class="input-bordered" value="{{ (data_get($exrates, 'currencies.'.strtoupper($g))) ? to_num(data_get($exrates, 'currencies.'.strtoupper($g))) : 1 }}" readonly="readonly">
+                                        <input class="input-bordered" value="{{ get_setting('pmc_auto_rate_'.$g) }}" readonly="readonly">
                                         <span class="input-hint">{{ strtoupper($g) }}</span>
                                     </div>
                                 </div>
@@ -88,20 +85,16 @@
                                     <div class="input-wrap">
                                     <label for="rate_time" class="input-item-label cap">Select automatic update rate time</label>
                                     <select name="automatic_rate_time" id="rate_time" class="select select-bordered select-block">
-                                        <option {{ get_setting('pm_automatic_rate_time') == 20 ? 'selected' : '' }} value="20">20 minute</option>
+                                        <option {{ get_setting('pm_automatic_rate_time') == 15 ? 'selected' : '' }} value="15">15 minute</option>
                                         <option {{ get_setting('pm_automatic_rate_time') == 30 ? 'selected' : '' }} value="30">30 minute</option>
                                         <option {{ get_setting('pm_automatic_rate_time') == 45 ? 'selected' : '' }} value="45">45 minute</option>
                                         <option {{ get_setting('pm_automatic_rate_time') == 60 ? 'selected' : '' }} value="60">1 hour</option>
                                         <option {{ get_setting('pm_automatic_rate_time') == 120 ? 'selected' : '' }} value="120">2 hour</option>
                                     </select>
                                     </div>
-                                    <div class="d-flex justify-content-between">
-                                        <span class="input-note">Last check : <strong>{{ _date(get_setting('pm_exchange_auto_lastcheck')) }}</strong></span>
-                                        @if(!empty(get_setting('exratesapi_error_msg')))
-                                        <span class="input-note text-danger">{{ get_setting('exratesapi_error_msg') }}</span>
-                                        @endif
-                                    </div>
+                                    <span class="input-note">Last check : {{ _date(get_setting('pm_exchange_auto_lastcheck')) }}</strong>
                                 </div>
+
                             </div>
                         </div>
                     </div>

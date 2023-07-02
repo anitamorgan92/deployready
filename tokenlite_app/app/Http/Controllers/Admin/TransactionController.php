@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-
 /**
  * Transactions Controller
  *
@@ -40,26 +39,26 @@ class TransactionController extends Controller
         $order_by = gmvl('tnx_order_by', 'id');
         $ordered  = gmvl('tnx_ordered', 'DESC');
 
-        if ($status=='referral' || $status=='bonus') {
+        if($status=='referral' || $status=='bonus') {
             $trnxs = Transaction::whereNotIn('status', ['deleted', 'new'])->where('tnx_type', $status)->orderBy($order_by, $ordered)->paginate($per_page);
-        } elseif ($status=='bonuses') {
+        } elseif($status=='bonuses') {
             $trnxs = Transaction::whereNotIn('status', ['deleted', 'new'])->whereNotIn('tnx_type', ['withdraw'])->whereIn('tnx_type', ['referral', 'bonus'])->orderBy($order_by, $ordered)->paginate($per_page);
-        } elseif ($status=='approved') {
+        } elseif($status=='approved') {
             $trnxs = Transaction::whereNotIn('status', ['deleted', 'new'])->whereNotIn('tnx_type', ['withdraw', 'bonus', 'referral'])->where('status', $status)->orderBy($order_by, $ordered)->paginate($per_page);
-        } elseif ($status=='pending') {
+        }  elseif($status=='pending') {
             $trnxs = Transaction::whereNotIn('status', ['deleted', 'new'])->whereNotIn('tnx_type', ['withdraw'])->whereIn('status', [$status, 'onhold'])->orderBy($order_by, $ordered)->paginate($per_page);
-        } elseif ($status!=null) {
+        } elseif($status!=null) {
             $trnxs = Transaction::whereNotIn('status', ['deleted', 'new'])->whereNotIn('tnx_type', ['withdraw'])->where('status', $status)->orderBy($order_by, $ordered)->paginate($per_page);
         } else {
             $trnxs = Transaction::whereNotIn('status', ['deleted', 'new'])->whereNotIn('tnx_type', ['withdraw'])->orderBy($order_by, $ordered)->paginate($per_page);
         }
 
         // Advance search v1.1.0
-        if ($request->s) {
+        if($request->s){
             $trnxs  = Transaction::AdvancedFilter($request)
                                 ->orderBy($order_by, $ordered)->paginate($per_page);
         }
-        if ($request->filter) {
+        if($request->filter){
             $trnxs = Transaction::AdvancedFilter($request)
                                 ->orderBy($order_by, $ordered)->paginate($per_page);
         }
@@ -115,34 +114,34 @@ class TransactionController extends Controller
         $trnx = Transaction::findOrFail($id);
         if ($trnx) {
             $status = $trnx->status;
-            if ($status == 'approved') {
+            if($status == 'approved') {                
                 $ret['msg'] = 'info';
                 $ret['message'] = __('messages.trnx.admin.already_approved');
             } else {
-                if ($status == 'canceled' && in_array($type, ['approved', 'deleted'])) {
-                    if ($type == 'deleted') {
+                if( $status == 'canceled' && in_array($type, ['approved', 'deleted']) ) {
+                    if($type == 'deleted') {
                         $ret = $this->deleted_tnx($trnx);
-                    } elseif ($type == 'approved') {
+                    } elseif($type == 'approved') {
                         $ret = $this->approved_tnx($trnx, $request);
                     }
-                } elseif (in_array($status, ['onhold', 'pending']) && in_array($type, ['approved', 'canceled'])) {
-                    if ($type == 'approved') {
+                }elseif(in_array($status, ['onhold', 'pending']) && in_array($type, ['approved', 'canceled']) ){
+                    if( $type == 'approved' ){
                         $ret = $this->approved_tnx($trnx, $request);
-                    } elseif ($type == 'canceled') {
+                    }elseif($type == 'canceled'){
                         $ret = $this->canceled_tnx($trnx, $request);
                     }
                 }
             }
         }
 
-        if ($type == 'refund' && $trnx) {
+        if($type == 'refund' && $trnx){
             $refund = $this->refund($trnx, $request->input('message'));
-            if ($refund) {
+            if($refund){
                 $ret['refund'] = $refund;
                 $ret['msg'] = 'success';
                 $ret['reload'] = true;
                 $ret['message'] = __('Refund Successful!');
-            } else {
+            }else{
                 $ret['msg'] = 'warning';
                 $ret['message'] = __('Already Refunded!');
             }
@@ -166,13 +165,13 @@ class TransactionController extends Controller
         $ret['msg'] = 'warning';
         $ret['message'] = __('Unable to cancel the transaction, reload the page.');
         if ($trnx) {
-            if ($trnx->status == 'canceled' || $trnx->status == 'approved') {
+            if($trnx->status == 'canceled' || $trnx->status == 'approved') {
                 $ret['msg'] = 'info';
                 $ret['message'] = ($trnx->status == 'approved') ? __('messages.trnx.admin.already_approved') : __('messages.trnx.admin.already_canceled');
-                return $ret;
+                 return $ret;
             }
 
-            if (in_array($trnx->status, ['onhold', 'pending'])) {
+            if(in_array($trnx->status, ['onhold', 'pending'])){
                 $trnx->status = 'canceled';
                 $trnx->checked_by = json_encode(['name' => Auth::user()->name, 'id' => Auth::id()]);
                 $trnx->checked_time = date('Y-m-d H:i:s');
@@ -204,7 +203,7 @@ class TransactionController extends Controller
         $ret['msg'] = 'warning';
         $ret['message'] = __('Unable to approve the transaction, reload the page.');
 
-        if ($trnx->status == 'deleted' || $trnx->status == 'approved') {
+        if($trnx->status == 'deleted' || $trnx->status == 'approved') {
             $ret['msg'] = 'info';
             $ret['message'] = __('messages.trnx.admin.already_updated', ['status' => $trnx->status]);
             return $ret;
@@ -213,56 +212,48 @@ class TransactionController extends Controller
         if ($trnx) {
             $msg = __('messages.form.wrong');
             $validator = Validator::make($request->all(), [ 'amount' => 'gt:0' ]);
-            if ($validator->fails() && gateway_type($trnx->payment_method, 'short') != 'online') {
+            if ($validator->fails()) {
                 if ($validator->errors()->has('amount')) {
                     $msg = $validator->errors()->first();
                 }
                 $ret['msg'] = 'warning';
                 $ret['message'] = $msg;
             } else {
-                if (gateway_type($trnx->payment_method, 'short') != 'online') {
-                    $chk_adjust = $request->input('chk_adjust');
-                    $receive_amount = round($request->input('amount'), max_decimal());
-                    $adjust_token = round($request->input('adjusted_token'), min_decimal());
-                    $token = round($request->input('token'), min_decimal());
-                    $base_bonus = round($request->input('base_bonus'), min_decimal());
-                    $token_bonus = round($request->input('token_bonus'), min_decimal());
-                }
+                $chk_adjust = $request->input('chk_adjust');
+                $receive_amount = round($request->input('amount'), max_decimal());
+                $adjust_token = round($request->input('adjusted_token'), min_decimal());
+                $token = round($request->input('token'), min_decimal());
+                $base_bonus = round($request->input('base_bonus'), min_decimal());
+                $token_bonus = round($request->input('token_bonus'), min_decimal());
                 
-                if (in_array($trnx->status, ['onhold', 'pending', 'canceled'])) {
+                if(in_array($trnx->status, ['onhold', 'pending', 'canceled'])){
                     $old_status = $trnx->status;
 
-                    if (gateway_type($trnx->payment_method, 'short') != 'online') {
-                        if ($chk_adjust == 1) {
-                            $old_tokens = $trnx->total_tokens;
-                            $old_base_amount = $trnx->base_amount;
-                            $trnx->tokens = $token;
-                            $trnx->base_amount = $token * $trnx->base_currency_rate;
-                            $trnx->total_bonus = $base_bonus + $token_bonus;
-                            $trnx->bonus_on_base = $base_bonus;
-                            $trnx->bonus_on_token = $token_bonus;
-                            $trnx->total_tokens = $adjust_token;
-                            $trnx->amount = $receive_amount;
-    
-                            if ($old_status != 'canceled') {
-                                $adjust_stage_token = $old_tokens - $trnx->total_tokens;
-                                $adjust_base_amount = $old_base_amount - $trnx->base_amount;
-    
-                                if ($adjust_stage_token < 0) {
-                                    IcoStage::token_adjust_to_stage($trnx, abs($adjust_stage_token), abs($adjust_base_amount), 'add');
-                                } elseif ($adjust_stage_token > 0) {
-                                    IcoStage::token_adjust_to_stage($trnx, abs($adjust_stage_token), abs($adjust_base_amount), 'sub');
-                                }
+                    if ($chk_adjust == 1) {
+                        $old_tokens = $trnx->total_tokens;
+                        $old_base_amount = $trnx->base_amount;
+                        $trnx->tokens = $token;
+                        $trnx->base_amount = $token * $trnx->base_currency_rate;
+                        $trnx->total_bonus = $base_bonus + $token_bonus;
+                        $trnx->bonus_on_base = $base_bonus;
+                        $trnx->bonus_on_token = $token_bonus;
+                        $trnx->total_tokens = $adjust_token;
+                        $trnx->amount = $receive_amount;
+
+                        if ($old_status != 'canceled') {
+                            $adjust_stage_token = $old_tokens - $trnx->total_tokens;
+                            $adjust_base_amount = $old_base_amount - $trnx->base_amount;
+
+                            if ($adjust_stage_token < 0) {
+                                IcoStage::token_adjust_to_stage($trnx, abs($adjust_stage_token), abs($adjust_base_amount), 'add');
+                            } elseif ($adjust_stage_token > 0) {
+                                IcoStage::token_adjust_to_stage($trnx, abs($adjust_stage_token), abs($adjust_base_amount), 'sub');
                             }
                         }
                     }
 
                     $trnx->receive_currency = $trnx->currency;
-                    if (gateway_type($trnx->payment_method, 'short') != 'online') {
-                        $trnx->receive_amount = $receive_amount;
-                    } else {
-                        $trnx->receive_amount = $trnx->amount;
-                    }
+                    $trnx->receive_amount = $receive_amount;
                     $trnx->status = 'approved';
                     $trnx->checked_by = json_encode(['name' => Auth::user()->name, 'id' => Auth::id()]);
                     $trnx->checked_time = date('Y-m-d H:i:s');
@@ -270,7 +261,7 @@ class TransactionController extends Controller
 
                     IcoStage::token_add_to_account($trnx, null, 'add'); // user
 
-                    if ($trnx->status == 'approved' && is_active_referral_system()) {
+                    if($trnx->status == 'approved' && is_active_referral_system()){
                         $referral = new ReferralHelper($trnx);
                         $referral->addToken('refer_to');
                         $referral->addToken('refer_by');
@@ -307,12 +298,12 @@ class TransactionController extends Controller
         $ret['message'] = __('Unable to delete the transaction, reload the page.');
 
         if ($trnx) {
-            if ($trnx->status == 'deleted' || $trnx->status == 'approved') {
+            if($trnx->status == 'deleted' || $trnx->status == 'approved') {
                 $ret['msg'] = 'info';
                 $ret['message'] = ($trnx->status == 'approved') ? __('messages.trnx.admin.already_approved') : __('messages.trnx.admin.already_deleted');
                 return $ret;
             }
-            if ($trnx->status == 'canceled') {
+            if($trnx->status == 'canceled') {
                 $trnx->status = 'deleted';
                 $trnx->checked_by = json_encode(['name' => Auth::user()->name, 'id' => Auth::id()]);
                 $trnx->checked_time = date('Y-m-d H:i:s');
@@ -335,7 +326,7 @@ class TransactionController extends Controller
      */
     protected function refund(Transaction $transaction, $message = '')
     {
-        if (empty($transaction->refund)) {
+        if(empty($transaction->refund)){
             $refund = new Transaction();
             $refund->fill($transaction->only([
                 'tnx_id', 'tnx_type', 'tnx_time', 'tokens', 'bonus_on_base', 'bonus_on_token', 'total_bonus', 'total_tokens', 'stage', 'user', 'amount', 'receive_amount', 'receive_currency', 'base_amount', 'base_currency', 'base_currency_rate', 'currency', 'currency_rate', 'all_currency_rate', 'wallet_address', 'payment_method', 'payment_id', 'payment_to', 'checked_by', 'added_by', 'checked_time', 'status', 'dist'
@@ -359,7 +350,7 @@ class TransactionController extends Controller
             $transaction->save();
             $this->refund_email($refund, $transaction);
             return $refund;
-        } else {
+        }else{
             return false;
         }
     }
@@ -415,7 +406,6 @@ class TransactionController extends Controller
             $ret['message'] = $msg;
         } else {
             $tc = new TC();
-            $timezone = get_setting('site_timezone', 'UTC');
             $token = $request->input('total_tokens');
             $bonus_calc = isset($request->bonus_calc) ? true : false;
             $tnx_type = $request->input('type');
@@ -425,10 +415,10 @@ class TransactionController extends Controller
             $base_currency_rate = Setting::exchange_rate($tc->get_current_price(), $base_currency);
             $all_currency_rate = json_encode(Setting::exchange_rate($tc->get_current_price(), 'except'));
             $added_time = Carbon::now()->toDateTimeString();
-            $tnx_date   = Carbon::parse($request->tnx_date.' '.now()->timezone($timezone)->format('H:i'), $timezone);
+            $tnx_date   = $request->tnx_date.' '.date('H:i');
 
             // v1.2
-            if ($tnx_type=='purchase' && $bonus_calc==true) {
+            if($tnx_type=='purchase' && $bonus_calc==true) {
                 $trnx_data = [
                     'token' => round($token, min_decimal()),
                     'bonus_on_base' => $tc->calc_token($token, 'bonus-base'),
@@ -449,12 +439,11 @@ class TransactionController extends Controller
                     'amount' => round($tc->calc_token($token, 'price')->$currency, max_decimal()),
                 ];
             }
-
             $save_data = [
                 'created_at' => $added_time,
                 'tnx_id' => set_id(rand(100, 999), 'trnx'),
                 'tnx_type' => $tnx_type,
-                'tnx_time' => ($request->tnx_date) ? _cdate($tnx_date)->timezone('UTC')->toDateTimeString() : $added_time,
+                'tnx_time' => ($request->tnx_date) ? _cdate($tnx_date)->toDateTimeString() : $added_time,
                 'tokens' => $trnx_data['token'],
                 'bonus_on_base' => $trnx_data['bonus_on_base'],
                 'bonus_on_token' => $trnx_data['bonus_on_token'],
@@ -553,31 +542,4 @@ class TransactionController extends Controller
         return back()->with([$ret['msg'] => $ret['message']]);
     }
 
-    public function checkStatus(Request $request)
-    {
-        $tnx = $request->get('tid');
-        $transaction = Transaction::where('id', $tnx)->first();
-        if (blank($transaction) || ($transaction->status == 'approved')) {
-            $ret['msg'] = 'info';
-            $ret['message'] = __('The transaction already updated or cancelled. Please reload the page and check again.');
-            return back()->with([$ret['msg'] => $ret['message']]);
-        }
-
-        $verify = false;
-        if (!blank($transaction) && gateway_type($transaction->payment_method, 'short') == 'online' && $transaction->tnx_type == 'purchase') {
-            $pm_method = ucfirst($transaction->payment_method);
-            try {
-                $verify = call_user_func('App\PayModule\\'.$pm_method.'\\'.$pm_method.'Module::verify', $transaction);
-                if ($verify) {
-                    $this->approved_tnx($transaction, $request);
-                }
-            } catch (\Exception $e) {
-                info($e->getMessage());
-                $verify = false;
-            }
-        }
-        $ret['msg'] = $verify ? 'success' : 'info';
-        $ret['message'] = $verify ? __('Transaction status updated successfully.') : __('Payment has not approved yet for this transaction. You may cancel this transaction.');
-        return back()->with([$ret['msg'] => $ret['message']]);
-    }
 }

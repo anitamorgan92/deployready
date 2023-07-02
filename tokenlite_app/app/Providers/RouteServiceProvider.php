@@ -100,13 +100,13 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapNioModuleRoutes()
     {
         foreach (nio_module()->loadModule() as $module) {
-            if (is_dir(app_path('NioModules/'.$module)) && file_exists(app_path('NioModules/'.$module.'/routes.php'))) {
-                Route::name('module::'.strtolower($module).'.')
-                     // ->prefix('admin')
-                     ->middleware('web')
-                     ->namespace('App\NioModules\\'.$module)
-                     ->group(app_path('NioModules/'.$module.'/routes.php'));
-            }
+			if( is_dir(app_path('NioModules/'.$module)) && file_exists(app_path('NioModules/'.$module.'/routes.php')) ){
+				Route::name('module::'.strtolower($module).'.')
+					 // ->prefix('admin')
+					 ->middleware('web')
+					 ->namespace('App\NioModules\\'.$module)
+					 ->group(app_path('NioModules/'.$module.'/routes.php'));
+			}
         }
     }
 }

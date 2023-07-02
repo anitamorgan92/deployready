@@ -14,10 +14,9 @@ use App\Helpers\IcoHandler;
 use App\Models\EmailTemplate;
 use App\Models\PaymentMethod;
 use App\Helpers\TokenCalculate;
-use App\Helpers\AddressValidation;
 use App\Notifications\TnxStatus;
-use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
+use App\Helpers\AddressValidation;
 use Illuminate\Support\Facades\Notification;
 
 /**
@@ -35,8 +34,8 @@ use Illuminate\Support\Facades\Notification;
 if (!function_exists('application_installed')) {
     function application_installed($full_check = false)
     {
-        if (file_exists(storage_path('installed'))) {
-            if ($full_check === true) {
+        if(file_exists(storage_path('installed'))){
+            if($full_check === true){
                 try {
                     \DB::connection()->getPdo();
                     return  true;
@@ -56,7 +55,7 @@ if (!function_exists('get_site')) {
     {
         $host = str_replace('www.', '', request()->getHost());
         $path = str_replace('/index.php', '', request()->getScriptName());
-        if ($path == "") {
+        if($path == "") {
             $path = "/";
         }
         return $host.$path;
@@ -139,7 +138,7 @@ if (!function_exists('site_info')) {
         ];
 
         $output = (empty($output)) ? 'name' : $output;
-        $return = (($output=='all') ? $infos : ((isset($infos[$output])) ? $infos[$output] : ''));
+        $return = ( ($output=='all') ? $infos : ((isset($infos[$output])) ? $infos[$output] : '') );
 
         return $return;
     }
@@ -239,7 +238,7 @@ if (!function_exists('site_whitelabel')) {
         $whitelabel = ($nio_cool=='cool' && env_file(3, 2)) ? $whitelabel_none : $whitelabel_exten;
 
         $return = (isset($whitelabel[$type]) && $whitelabel[$type]) ? $whitelabel[$type] : '';
-
+        
         return $return;
     }
 }
@@ -298,32 +297,6 @@ if (!function_exists('show_str')) {
     }
 }
 
-if (!function_exists('compact_str')) {
-    /**
-     * @param $str
-     * @param $sep
-     * @param $length
-     * @return mixed|string
-     * @version 1.0.0
-     * @since 1.0
-     */
-    function compact_str($str, $sep = '...', $length = 4, $end = 0)
-    {
-        $length = ($length) ? $length : 1;
-        $len = strlen($str);
-        $max = floor($len / 2);
-        $min = (1 + ($length * 2) + ($end * 2));
-
-        if ($len <= 5) {
-            return $str;
-        }
-        $sub = ($len >= $min) ? $length : (((min($length, $max) * 2) <= $len) ? min($min, $max) : min($length, $max));
-        $sub = ($length < $sub) ? $length : $sub;
-        $sub_end = ($sub > $end) ? $sub : $end;
-        return substr($str, 0, $sub) . $sep . substr($str, -$sub_end);
-    }
-}
-
 /* @function has_wallet()  @version v1.0  @since 1.0 */
 if (!function_exists('has_wallet')) {
     function has_wallet($get = false)
@@ -339,14 +312,14 @@ if (!function_exists('token_wallet')) {
         $user = auth()->user();
         $wallets = array();
         $wallet = field_value_text('token_wallet_opt', 'wallet_opt');
-        if ($wallet) {
-            foreach ($wallet as $wal) {
-                $wallets[$wal] = ucfirst($wal);
+        if($wallet) {
+            foreach ($wallet as $wal) { 
+                $wallets[$wal] = ucfirst($wal); 
             }
         }
 
         $custom = field_value_text('token_wallet_custom');
-        if ($custom['cw_name'] != '' && $custom['cw_text'] != '') {
+        if($custom['cw_name'] != '' && $custom['cw_text'] != ''){
             $wallets[$custom['cw_name']] = $custom['cw_text'];
         }
 
@@ -374,9 +347,10 @@ if (!function_exists('app_info')) {
 if (!function_exists('app_key')) {
     function app_key($t='lkey', $true=false)
     {
+        return true;
         $return = ($t=='w'||$t=='2'||$t=='credible') ? gws('tokenlite_credible') : gws('nio_lkey');
 
-        if ($true==true||$true==1) {
+        if($true==true||$true==1) {
             return (empty($return)) ? false : true;
         }
         return $return;
@@ -386,21 +360,21 @@ if (!function_exists('app_key')) {
 /* @function env_file()  @version v1.0  @since 1.1.0 */
 if (!function_exists('env_file')) {
     function env_file($et='code', $comp=null)
-    {
+    {   
         $pcode = gws('env_pcode');
         $uname = gws('env_uname');
         $ptype = gws('env_ptype');
 
         $return = $pcode;
-        if ($et=='n'||$et=='2'||$et=='name') {
+        if($et=='n'||$et=='2'||$et=='name') {
             $return = $uname;
-        } elseif ($et=='t'||$et=='3'||$et=='type') {
+        } elseif($et=='t'||$et=='3'||$et=='type') {
             $return = (!empty($ptype) ? substr($ptype, 0, 1) : false);
-        } elseif ($et=='ptype') {
+        } elseif($et=='ptype') {
             $return = (!empty($ptype) ? $ptype : false);
         }
 
-        if (!empty($comp)) {
+        if(!empty($comp)) {
             return ($comp==$return) ? true : false;
         }
         return $return;
@@ -522,13 +496,6 @@ if (!function_exists('is_method_valid')) {
             'DASH' => (token('purchase_dash')) ? 1 : 0,
             'WAVES' => (token('purchase_waves')) ? 1 : 0,
             'XMR' => (token('purchase_xmr')) ? 1 : 0,
-            'BUSD' => (token('purchase_busd')) ? 1 : 0,
-            'ADA' => (token('purchase_ada')) ? 1 : 0,
-            'DOGE' => (token('purchase_doge')) ? 1 : 0,
-            'SOL' => (token('purchase_sol')) ? 1 : 0,
-            'UNI' => (token('purchase_uni')) ? 1 : 0,
-            'LINK' => (token('purchase_link')) ? 1 : 0,
-            'CAKE' => (token('purchase_cake')) ? 1 : 0,
         ];
         if ($act_method[$def_method] === 1) {
             $is_fallback = true;
@@ -622,7 +589,7 @@ if (!function_exists('token_calc')) {
 if (!function_exists('_format')) {
     function _format($attr = [])
     {
-        $number = isset($attr['number']) ? (float) $attr['number'] : 0;
+        $number = isset($attr['number']) ? $attr['number'] : 0;
         $point = isset($attr['point']) ? $attr['point'] : '.';
         $thousand = isset($attr['thousand']) ? $attr['thousand'] : '';
         $decimal = isset($attr['decimal']) ? $attr['decimal'] : 'max';
@@ -631,16 +598,10 @@ if (!function_exists('_format')) {
         $zero_lead = isset($attr['zero_lead']) ? $attr['zero_lead'] : false;
         $site_decimal = max_decimal();
 
-        if (in_array($decimal, ['max', 'min', 'auto', 'zero'])) {
-            if ($decimal=='min') {
-                $site_decimal = min_decimal();
-            }
-            if ($decimal=='auto') {
-                $site_decimal = decimal_show();
-            }
-            if ($decimal=='zero') {
-                $site_decimal = 0;
-            }
+        if ( in_array($decimal, ['max', 'min', 'auto', 'zero']) ) {
+            if($decimal=='min') $site_decimal = min_decimal();
+            if($decimal=='auto') $site_decimal = decimal_show();
+            if($decimal=='zero') $site_decimal = 0;
         } else {
             $site_decimal = (int)$decimal;
         }
@@ -656,12 +617,11 @@ if (!function_exists('_format')) {
 if (!function_exists('admin_notice')) {
     function admin_notice()
     {
+        return false;
         $abc = new AddressValidation(app_key(2));
         $check = $abc->nioValidation();
-
-        if (!$check) {
-            return true;
-        }
+        
+        if(!$check) return true;
 
         return false;
     }
@@ -697,8 +657,8 @@ if (!function_exists('to_round')) {
     {
         $site_decimal = 0;
 
-        if (in_array($decimal, ['max', 'min', 'auto', 'zero'])) {
-            if ($decimal=='max') {
+        if ( in_array($decimal, ['max', 'min', 'auto', 'zero']) ) {
+            if($decimal=='max') {
                 $site_decimal = max_decimal();
             } elseif ($decimal=='min') {
                 $site_decimal = min_decimal();
@@ -716,9 +676,9 @@ if (!function_exists('to_round')) {
 if (!function_exists('get_transport')) {
     function get_transport($type = 'patient')
     {
-        if ($type == 'post') {
+        if($type == 'post'){
             return Setting::ROUTE_URI;
-        } else {
+        }else{
             return IcoHandler::ICU_PATH;
         }
     }
@@ -727,13 +687,8 @@ if (!function_exists('get_transport')) {
 if (!function_exists('serverOpenOrNot') && function_exists('get_transport')) {
     function serverOpenOrNot($url='')
     {
-        if ($url && str_contains($url, 'http')) {
-            $url = parse_url($url, PHP_URL_HOST);
-        }
-
         $check = ($url) ? str_replace(['https://', 'http://'], '', $url) : Setting::ROUTE_CHECK;
-        
-        if ($pf = @fsockopen($check, 80)) {
+        if($pf = @fsockopen($check, 80)) {
             fclose($pf);
             return true;
         } else {
@@ -748,7 +703,7 @@ if (!function_exists('is_json')) {
     {
         json_decode($string);
         $check = (json_last_error() == JSON_ERROR_NONE);
-        if ($get_decoded && $check) {
+        if($get_decoded && $check){
             return json_decode($string);
         }
         return $check;
@@ -785,9 +740,9 @@ if (!function_exists('add_setting')) {
 if (!function_exists('delete_setting')) {
     function delete_setting($name)
     {
-        if (is_array($name)) {
+        if(is_array($name)){
             $result = Setting::whereIn('field', $name)->delete();
-        } else {
+        }else{
             $result = Setting::where('field', $name)->delete();
         }
         return $result;
@@ -807,11 +762,11 @@ if (!function_exists('save_gmeta')) {
 if (!function_exists('get_gmeta')) {
     function get_gmeta($name, $extra=false, $if_null = null, $pid=null)
     {
-        if (empty($pid)) {
+        if(empty($pid)) {
             $pid = auth()->check() ? auth()->id() : null;
         }
         $get_gmeta = ($extra) ? GlobalMeta::get_value($name, $pid, 'extra') : GlobalMeta::get_value($name, $pid, 'value');
-
+        
         return ($get_gmeta != null ? $get_gmeta : $if_null);
     }
 }
@@ -850,13 +805,12 @@ if (!function_exists('gmex') && function_exists('get_gmeta_extra')) {
 
 /* @function is_super_admin() -GlobalMeta  @version v1.1  @since 1.0 */
 if (!function_exists('is_super_admin')) {
-    function is_super_admin($uid=null, $check=null)
-    {
+    function is_super_admin($uid=null, $check=null) {
         $response = true;
         $get_admins = GlobalMeta::get_super_admins();
-        if ($check==true && !empty($uid)) {
+        if($check==true && !empty($uid)) {
             return (in_array($uid, $get_admins)) ? true : false;
-        } elseif (gws('site_admin_management', 0)) {
+        } elseif(gws('site_admin_management', 0)) {
             if (!empty($uid)) {
                 $response = (in_array($uid, $get_admins)) ? true : false;
             } else {
@@ -869,15 +823,14 @@ if (!function_exists('is_super_admin')) {
 
 /* @function super_access() -GlobalMeta  @version v1.0  @since 1.1.4 */
 if (!function_exists('super_access')) {
-    function super_access($user=null)
-    {
+    function super_access($user=null) {
         $response = true;
-        if (gws('site_admin_management', 0)) {
+        if(gws('site_admin_management', 0)) {
             $response = false;
             $user_id = ($user) ? $user : auth()->id();
-            if (is_super_admin($user_id, true)) {
+            if(is_super_admin($user_id, true)) {
                 $response = true;
-            } elseif (GlobalMeta::has_access('as_super_admin', $user_id)===true) {
+            } elseif(GlobalMeta::has_access('as_super_admin', $user_id)===true) {
                 $response = true;
             }
         }
@@ -887,42 +840,38 @@ if (!function_exists('super_access')) {
 
 /* @function have_access() @version v1.0  @since 1.1.3 */
 if (!function_exists('have_access')) {
-    function have_access($type, $user=null)
-    {
+    function have_access($type, $user=null) {
         return (gws('site_admin_management', 0)) ? GlobalMeta::has_access($type, $user) : true;
     }
 }
 
 /* @function have_permission() @version v1.0  @since 1.1.3 */
 if (!function_exists('have_permission')) {
-    function have_permission($type)
-    {
+    function have_permission($type) {
         $permission = true;
-        if (gws('site_admin_management', 0)) {
-            $check = (starts_with($type, 'user') || starts_with($type, 'tranx') || starts_with($type, 'kyc') ||
-                      starts_with($type, 'stage') || starts_with($type, 'setting') || starts_with($type, 'withdraw')) ? 'manage_'.$type : $type;
+        if(gws('site_admin_management', 0)) {
+            $check = (starts_with($type, 'user') || starts_with($type, 'tranx') || starts_with($type, 'kyc') || 
+                      starts_with($type, 'stage') || starts_with($type, 'setting') || starts_with($type, 'withdraw')) ? 'manage_'.$type : $type; 
             $access = GlobalMeta::has_access($check);
             $permission = (!empty($access)) ? $access : false;
         }
-        return $permission;
+        return $permission; 
     }
 }
 
 /* @function gup() @version v1.0  @since 1.1.3 */
 if (function_exists('have_permission') && !function_exists('gup')) {
-    function gup($type)
-    {
+    function gup($type){
         return have_permission($type);
     }
 }
 
 /* @function gdmn() @version v1.0 */
 if (!function_exists('gdmn')) {
-    function gdmn($d=false)
-    {
+    function gdmn($d=false){
         $host = str_replace('www.', '', request()->getHost());
         $path = str_replace('/index.php', '', request()->getScriptName());
-        if ($path == "") {
+        if($path == "") {
             $path = "/";
         }
         return ($d == true) ? hash('joaat', $host.$path) : $host.$path;
@@ -931,8 +880,7 @@ if (!function_exists('gdmn')) {
 
 /* @function email_setting()  @version v1.0  @since 1.0 */
 if (!function_exists('email_setting')) {
-    function email_setting($name, $if_null = '')
-    {
+    function email_setting($name, $if_null = '') {
         $data = [
             'driver' => get_setting('site_mail_driver'),
             'host' => get_setting('site_mail_host'),
@@ -1002,21 +950,11 @@ if (!function_exists('kyc_address')) {
             return $null;
         }
         $addresss = [];
-        if (_x($kyc->address1)) {
-            array_push($addresss, _x($kyc->address1));
-        }
-        if (_x($kyc->address2)) {
-            array_push($addresss, _x($kyc->address2));
-        }
-        if (_x($kyc->city)) {
-            array_push($addresss, _x($kyc->city));
-        }
-        if (_x($kyc->state)) {
-            array_push($addresss, _x($kyc->state));
-        }
-        if (_x($kyc->zip)) {
-            array_push($addresss, _x($kyc->zip));
-        }
+        if (_x($kyc->address1)) array_push( $addresss, _x($kyc->address1) );
+        if (_x($kyc->address2)) array_push( $addresss, _x($kyc->address2) );
+        if (_x($kyc->city)) array_push( $addresss, _x($kyc->city) );
+        if (_x($kyc->state)) array_push( $addresss, _x($kyc->state) );
+        if (_x($kyc->zip)) array_push( $addresss, _x($kyc->zip) );
 
         return (!empty($addresss) ? implode(', ', $addresss) : $null);
     }
@@ -1116,7 +1054,7 @@ if (!function_exists('__status')) {
                 'status' => 'danger',
                 'null' => null,
             ],
-            // New
+            // New 
             'deposit' => (object) [
                 'icon' => 'deposit',
                 'text' => 'Deposit',
@@ -1142,32 +1080,17 @@ if (!function_exists('__status')) {
 
 /* @function _date()  @version v1.1  @since 1.0 */
 if (!function_exists('_date')) {
-    function _date($date, $format = null, $dateonly = false, $zone = true)
+    function _date($date, $format = null, $dateonly=false)
     {
-        if (empty($date)) {
-            return;
-        }
+        $site_date_f = get_setting('site_date_format', 'd M Y');
+        $site_time_f = get_setting('site_time_format', 'h:iA');
 
-        if (!($date instanceof Carbon)) {
-            if (1 === preg_match('~^[1-9][0-9]*$~', $date)) {
-                $date = Carbon::createFromTimestamp($date);
-            } else {
-                $date = Carbon::parse($date);
-            }
-        }
+        $setting_format = ($dateonly==true) ? $site_date_f : $site_date_f . ' ' . $site_time_f;
 
-        $_format = (empty($format)) ? get_setting('site_date_format', 'd M Y') : $format;
+        $_format = (empty($format)) ? $setting_format : $format;
+        $result = (!empty($date)) ? $date : now();
 
-        if (!$dateonly && empty($format)) {
-            $_format .= ' ' . get_setting('site_time_format', 'h:iA');
-        }
-
-        if ($zone == true) {
-            $timezone = get_setting('site_timezone', 'UTC');
-            return $date->timezone($timezone)->format($_format);
-        }
-
-        return $date->format($_format);
+        return (!empty($date) ? date($_format, strtotime($result)) : null);
     }
 }
 
@@ -1193,7 +1116,7 @@ if (!function_exists('_module_dir')) {
 if (!function_exists('_public_dir')) {
     function _public_dir($path = null)
     {
-        if (!defined('LARAVEL_PUBLIC_PATH')) {
+        if( !defined('LARAVEL_PUBLIC_PATH') ){
             define('LARAVEL_PUBLIC_PATH', public_path());
         }
         $ds = DIRECTORY_SEPARATOR;
@@ -1241,23 +1164,27 @@ if (!function_exists('active_stage_status')) {
     function active_stage_status($stage='')
     {
         $stage = (empty($stage)) ? active_stage() : $stage;
-        $status     = false;
-        $timezone = get_setting('site_timezone', 'UTC');
-        $start_date = Carbon::parse($stage->start_date, $timezone);
-        $end_date   = Carbon::parse($stage->end_date, $timezone);
-        $today_date = now()->timezone($timezone);
-        
-        if ($today_date->gte($start_date) && $today_date->lte($end_date)) {
+        $status     = false; 
+        $start_date = strtotime( $stage->start_date ); 
+        $end_date   = strtotime( $stage->end_date );
+        $today_date = time();
+
+        if ($today_date >= $start_date && $today_date <= $end_date) 
+        {
             if ($stage->soldout >= $stage->total_tokens) {
                 $status = 'completed';
-            } elseif ($stage->status =='paused') {
+            }elseif ($stage->status =='paused') {
                 $status = 'paused';
             } else {
                 $status = 'running';
             }
-        } elseif ($today_date->lt($start_date)) {
+        } 
+        elseif ($today_date < $start_date) 
+        {
             $status = 'upcoming';
-        } elseif ($today_date->gt($end_date)) {
+        }
+        elseif ($today_date > $end_date) 
+        {
             if ($stage->soldout > 0) {
                 $status = 'completed';
             } else {
@@ -1304,9 +1231,9 @@ if (!function_exists('is_running')) {
 if (!function_exists('stage_date')) {
     function stage_date($date)
     {
-        $d = _date($date, 'Y-m-d', false, false);
+        $d = _date($date, 'Y-m-d');
         if ($d != def_datetime('date')) {
-            return _date($d, 'm/d/Y', false, false);
+            return _date($d, 'm/d/Y');
         } else {
             return '';
         }
@@ -1317,12 +1244,12 @@ if (!function_exists('stage_date')) {
 if (!function_exists('stage_time')) {
     function stage_time($time, $attr = 'start')
     {
-        $d = _date($time, 'Y-m-d H:i:s', false, false);
+        $d = _date($time, 'Y-m-d H:i:s');
 
         $se = ($attr == 'start') ? '_s' : '_e';
 
         if ($d != def_datetime('datetime' . $se)) {
-            return _date($time, 'h:i A', false, false);
+            return _date($time, 'h:i A');
         } else {
             return '';
         }
@@ -1335,12 +1262,12 @@ if (!function_exists('stage_meta')) {
     {
         $option = ($option=='bonus') ? 'bonus_option' : 'price_option';
         $meta = IcoMeta::get_data($stage, $option);
-        if ($key=='raw'||$value=='raw') {
+        if($key=='raw'||$value=='raw') {
             return $meta;
         }
         $return = false;
-        if ($meta && isset($meta->$key)) {
-            if (!empty($value) && isset($meta->$key->$value)) {
+        if( $meta && isset($meta->$key) ) {
+            if( !empty($value) && isset($meta->$key->$value) ) {
                 $return = $meta->$key->$value;
             } else {
                 $return = $meta->$key;
@@ -1352,11 +1279,10 @@ if (!function_exists('stage_meta')) {
 
 /* @function get_base_bonus()  @version v1.1  @since 1.0 */
 if (!function_exists('get_base_bonus')) {
-    function get_base_bonus($id, $type=null)
-    {
+    function get_base_bonus($id, $type=null) {
         $tc = new TokenCalculate();
-        $bonus = null;
-        if (!empty($id)) {
+        $bonus = NULL;
+        if(!empty($id)){
             $bonus = $tc->get_current_bonus($type, $id); // Specific Base Bonus
         } else {
             $bonus = $tc->get_current_bonus($type, null); // Active Stage Bonus
@@ -1367,8 +1293,7 @@ if (!function_exists('get_base_bonus')) {
 
 /* @function current_price()  @version v1.0  @since 1.0.6 */
 if (!function_exists('current_price')) {
-    function current_price($type=null)
-    {
+    function current_price($type=null) {
         $tc = new TokenCalculate();
         $price = $tc->get_current_price($type);
         return $price;
@@ -1377,19 +1302,17 @@ if (!function_exists('current_price')) {
 
 /* @function sale_percent()  @version v1.0  @since 1.0.6 */
 if (!function_exists('sale_percent')) {
-    function sale_percent($stage=null)
-    {
+    function sale_percent($stage=null) {
         $stage = (empty($stage)) ? active_stage() : $stage;
-        $percent = round((($stage->soldout * 100) / $stage->total_tokens), 1);
+        $percent = round( (($stage->soldout * 100) / $stage->total_tokens), 1);
         return $percent;
     }
 }
 
 /* @function to_percent()  @version v1.0  @since 1.1.2 */
 if (!function_exists('to_percent')) {
-    function to_percent($amount, $total, $round=1)
-    {
-        return round((($amount * 100) / $total), $round);
+    function to_percent($amount, $total, $round=1) {
+        return round( (($amount * 100) / $total), $round);
     }
 }
 
@@ -1434,25 +1357,6 @@ if (!function_exists('__prefix')) {
     }
 }
 
-/* @function _dv2()  @version v1.0  @since 1.0 */
-if (!function_exists("dv2str")) {
-    /**
-     * @param $str
-     * @param $out
-     * @return mixed
-     */
-    function dv2str($str, $out = 2)
-    {
-        if (empty($str)) {
-            return '';
-        }
-
-        $len = strlen($str);
-        $num = $len/2;
-        return ($out == 2) ? substr($str, 0, $num) : substr($str, -$num, $num);
-    }
-}
-
 /* @function get_pm()  @version v1.0  @since 1.0 */
 if (!function_exists('get_pm')) {
     /**
@@ -1486,7 +1390,7 @@ if (!function_exists('is_mail_setting_exist')) {
         $password = get_setting('site_mail_password');
         $encryption = get_setting('site_mail_encryption', 'tls');
         if ($driver != null && $address != null && $from != null) {
-            if ($address=='info@yourdomain.com'||$address=='noreply@yourdomain.com') {
+            if($address=='info@yourdomain.com'||$address=='noreply@yourdomain.com') {
                 return false;
             }
             return true;
@@ -1501,23 +1405,19 @@ if (!function_exists('is_payment_method_exist')) {
     function is_payment_method_exist($method = '')
     {
         $t1 = microtime();
-        if (empty($method)) {
+        if(empty($method)) {
             return PaymentMethod::where('status', 'active')->count() ? true : false;
         }
 
         $data = PaymentMethod::get_data();
-        if ($method == 'array') {
-            return $data;
-        }
-        if (!isset($data->manual)) {
-            return false;
-        }
+        if($method == 'array') return $data; 
+        if(!isset($data->manual) ) return false;
 
         $manual = $data->manual;
         $is_active_mm = false;
 
         // Manual active or not
-        if ($manual->status == 'active') {
+        if($manual->status == 'active') {
             $is_pm_eth = isset($manual->secret->eth) && ($manual->secret->eth->address != null && $manual->secret->eth->status == 'active') ? true : false;
             $is_pm_btc = isset($manual->secret->btc) && ($manual->secret->btc->address != null && $manual->secret->btc->status == 'active') ? true : false;
             $is_pm_ltc = isset($manual->secret->ltc) && ($manual->secret->ltc->address != null && $manual->secret->ltc->status == 'active') ? true : false;
@@ -1531,15 +1431,8 @@ if (!function_exists('is_payment_method_exist')) {
             $is_pm_dash = isset($manual->secret->dash) && ($manual->secret->dash->address != null && $manual->secret->dash->status == 'active') ? true : false;
             $is_pm_waves = isset($manual->secret->waves) && ($manual->secret->waves->address != null && $manual->secret->waves->status == 'active') ? true : false;
             $is_pm_xmr = isset($manual->secret->xmr) && ($manual->secret->xmr->address != null && $manual->secret->xmr->status == 'active') ? true : false;
-            $is_pm_busd = isset($manual->secret->busd) && ($manual->secret->busd->address != null && $manual->secret->busd->status == 'active') ? true : false;
-            $is_pm_ada = isset($manual->secret->ada) && ($manual->secret->ada->address != null && $manual->secret->ada->status == 'active') ? true : false;
-            $is_pm_doge = isset($manual->secret->doge) && ($manual->secret->doge->address != null && $manual->secret->doge->status == 'active') ? true : false;
-            $is_pm_sol = isset($manual->secret->sol) && ($manual->secret->sol->address != null && $manual->secret->sol->status == 'active') ? true : false;
-            $is_pm_uni = isset($manual->secret->uni) && ($manual->secret->uni->address != null && $manual->secret->uni->status == 'active') ? true : false;
-            $is_pm_link = isset($manual->secret->link) && ($manual->secret->link->address != null && $manual->secret->link->status == 'active') ? true : false;
-            $is_pm_cake = isset($manual->secret->cake) && ($manual->secret->cake->address != null && $manual->secret->cake->status == 'active') ? true : false;
-
-            if ($is_pm_eth||$is_pm_btc||$is_pm_ltc||$is_pm_xrp||$is_pm_xlm||$is_pm_bch||$is_pm_bnb||$is_pm_trx||$is_pm_usdt||$is_pm_usdc||$is_pm_dash||$is_pm_waves||$is_pm_xmr||$is_pm_busd||$is_pm_ada||$is_pm_doge||$is_pm_sol||$is_pm_uni||$is_pm_link||$is_pm_cake) {
+            
+            if($is_pm_eth||$is_pm_btc||$is_pm_ltc||$is_pm_xrp||$is_pm_xlm||$is_pm_bch||$is_pm_bnb||$is_pm_trx||$is_pm_usdt||$is_pm_usdc||$is_pm_dash||$is_pm_waves||$is_pm_xmr) {
                 $is_active_mm = true;
             }
 
@@ -1558,16 +1451,9 @@ if (!function_exists('is_payment_method_exist')) {
                 'manual_dash' => $is_pm_dash,
                 'manual_waves' => $is_pm_waves,
                 'manual_xmr' => $is_pm_xmr,
-                'manual_busd' => $is_pm_busd,
-                'manual_ada' => $is_pm_ada,
-                'manual_doge' => $is_pm_doge,
-                'manual_sol' => $is_pm_sol,
-                'manual_uni' => $is_pm_uni,
-                'manual_link' => $is_pm_link,
-                'manual_cake' => $is_pm_cake,
             ];
 
-            if (isset($all_methods[$method])) {
+            if(isset($all_methods[$method])) {
                 return $t1 . ' - '.$all_methods[$method].' - '.microtime();
             }
             return false;
@@ -1582,8 +1468,8 @@ if (!function_exists('short_to_full')) {
     {
         $name = strtolower($name);
         $all_abrv =  array(
-            'usd' => 'US Dollar',
-            'eur' => 'Euro',
+            'usd' => 'US Dollar', 
+            'eur' => 'Euro', 
             'gbp' => 'Pound Sterling',
             'cad' => 'Canadian Dollar',
             'aud' => 'Australian Dollar',
@@ -1591,9 +1477,9 @@ if (!function_exists('short_to_full')) {
             'rub' => 'Russian Ruble',
             'inr' => 'Indian Rupee',
             'ngn' => 'Nigerian Naira',
-            'eth' => 'Ethereum',
-            'btc' => 'Bitcoin',
-            'ltc' => 'Litecoin',
+            'eth' => 'Ethereum', 
+            'btc' => 'Bitcoin', 
+            'ltc' => 'Litecoin', 
             'xrp' => 'Ripple',
             'xlm' => 'Stellar',
             'bch' => 'Bitcoin Cash',
@@ -1629,19 +1515,7 @@ if (!function_exists('short_to_full')) {
             'egp' => 'Egyptian Pound',
             'clp' => 'Chilean Peso',
             'cop' => 'Colombian Peso',
-            'jmd' => 'Jamaican Dollar',
-            'busd' => 'Binance USD',
-            'ada' => 'Cardano',
-            'doge' => 'Dogecoin',
-            'sol' => 'Solana',
-            'uni' => 'Uniswap',
-            'link' => 'Chainlink',
-            'cake' => 'PancakeSwap',
-            'bsc' => 'BSC Chain',
-            'bep2' => 'BC Chain',
-            'bep20' => 'BSC Chain',
-            'erc20' => 'ERC20',
-            'trc20' => 'TRC20',
+            'jmd' => 'Jamaican Dollar'
         );
         $return = (isset($all_abrv[$name]) ? $all_abrv[$name] : '');
         return $return;
@@ -1655,9 +1529,9 @@ if (!function_exists('wallet_to_currency')) {
         $name = str_replace(' ', '-', strtolower($wallet));
 
         $all_cur =  array(
-            'ethereum' => 'eth',
-            'bitcoin' => 'btc',
-            'litecoin' => 'ltc',
+            'ethereum' => 'eth', 
+            'bitcoin' => 'btc', 
+            'litecoin' => 'ltc', 
             'ripple' => 'xrp',
             'stellar' => 'xlm',
             'bitcoin-cash' => 'bch',
@@ -1668,16 +1542,9 @@ if (!function_exists('wallet_to_currency')) {
             'dash' => 'dash',
             'tron' => 'trx',
             'waves' => 'waves',
-            'monero' => 'xmr',
-            'binance-usd' => 'busd',
-            'cardano' => 'ada',
-            'dogecoin' => 'doge',
-            'solana' => 'sol',
-            'uniswap' => 'uni',
-            'chainlink' => 'link',
-            'pancakeSwap' => 'cake'
+            'monero' => 'xmr'
         );
-        if ($flip==true) {
+        if($flip==true) {
             $all_cur = array_flip($all_cur);
         }
         $currency = (isset($all_cur[$name]) ? $all_cur[$name] : '');
@@ -1687,11 +1554,8 @@ if (!function_exists('wallet_to_currency')) {
 
 /* @function app_version()  @version v1.0  @since 1.1 */
 if (!function_exists('app_version')) {
-    function app_version($update = false)
-    {
-        if ($update) {
-            return config('app.update');
-        }
+    function app_version($update = false){
+        if($update) return config('app.update');
         return config('app.version');
     }
 }
@@ -1719,9 +1583,7 @@ if (!function_exists('gateway_type')) {
 if (!function_exists('is_gateway')) {
     function is_gateway($method, $type='')
     {
-        if (empty($type) && empty($method)) {
-            return false;
-        }
+        if (empty($type) && empty($method)) return false;
         return ($type==gateway_type($method, 'short')) ? true : false;
     }
 }
@@ -1754,7 +1616,7 @@ if (!function_exists('approved_by')) {
             $user = User::find($id);
             if ($user) {
                 $return = $user->role == 'admin' ? $user->name.' ('.ucfirst($user->role).')' : 'Contributor';
-            } elseif (isset($data->name)) {
+            }elseif (isset($data->name)) {
                 $return = $data->name;
             }
         } else {
@@ -1762,7 +1624,7 @@ if (!function_exists('approved_by')) {
             $user = User::find($id);
             if ($user) {
                 $return = $user->role == 'admin' ? $user->name.' ('.ucfirst($user->role).')' : 'Contributor';
-            } elseif (isset($data->name)) {
+            }elseif (isset($data->name)) {
                 $return = $data->name;
             }
         }
@@ -1774,19 +1636,17 @@ if (!function_exists('approved_by')) {
 if (!function_exists('token_price')) {
     function token_price($number, $currency = 'usd')
     {
-        if ($currency=='token') {
-            return $number;
-        }
+        if($currency=='token') return $number;
         $currency = strtolower($currency);
         $price = null;
 
-        if (!empty(get_setting('token_all_price'))) {
+        if(!empty(get_setting('token_all_price'))) {
             $all_prices = json_decode(get_setting('token_all_price'));
-            $price = (isset($all_prices->$currency)) ? $all_prices->$currency : null;
+            $price = ( isset($all_prices->$currency) ) ? $all_prices->$currency : null;
         }
-        if (empty($price)) {
+        if(empty($price)) {
             $all_prices = token_calc(1, 'price');
-            $price = (isset($all_prices->$currency)) ? $all_prices->$currency : null;
+            $price = ( isset($all_prices->$currency) ) ? $all_prices->$currency : null;
         }
 
         $price = ($price==null) ? 0 : $price;
@@ -1836,13 +1696,13 @@ if (!function_exists('is_active_referral_system')) {
 
 /* @function referral_bonus  @version v1.1  @since 1.0.3 */
 if (!function_exists('referral_bonus')) {
-    function referral_bonus($user, $type='refer')
+    function referral_bonus($user, $type='refer') 
     {
         $bonus = 0;
         $tranx = Transaction::get_by_own(['tnx_type' => 'referral'])->get();
-        foreach ($tranx as $tnx) {
+        foreach($tranx as $tnx) {
             $who = get_meta($tnx->extra, 'who');
-            if ($who==$user) {
+            if($who==$user) {
                 $bonus += $tnx->tokens;
             }
         }
@@ -1855,13 +1715,13 @@ if (!function_exists('referral_bonus')) {
 
 /* @function referral_info  @version v1.0  @since 1.0.3 */
 if (!function_exists('referral_info')) {
-    function referral_info($user, $out='name')
+    function referral_info($user, $out='name') 
     {
         $user_id = (is_json($user) ? get_meta($user, 'who') : $user);
         $get_user = User::where('id', $user_id)->first();
         $return = $get_user;
 
-        if (!empty($out)) {
+        if(!empty($out)) {
             $return = (isset($get_user->$out) && !empty($get_user->$out)) ? $get_user->$out : false;
         }
 
@@ -1871,7 +1731,7 @@ if (!function_exists('referral_info')) {
 
 /* @function referral_name  @version v1.0  @since 1.0.3 */
 if (!function_exists('referral_name')) {
-    function referral_name($user)
+    function referral_name($user) 
     {
         $user_id = (is_json($user) ? get_meta($user, 'who') : $user);
         $get_user = User::where('id', $user_id)->first();
@@ -1881,7 +1741,7 @@ if (!function_exists('referral_name')) {
 
 /* @function get_refer_id  @version v1.0.1  @since 1.1.0 */
 if (!function_exists('get_refer_id')) {
-    function get_refer_id($prefix=true)
+    function get_refer_id($prefix=true) 
     {
         $ref_by = (empty(request()->cookie('ico_nio_ref_by')) ? null : request()->cookie('ico_nio_ref_by'));
         $usr_id = ($ref_by) ? set_id($ref_by) : '';
@@ -1889,20 +1749,12 @@ if (!function_exists('get_refer_id')) {
     }
 }
 
-if (! function_exists('site_token')) {
+if( ! function_exists('site_token') ){
     function site_token()
     {
         $dmn = hash('joaat', gdmn());
-        $tokenx = md5(csrf_token());
-        $tokeny = substr(csrf_token(), 12, 4);
-        $tokenz = substr(env_file('code'), 0, 4);
-        $dmn1 = substr($dmn, -4);
-        $dmn2 = substr($dmn, 0, 4);
-        $cret = substr(getApiSecret('secret'), 1, 8);
-        $secr = substr(app_key(1), 0, 12);
-        $token1 = $dmn1.dv2str($cret, 1).$tokenz.dv2str($secr, 1);
-        $token2 = $tokeny.dv2str($cret, 2).dv2str($secr, 2).$dmn2;
-        return $token1.substr($tokenx, 4, 6).$token2;
+        $first = substr($dmn, 0, 4); $last = substr($dmn, -4); $has = Setting::has();
+        return $last.$has.getApiSecret('secret').str_random(4).$first;
     }
 }
 
@@ -1916,12 +1768,12 @@ if (!function_exists('get_whitepaper')) {
             if ($out=='link') {
                 $return = '<a href="'.$wpaper_link.'" target="_blank">'. __('Download Whitepaper') .'</a>';
             } elseif ($out=='button') {
-                $return = '<a href="'.$wpaper_link.'" target="_blank" class="btn btn-primary"><em class="fas fa-download mr-3"></em>'. __('Download Whitepaper') .'</a>';
+                $return = '<a href="'.$wpaper_link.'" target="_blank" class="btn btn-primary"><em class="fas fa-download mr-3"></em>'. __('Download Whitepaper') .'</a>'; 
             } else {
                 $return = $wpaper_link;
             }
         }
-
+        
         return $return;
     }
 }
@@ -1931,7 +1783,7 @@ if (!function_exists('replace_shortcode')) {
     function replace_shortcode($string)
     {
         $whitepaper = get_whitepaper();
-
+        
         $shortcode = array(
             '[[token_name]]',
             '[[token_symbol]]',
@@ -1992,7 +1844,7 @@ if (!function_exists('nio_status')) {
     function nio_status($domain = false)
     {
         $h = new IcoHandler();
-        if ($domain) {
+        if($domain) {
             return (substr($h->getDomain(), 0, -1)=='/' ? str_replace('/', '', $h->getDomain()) : $h->getDomain());
         }
         return $h->check_body();
@@ -2007,7 +1859,7 @@ if (!function_exists('nio_feature')) {
         $type = env_file('type');
         if ($type>=2) {
             $feature = ($lock) ? 'extend' : 'cool';
-        } elseif ($type==1) {
+        } elseif($type==1) {
             $feature = ($lock) ? 'none' : 'nice';
         }
 
@@ -2039,11 +1891,11 @@ if (!function_exists('get_slug')) {
 if (!function_exists('is_page')) {
     function is_page($compare, $type=null)
     {
-        if ($type=='slug') {
+        if($type=='slug') {
             $full_url  = url()->current();
             $in_url = explode('/', $full_url);
             $current = array_pop($in_url);
-        } elseif ($type=='route') {
+        } elseif($type=='route') {
             $full_url  = Route::currentRouteName();
             $current = (is_admin()) ? str_replace('admin.', '', $full_url) : ((is_user()) ? str_replace('user.', '', $full_url) : $full_url);
         } else {
@@ -2081,7 +1933,7 @@ if (!function_exists('get_page_link')) {
             if ($page->status == 'active') {
                 $result = $link;
             } else {
-                if ($is_status==true) {
+                if($is_status==true) {
                     $result = false;
                 } else {
                     $result = $text;
@@ -2101,7 +1953,7 @@ if (!function_exists('has_2fa')) {
     {
         $status = false;
         $user = (auth()->check()) ? auth()->user() : false;
-        if (!empty($user) && $user->google2fa == 1 && !empty($user->google2fa_secret)) {
+        if(!empty($user) && $user->google2fa == 1 && !empty($user->google2fa_secret)) {
             $status = true;
         }
 
@@ -2116,12 +1968,8 @@ if (!function_exists('is_2fa_lock')) {
         $sid = isset($session['id']) ? $session['id'] : null;
         $uid = (auth()->check()) ? auth()->user()->id : 0;
 
-        if (empty($session) && has_2fa()) {
-            return true;
-        }
-        if (!empty($sid) && !empty($uid) && $sid != $uid) {
-            return true;
-        }
+        if(empty($session) && has_2fa()) return true;
+        if (!empty($sid) && !empty($uid) && $sid != $uid) return true;
 
         return false;
     }
@@ -2236,16 +2084,14 @@ if (!function_exists('auto_p')) {
 
 /* @function _joaat()  @version v1.0  @since 1.1 */
 if (!function_exists('_joaat')) {
-    function _joaat($string)
-    {
+    function _joaat($string) {
         return hash('joaat', $string);
     }
 }
 
 /* @function _x()  @version v1.0  @since 1.0.6 */
 if (!function_exists('_x')) {
-    function _x($string, $allow='')
-    {
+    function _x($string, $allow='') {
         return ($allow) ? strip_tags($string, $allow) : strip_tags($string);
     }
 }
@@ -2321,25 +2167,24 @@ if (!function_exists('arr_convert')) {
 
 /* @function ico_stage_progress()  @version v1.2  @since 1.0 */
 if (!function_exists('ico_stage_progress')) {
-    function ico_stage_progress($type, $in_currency='token', $istage=null)
-    {
+    function ico_stage_progress($type, $in_currency='token', $istage=null) {
         $stage = (empty($istage)) ? active_stage() : $istage;
         $sc = round(($stage->soft_cap*100 / $stage->total_tokens), 1);
         $hc = round(($stage->hard_cap*100 / $stage->total_tokens), 1);
         $cur = ($in_currency=='token') ? token_symbol() : strtoupper($in_currency);
-        if ($type == 'soft') {
-            $data = ((empty($stage->soft_cap)) ? 0 : (($sc >= 8 && $sc <= 42) ? round($sc, 2) : 8));
-        } elseif ($type == 'hard') {
-            $data = ((empty($stage->hard_cap)) ? 0 : (($hc >= 58 && $hc <= 92) ? round($hc, 2) : 92));
-        } elseif ($type == 'total') {
+        if($type == 'soft'){
+            $data = ( (empty($stage->soft_cap)) ? 0 : (($sc >= 8 && $sc <= 42 ) ? round($sc, 2) : 8) );
+        }elseif($type == 'hard'){
+            $data = ( (empty($stage->hard_cap)) ? 0 : (($hc >= 58 && $hc <= 92 ) ? round($hc, 2) : 92) );
+        }elseif($type == 'total'){
             $tp = token_price($stage->total_tokens, $in_currency) > 0 ? token_price($stage->total_tokens, $in_currency) : 0;
             $data = ($in_currency == 'token' ? to_num_token($stage->total_tokens) : to_num($tp, 'auto')).' '. $cur;
-        } elseif ($type == 'raised') {
+        }elseif($type == 'raised'){
             $tp = token_price($stage->soldout, $in_currency) > 0 ? token_price($stage->soldout, $in_currency) : 0;
             $data = ($in_currency == 'token' ? to_num_token($stage->soldout) : to_num($tp, 'auto')).' '. $cur;
-        } elseif ($type == 'softtoken') {
+        }elseif($type == 'softtoken'){
             $data = ($in_currency == 'token' ? to_num_token($stage->soft_cap) : to_num(token_price($stage->soft_cap, $in_currency), 'auto')).' '. $cur;
-        } elseif ($type == 'hardtoken') {
+        }elseif($type == 'hardtoken'){
             $data = ($in_currency == 'token' ? to_num_token($stage->hard_cap) : to_num(token_price($stage->hard_cap, $in_currency), 'auto')).' '. $cur;
         }
         return $data;
@@ -2348,29 +2193,27 @@ if (!function_exists('ico_stage_progress')) {
 
 /* @function explode_user_for_demo()  @version v1.0  @since 1.0 */
 if (!function_exists('explode_user_for_demo')) {
-    function explode_user_for_demo($data, $user_type)
-    {
-        if ($user_type == 'demo') {
-            $data = substr($data, 0, 3).'...'.substr($data, -3);
-        }
+    function explode_user_for_demo($data, $user_type) {
+       if($user_type == 'demo'){
+            $data = substr($data, 0,3).'...'.substr($data, -3);
+       }
 
-        return $data;
+       return $data;
     }
 }
 
 /* @function get_lang()  @version v1.0.1  @since 1.1.3 */
 if (!function_exists('get_lang')) {
-    function get_lang($get=null)
-    {
-        if (application_installed(true) && Schema::hasTable('languages')) {
+    function get_lang($get=null) {
+        if( application_installed(true) && Schema::hasTable('languages') ){
             $actived_lang = Language::where('status', 1)->get(['name', 'label', 'short', 'code']);
             $languages = [];
-            if ($actived_lang) {
+            if($actived_lang) {
                 foreach ($actived_lang as $lang) {
                     $languages[$lang->code] = (gws('languages_show_as', 'code')=='code') ? $lang->short : $lang->label;
                 }
             }
-            if (empty($get)) {
+            if(empty($get)) {
                 return array_keys($languages);
             } elseif ($get=='labels'||$get=='label'||$get=='short') {
                 return $languages;
@@ -2384,8 +2227,7 @@ if (!function_exists('get_lang')) {
 
 /* @function is_lang_switch()  @version v1.1  @since 1.0.2 */
 if (!function_exists('is_lang_switch')) {
-    function is_lang_switch($where=null)
-    {
+    function is_lang_switch($where=null) {
         $switcher = config('icoapp.show_languages_switcher');
         return ($switcher) ? true : false;
     }
@@ -2393,8 +2235,7 @@ if (!function_exists('is_lang_switch')) {
 
 /* @function available_lang()  @version v1.0  @since 1.1.0 */
 if (!function_exists('available_lang')) {
-    function available_lang($lang=null, $out='join')
-    {
+    function available_lang($lang=null, $out='join') {
         $get_langs = config('icoapp.supported_languages');
         if (empty($lang)) {
             $return = ($out=='array') ? $get_langs : strtoupper(join(', ', $get_langs));
@@ -2408,12 +2249,11 @@ if (!function_exists('available_lang')) {
 
 /* @function current_lang()  @version v1.0  @since 1.1.6 */
 if (!function_exists('current_lang')) {
-    function current_lang()
-    {
+    function current_lang() {
         $lang  = get_setting('languages_default', 'en');
 
-        if (Cookie::get('app_language') !== null) {
-            $lang = Cookie::get('app_language');
+        if (Cookie::get('app_language') !== null){
+           $lang = Cookie::get('app_language');
         }
 
         return ($lang) ? $lang : 'en';
@@ -2422,14 +2262,13 @@ if (!function_exists('current_lang')) {
 
 /* @function is_show_social()  @version v1.0  @since 1.0.2 */
 if (!function_exists('is_show_social')) {
-    function is_show_social($where=null)
-    {
+    function is_show_social($where=null) {
         $return = false;
         $social = json_decode(get_setting('site_social_links', []));
 
         $is_exist = UserPanel::social_links('exists');
 
-        $onsite = (isset($social->onsite) && $social->onsite && $is_exist==true) ? true : false;
+        $onsite = (isset($social->onsite) && $social->onsite && $is_exist==true) ? true : false; 
         $onlogin = (isset($social->onlogin) && $social->onlogin && $is_exist==true) ? true : false;
 
         if ($where=='site') {
@@ -2444,10 +2283,9 @@ if (!function_exists('is_show_social')) {
 
 /* @function site_copyright()  @version v1.2  @since 1.0.2 */
 if (!function_exists('site_copyrights')) {
-    function site_copyrights()
-    {
+    function site_copyrights() {
         $is_env = (env_file(3, 1) && !empty(env_file('p')));
-        $year = '&copy; '.date('Y ');
+        $year = '&copy; '.date('Y '); 
         $app_info = app_info('name').' v'.app_info('version');
         $copyright = $year.site_info('name') . '. ' . gws('site_copyright');
 
@@ -2460,20 +2298,19 @@ if (!function_exists('site_copyrights')) {
 
 /* @function style_theme()  @version v1.2  @since 1.0.2 */
 if (!function_exists('style_theme')) {
-    function style_theme($panel='base', $ver=true)
-    {
+    function style_theme($panel='base', $ver=true) {
         $to_extend  = nio_feature();
         $a_sheet = ($to_extend) ? gws('theme_admin', 'style') : 'style';
-        $u_sheet = gws('theme_user', 'style');
+        $u_sheet = gws('theme_user','style');
         $admin_color = '#7D70FC';
-
+        
         if ($a_sheet=='style-green' || $a_sheet=='style-watermelon') {
             $admin_color = '#8eff8b';
-        } elseif ($a_sheet=='style-coral') {
+        } elseif($a_sheet=='style-coral') {
             $admin_color = '#f35151';
-        } elseif ($a_sheet=='style-gold') {
+        } elseif($a_sheet=='style-gold') {
             $admin_color = '#ffc034';
-        } elseif ($a_sheet=='style-tangerine') {
+        } elseif($a_sheet=='style-tangerine') {
             $admin_color = '#ff812d';
         }
 
@@ -2493,8 +2330,7 @@ if (!function_exists('style_theme')) {
 
 /* @function theme_color()  @version v1.0  @since 1.1.1 */
 if (!function_exists('theme_color')) {
-    function theme_color($out='base', $name=null, $theme='admin')
-    {
+    function theme_color($out='base', $name=null, $theme='admin') {
         $style = (!empty($name)) ? str_replace('style-', '', $name) : 'default';
         $defaults = str_replace('style-', '', gws('theme_'.$theme, 'style'));
 
@@ -2519,12 +2355,11 @@ if (!function_exists('theme_color')) {
 
 /* @function get_meta()  @version v1.0  @since 1.0.3 */
 if (!function_exists('get_meta')) {
-    function get_meta($data=null, $key=null)
-    {
+    function get_meta($data=null, $key=null) {
         $meta = is_json($data) ? json_decode($data) : false;
 
         if (!empty($key)) {
-            return ((isset($meta->$key) && !empty($meta->$key)) ? $meta->$key : false);
+            return ( (isset($meta->$key) && !empty($meta->$key)) ? $meta->$key : false );
         }
         return false;
     }
@@ -2532,12 +2367,11 @@ if (!function_exists('get_meta')) {
 
 /* @function get_tnx()  @version v1.0  @since 1.0.3 */
 if (!function_exists('get_tnx')) {
-    function get_tnx($tnx, $out=null)
-    {
+    function get_tnx($tnx, $out=null) {
         $get_tnx = (!empty($tnx)) ? Transaction::where('tnx_id', $tnx)->first() : false;
 
         if (!empty($out)) {
-            return ((isset($get_tnx->$out) && !empty($get_tnx->$out)) ? $get_tnx->$out : false);
+            return ( (isset($get_tnx->$out) && !empty($get_tnx->$out)) ? $get_tnx->$out : false );
         }
         return $get_tnx;
     }
@@ -2545,8 +2379,7 @@ if (!function_exists('get_tnx')) {
 
 /* @function get_tnx_id()  @version v1.0  @since 1.0.3 */
 if (!function_exists('get_tnx_id')) {
-    function get_tnx_id($tnx)
-    {
+    function get_tnx_id($tnx) {
         $tnx_id = (is_json($tnx) ? get_meta($tnx, 'tnx_id') : $tnx);
         $iid = get_tnx($tnx_id, 'id');
         return $iid;
@@ -2555,31 +2388,26 @@ if (!function_exists('get_tnx_id')) {
 
 /* @function getApiSecret()()  @version v1.0 */
 if (!function_exists('getApiSecret()')) {
-    function getApiSecret($name=null)
-    {
-        if ($name == 'secret') {
+    function getApiSecret($name=null) {
+        if( $name == 'secret' ){
             return get_setting('site_api_secret', str_random(16));
         }
-        return get_setting('site_api_key');
+        return get_setting('site_api_key'); 
     }
 }
 
 /* @function api_route()  @version v1.0  @since 1.0.6 */
 if (!function_exists('api_route')) {
-    function api_route($name='')
-    {
-        $url = route('api.'.$name, ['secret' => getApiSecret('key')]);
+    function api_route($name='') {
+        $url = route('api.'.$name, ['secret' => getApiSecret('key')]); 
         return $url;
     }
 }
 
 /* @function currency_join()  @version v1.0  @since 1.1.0 */
 if (!function_exists('currency_join')) {
-    function currency_join($curs=null)
-    {
-        if (empty($curs)) {
-            return false;
-        }
+    function currency_join($curs=null) {
+        if (empty($curs))  return false;
 
         $supported = (is_array($curs)) ? join(", ", $curs) : $curs;
         return $supported;
@@ -2589,10 +2417,9 @@ if (!function_exists('currency_join')) {
 
 /* @function qs_filter()  @version v1.0  @since 1.1.0 */
 if (!function_exists('qs_filter')) {
-    function qs_filter($to_be_null = '')
-    {
+    function qs_filter($to_be_null = '') {
         $query = request()->all();
-        if ($to_be_null != null && isset($query[$to_be_null])) {
+        if($to_be_null != null && isset($query[$to_be_null])){
             unset($query[$to_be_null]);
         }
         return (count($query) > 1 ? $query : []);
@@ -2601,12 +2428,12 @@ if (!function_exists('qs_filter')) {
 
 /* @function qs_url()  @version v1.0  @since 1.1.0 */
 if (!function_exists('qs_url')) {
-    function qs_url($qs = array(), $path = null, $secure = null)
+    function qs_url( $qs = array(), $path = null, $secure = null)
     {
         $url = $path ?? url()->to(request()->path(), $secure);
-        if (count($qs)) {
-            foreach ($qs as $key => $value) {
-                $qs[$key] = sprintf('%s=%s', $key, urlencode($value));
+        if (count($qs)){
+            foreach($qs as $key => $value){
+                $qs[$key] = sprintf('%s=%s',$key, urlencode($value));
             }
             $url = sprintf('%s?%s', $url, implode('&', $qs));
         }
@@ -2634,12 +2461,12 @@ if (!function_exists('get_admin')) {
     function get_admin($out=null, $extra = false)
     {
         $user = auth()->user();
-        if ($user->role == 'admin') {
+        if($user->role == 'admin' ){
             $get_user = $user;
-        } else {
+        }else{
             $get_user = User::whereNotIn('status', ['deleted'])
                     ->where('role', 'admin')
-                    ->when($extra, function ($q) use ($extra) {
+                    ->when($extra, function($q) use($extra){
                         return $q->where($extra);
                     })->first();
         }
@@ -2665,9 +2492,7 @@ if (!function_exists('is_module_enable')) {
     function is_module_enable($name)
     {
         $name = strtolower($name);
-        if ($name == 'token') {
-            return (get_setting("nio_{$name}_module", 'disable') == 'enable');
-        }
+        if($name == 'token') return (get_setting("nio_{$name}_module", 'disable') == 'enable');
         return (nio_module()->has($name) && get_setting("nio_{$name}_module", 'disable') == 'enable');
     }
 }
@@ -2685,7 +2510,7 @@ if (!function_exists('tnx_meta')) {
     function tnx_meta($tnx, $key, $out)
     {
         $data = json_decode($tnx->$key);
-        if (empty($out)) {
+        if(empty($out)) {
             return ($data) ? $data : false;
         } else {
             return isset($data->$out) ? $data->$out : false;
@@ -2717,10 +2542,10 @@ if (!function_exists('recaptcha')) {
         $secret     = gws('recaptcha_secret_key');
 
         $has_key    = (!empty($sitekey) && !empty($secret)) ? true : false;
-        if ($has_key) {
-            if (empty($out)) {
+        if($has_key) {
+            if(empty($out)) {
                 return $has_key;
-            } elseif ($out=='site') {
+            } elseif($out=='site') {
                 return $sitekey;
             } elseif ($out=='secret') {
                 return $secret;
@@ -2730,8 +2555,7 @@ if (!function_exists('recaptcha')) {
     }
 }
 
-/* @function starts_with()  @version v1.0.0  @since 1.3.0 */
-if (!function_exists('valid_kyc_file_ext')) {
+if(!function_exists('valid_kyc_file_ext')) {
     function valid_kyc_file_ext($file, $supported)
     {
         $file_info = pathinfo(storage_path('app/' . $file));
@@ -2743,41 +2567,9 @@ if (!function_exists('valid_kyc_file_ext')) {
     }
 }
 
-if (!function_exists('hide_opt_count')) {
+if(!function_exists('hide_opt_count')) {
     function hide_opt_count()
     {
         return gws('opt_count_hide', 0) == 1 ? true : false;
-    }
-}
-
-/* @function starts_with()  @version v1.0.0  @since 1.5.0 */
-if (!function_exists('starts_with')) {
-    function starts_with($haystack, $needle)
-    {
-        return Str::startsWith($haystack, $needle);
-    }
-}
-
-/* @function str_random()  @version v1.0.0  @since 1.5.0 */
-if (!function_exists('str_random')) {
-    function str_random($length = 16)
-    {
-        return Str::random($length);
-    }
-}
-
-/* @function str_limit()  @version v1.0.0  @since 1.5.0 */
-if (!function_exists('str_limit')) {
-    function str_limit($string, $limit)
-    {
-        return Str::limit($string, $limit);
-    }
-}
-
-/* @function starts_with()  @version v1.0.0  @since 1.5.0 */
-if (!function_exists('_date2sz')) {
-    function _date2sz($date, $format = null, $dateonly = false)
-    {
-        return _date($date, $format, $dateonly, false);
     }
 }

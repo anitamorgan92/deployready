@@ -13,7 +13,7 @@ is_array($custom) ? true : $custom = array();
                 {{-- Content Start --}}
                 <div class="popup-header">
                     <h3 class="popup-title">KYC Form Settings</h3>
-                    <p>You can manage your KYC Application form settings with below option.</p>
+                    <p>You can manage currency what you want to use in payment system. You can use one or multiple currency from below option.</p>
                 </div>
                 <form action="{{ route('admin.ajax.kyc.update') }}" method="POST" id="kyc_settings">
                     @csrf

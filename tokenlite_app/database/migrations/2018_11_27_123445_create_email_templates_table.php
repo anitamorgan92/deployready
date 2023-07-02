@@ -24,6 +24,7 @@ class CreateEmailTemplatesTable extends Migration
             $table->smallInteger('notify')->default(1);
             $table->timestamps();
         });
+        
     }
 
     /**

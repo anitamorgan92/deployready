@@ -3,7 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
- * (c) 2012-2022 Justin Hileman
+ * (c) 2012-2018 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,8 +11,6 @@
 
 namespace Psy\Readline;
 
-use Hoa\Console\Console;
-use Hoa\Console\Cursor;
 use Hoa\Console\Readline\Readline as HoaReadline;
 use Psy\Exception\BreakException;
 
@@ -24,39 +22,23 @@ class HoaConsole implements Readline
     /** @var HoaReadline */
     private $hoaReadline;
 
-    /** @var string|null */
-    private $lastPrompt;
-
     /**
      * @return bool
      */
-    public static function isSupported(): bool
+    public static function isSupported()
     {
-        return \class_exists(Console::class, true);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function supportsBracketedPaste(): bool
-    {
-        return false;
+        return \class_exists('\Hoa\Console\Console', true);
     }
 
     public function __construct()
     {
         $this->hoaReadline = new HoaReadline();
-        $this->hoaReadline->addMapping('\C-l', function () {
-            $this->redisplay();
-
-            return HoaReadline::STATE_NO_ECHO;
-        });
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addHistory(string $line): bool
+    public function addHistory($line)
     {
         $this->hoaReadline->addHistory($line);
 
@@ -66,7 +48,7 @@ class HoaConsole implements Readline
     /**
      * {@inheritdoc}
      */
-    public function clearHistory(): bool
+    public function clearHistory()
     {
         $this->hoaReadline->clearHistory();
 
@@ -76,7 +58,7 @@ class HoaConsole implements Readline
     /**
      * {@inheritdoc}
      */
-    public function listHistory(): array
+    public function listHistory()
     {
         $i = 0;
         $list = [];
@@ -90,7 +72,7 @@ class HoaConsole implements Readline
     /**
      * {@inheritdoc}
      */
-    public function readHistory(): bool
+    public function readHistory()
     {
         return true;
     }
@@ -100,12 +82,10 @@ class HoaConsole implements Readline
      *
      * @throws BreakException if user hits Ctrl+D
      *
-     * @return false|string
+     * @return string
      */
-    public function readline(string $prompt = null)
+    public function readline($prompt = null)
     {
-        $this->lastPrompt = $prompt;
-
         return $this->hoaReadline->readLine($prompt);
     }
 
@@ -114,15 +94,13 @@ class HoaConsole implements Readline
      */
     public function redisplay()
     {
-        $currentLine = $this->hoaReadline->getLine();
-        Cursor::clear('all');
-        echo $this->lastPrompt, $currentLine;
+        // noop
     }
 
     /**
      * {@inheritdoc}
      */
-    public function writeHistory(): bool
+    public function writeHistory()
     {
         return true;
     }

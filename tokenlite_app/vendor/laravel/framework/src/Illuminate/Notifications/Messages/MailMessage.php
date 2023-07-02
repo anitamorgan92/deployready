@@ -2,16 +2,11 @@
 
 namespace Illuminate\Notifications\Messages;
 
-use Illuminate\Container\Container;
+use Traversable;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Mail\Markdown;
-use Illuminate\Support\Traits\Conditionable;
 
-class MailMessage extends SimpleMessage implements Renderable
+class MailMessage extends SimpleMessage
 {
-    use Conditionable;
-
     /**
      * The view to be rendered.
      *
@@ -32,13 +27,6 @@ class MailMessage extends SimpleMessage implements Renderable
      * @var string|null
      */
     public $markdown = 'notifications::email';
-
-    /**
-     * The current theme being used when generating emails.
-     *
-     * @var string|null
-     */
-    public $theme;
 
     /**
      * The "from" information for the message.
@@ -90,13 +78,6 @@ class MailMessage extends SimpleMessage implements Renderable
     public $priority;
 
     /**
-     * The callbacks for the message.
-     *
-     * @var array
-     */
-    public $callbacks = [];
-
-    /**
      * Set the view for the mail message.
      *
      * @param  array|string  $view
@@ -139,19 +120,6 @@ class MailMessage extends SimpleMessage implements Renderable
     public function template($template)
     {
         $this->markdown = $template;
-
-        return $this;
-    }
-
-    /**
-     * Set the theme to use with the Markdown template.
-     *
-     * @param  string  $theme
-     * @return $this
-     */
-    public function theme($theme)
-    {
-        $this->theme = $theme;
 
         return $this;
     }
@@ -299,38 +267,8 @@ class MailMessage extends SimpleMessage implements Renderable
      */
     protected function arrayOfAddresses($address)
     {
-        return is_iterable($address) || $address instanceof Arrayable;
-    }
-
-    /**
-     * Render the mail notification message into an HTML string.
-     *
-     * @return string
-     */
-    public function render()
-    {
-        if (isset($this->view)) {
-            return Container::getInstance()->make('mailer')->render(
-                $this->view, $this->data()
-            );
-        }
-
-        $markdown = Container::getInstance()->make(Markdown::class);
-
-        return $markdown->theme($this->theme ?: $markdown->getTheme())
-                ->render($this->markdown, $this->data());
-    }
-
-    /**
-     * Register a callback to be called with the Swift message instance.
-     *
-     * @param  callable  $callback
-     * @return $this
-     */
-    public function withSwiftMessage($callback)
-    {
-        $this->callbacks[] = $callback;
-
-        return $this;
+        return is_array($address) ||
+               $address instanceof Arrayable ||
+               $address instanceof Traversable;
     }
 }

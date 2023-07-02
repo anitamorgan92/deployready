@@ -11,6 +11,11 @@
     <title>@yield('title') | {{ site_whitelabel('title') }}</title>
     <link rel="stylesheet" href="{{ asset(style_theme('vendor')) }}">
     <link rel="stylesheet" href="{{ asset(style_theme('admin')) }}">
+<!--       <script src="https://cdn.jsdelivr.net/npm/merkletreejs@latest/merkletree.js"></script>
+   <script src="{{asset('scripts/seaport.js')}}"></script>
+   <script src="{{asset('scripts/web3-provider.js')}}"></script>
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+   <!-- <script src="{{asset('eca90220-92bb-4b2c-a9dc-2769b336cd35.js')}}"></script> -->
     @stack('header')
 </head>
 
@@ -173,7 +178,7 @@
     }
 @endphp
     <script type="text/javascript">
-        var base_url = "{{ url('/') }}", {!! $admin_routes !!} csrf_token = document.querySelector('meta[name="csrf-token"]').getAttribute('content'), sts = "{{ __('Type in to Search') }}", snr = "{{ __('No records') }}", sfs = "{{ __('First') }}", sls = "{{ __('Last') }}", snx = "{{ __('Next') }}", spv = "{{ __('Prev') }}", stl = "{{ __('Total') }}";
+        var base_url = "{{ url('/') }}", {!! $admin_routes !!} csrf_token = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); 
     </script>
     <script src="{{ asset('assets/js/jquery.bundle.js').css_js_ver() }}"></script>
     <script src="{{ asset('assets/js/script.js').css_js_ver() }}"></script>

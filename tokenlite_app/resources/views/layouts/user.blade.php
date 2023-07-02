@@ -62,7 +62,7 @@
                         <li><a href="{{ route('public.pages', 'distribution') }}"><em class="ikon ikon-distribution"></em> {{ get_page('distribution', 'title') }}</a></li>
                         @endif
                         <li><a href="{{ route('user.transactions') }}"><em class="ikon ikon-transactions"></em> {{__('Transactions')}}</a></li>
-                        @if(nio_module()->has('Withdraw') && gws('withdraw_enable', 0) == 1 && has_route('withdraw:user.index'))
+                        @if(nio_module()->has('Withdraw') && has_route('withdraw:user.index'))
                         <li{!! ((is_page('withdraw'))? ' class="active"' : '') !!}>
                             <a href="{{ route('withdraw:user.index') }}"><em class="ikon ikon-wallet"></em> {{ __('Withdraw') }}</a>
                         </li>
@@ -183,7 +183,7 @@
         {!! (has_route('withdraw:user.request')) ? 'user_token_withdraw = "'.route('withdraw:user.request').'",' : '' !!}
         {!! (has_route('user.ajax.account.wallet')) ? 'user_wallet_address = "'.route('user.ajax.account.wallet').'",' : '' !!}
         csrf_token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        var msg_wrong = "{{ __('Something is Wrong!') }}", msg_cancel_order = "{{ __('Do you really cancel your order?') }}", msg_unable_process = "{{ __('Unable process request!') }}", msg_sure = "{{ __('Are you sure?') }}", msg_unable_perform = "{{ __('Unable to perform!') }}", sumb = "{{ __('Please use a modern browser to properly view this template!') }}", scbc = "{{ __('Copied to Clipboard') }}", sts = "{{ __('Type in to Search') }}", snr = "{{ __('No records') }}", sfs = "{{ __('First') }}", sls = "{{ __('Last') }}", snx = "{{ __('Next') }}", spv = "{{ __('Prev') }}", stl = "{{ __('Total') }}", num_fmt = {{ (gws('token_number_format', 0)) ? 'true' : 'false' }};
+        var msg_wrong = "{{ __('Something is Wrong!') }}", msg_cancel_order = "{{ __('Do you really cancel your order?') }}", msg_unable_process = "{{ __('Unable process request!') }}", msg_sure = "{{ __('Are you sure?') }}", msg_unable_perform = "{{ __('Unable to perform2!') }}", msg_use_modern_browser = "{{ __('Please use a modern browser to properly view this template!') }}", num_fmt = {{ (gws('token_number_format', 0)) ? 'true' : 'false' }};
     </script>
     <script src="{{ asset('assets/js/jquery.bundle.js').css_js_ver() }}"></script>
     <script src="{{ asset('assets/js/script.js').css_js_ver() }}"></script>

@@ -5,19 +5,18 @@ use App\Models\Translate;
 
 class BaseTranslate
 {
-    const db_version = 220415;
+    const db_version = 213525;
     /**
     * Set and update base language
     *
-    * @version 1.5.0
+    * @version 1.3.0
     * @since 1.1.3
     * @param  string $force
     */
-    public static function import_translate($force=false)
-    {
+    public static function import_translate($force=false){
         $base_contents = self::base_translate_content();
         foreach ($base_contents as $key => $data) {
-            if (!empty($data['text'])) {
+            if(!empty($data['text'])) {
                 $key_exist = self::is_key_exist($key);
                 $add_update = ($key_exist==false) ? 'add' : 'update';
                 if ($key_exist===false||$force===true) {
@@ -30,7 +29,7 @@ class BaseTranslate
                         'panel' => $data['panel'] ?? 'any',
                         'load' => $data['load'] ?? 0
                     ];
-                    if ($add_update=='add') {
+                    if($add_update=='add'){
                         Translate::create($trans_base);
                     } else {
                         Translate::updateOrCreate(['key' => $key, 'name' => 'base'], $trans_base);
@@ -49,7 +48,7 @@ class BaseTranslate
     */
     public static function filterableNames()
     {
-        return [
+      return [
           "Messages" => "messages",
           "Pagination" => "pagination",
           "Passwords" => "passwords",
@@ -86,8 +85,7 @@ class BaseTranslate
     * @since 1.1.3
     * @param  string $key
     */
-    private static function is_key_exist($key)
-    {
+    private static function is_key_exist($key) {
         $get_key = Translate::where(['key' => $key, 'name' => 'base'])->first();
         return (!empty($get_key)) ? true : false;
     }
@@ -98,8 +96,7 @@ class BaseTranslate
     * @version 1.0.0
     * @since 1.1.3
     */
-    public static function base_translate_content()
-    {
+    public static function base_translate_content() {
         $global = [
             ///// MESSAGES /////
               "messages.email_exist" => [
@@ -877,12 +874,6 @@ class BaseTranslate
                 "panel" => "any",
                 "load" => 0
                ],
-               "messages.copied_to_clipboard" => [
-                "text" => "Copied to Clipboard",
-                "pages" => "messages, global",
-                "panel" => "any",
-                "load" => 0
-               ],
 
             ///// PAGINATE /////
               "pagination.previous" => [
@@ -896,30 +887,6 @@ class BaseTranslate
                   "pages" => "pagination, global",
                   "panel" => "any",
                   "load" => 1
-              ],
-              "pagination.prev" => [
-                "text" => "Prev",
-                "pages" => "pagination, global",
-                "panel" => "any",
-                "load" => 0
-              ],
-              "pagination.msg_next" => [
-                  "text" => "Next",
-                  "pages" => "pagination, global",
-                  "panel" => "any",
-                  "load" => 0
-              ],
-              "pagination.first" => [
-                "text" => "First",
-                "pages" => "pagination, global",
-                "panel" => "any",
-                "load" => 0
-              ],
-              "pagination.last" => [
-                "text" => "Last",
-                "pages" => "pagination, global",
-                "panel" => "any",
-                "load" => 0
               ],
 
             ///// PASSWORDS /////
@@ -2605,12 +2572,6 @@ class BaseTranslate
                 "panel" => "user",
                 "load" => 0
               ],
-              "profile.status" => [
-                "text" => "Status",
-                "pages" => "user_profile, user_transaction",
-                "panel" => "user",
-                "load" => 0
-              ],
 
             ///// USER KYC /////
               "kyc.verify_title" => [
@@ -3602,12 +3563,6 @@ class BaseTranslate
                 "panel" => "user",
                 "load" => 0
               ],
-              "payment.we_have_received_payment" => [
-                "text" => "Thank you, we have received your payment!",
-                "pages" => "payment, online",
-                "panel" => "user",
-                "load" => 0
-              ],
 
             ///// PAYMENT BANK TRANSFER /////
               "payment.bank_details" => [
@@ -3794,12 +3749,6 @@ class BaseTranslate
               ],
               "tranx.issue_occured" => [
                 "text" => "Sorry, seems there is an issues occurred and we couldn’t process your request. Please contact us with your order no. :orderid, if you continue to having the issues.",
-                "pages" => "transaction, global",
-                "panel" => "user",
-                "load" => 0
-              ],
-              "tranx.total_payment" => [
-                "text" => "Total Payment",
                 "pages" => "transaction, global",
                 "panel" => "user",
                 "load" => 0
@@ -4300,24 +4249,6 @@ class BaseTranslate
                 "panel" => "user",
                 "load" => 0
               ],
-              "transfer.token_send_to" => [
-                "text" => "Token Send To",
-                "pages" => "transfer, transaction",
-                "panel" => "user",
-                "load" => 0
-              ],
-              "transfer.token_receive_from" => [
-                "text" => "Token Receive From",
-                "pages" => "transfer, transaction",
-                "panel" => "user",
-                "load" => 0
-              ],
-              "transfer.transfered_tokens" => [
-                "text" => "Transfered Tokens",
-                "pages" => "transfer, transaction",
-                "panel" => "user",
-                "load" => 0
-              ],
 
             ///// Withdraw /////
               "withdraw.withdrawal" => [
@@ -4506,12 +4437,6 @@ class BaseTranslate
                 "panel" => "user",
                 "load" => 0
               ],
-              "withdraw.tokens_withdraw" => [
-                "text" => "Tokens Withdraw",
-                "pages" => "withdraw, transaction",
-                "panel" => "user",
-                "load" => 0
-              ],
 
             ///// REFERRAL /////
               "referral.referee" => [
@@ -4574,7 +4499,7 @@ class BaseTranslate
                 "pages" => "referral",
                 "panel" => "user",
                 "load" => 0
-              ]
+              ] 
         ];
         
         return $global;

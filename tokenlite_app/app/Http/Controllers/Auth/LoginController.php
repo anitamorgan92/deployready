@@ -63,7 +63,7 @@ class LoginController extends Controller
      */
     public function login(AuthRequest $request)
     {
-        if (recaptcha()) {
+        if(recaptcha()) {
             $this->checkReCaptcha($request->recaptcha);
         }
 
@@ -77,15 +77,15 @@ class LoginController extends Controller
             $user = User::where('email', $email)->first();
 
             $totalAttempts = $this->totalAttempts($request);
-            if ($user && $totalAttempts >= $this->maxAttempts) {
+            if ($user && $totalAttempts < $this->maxAttempts) {
                 $userMeta = UserMeta::where('userId', $user->id)->first();
                 if ($userMeta->unusual == 1) {
-                    try {
+                    try{
                         $user->notify(new UnusualLogin($user));
-                    } catch (\Exception $e) {
-                    } finally {
+                    }catch(\Exception $e){
+                    } finally{
                         $this->incrementLoginAttempts($request);
-                    }
+                    } 
                 }
             }
 
@@ -101,8 +101,8 @@ class LoginController extends Controller
     }
 
     /**
-     * Return how much time attempts to login
-     *
+     * Return how much time attempts to login 
+     * 
      * @version 1.0.0
      * @param Illuminate\Http\Request as $request
      * @return integer
@@ -126,7 +126,7 @@ class LoginController extends Controller
         }
 
         $have_user = User::where('role', 'admin')->count();
-        if (!$have_user) {
+        if(!$have_user){
             return redirect(url('/register?setup=admin'));
         }
         return view('auth.login');
@@ -164,16 +164,14 @@ class LoginController extends Controller
     {
         $user = Auth::user();
         $check = str_contains(app_key(), $this->handler->find_the_path($this->handler->getDomain())) && $this->handler->cris_cros($this->handler->getDomain(), app_key(2));
-        if (!$user->is('admin') && !$check) {
+        if( !$user->is('admin') && !$check ){
             Auth::logout();
             return redirect()->route('login')->with([
                 'warning' => $this->handler->accessMessage()
             ]);
         }
         $user->lastLogin = now();
-        if ($user->is('admin')) {
-            $user->generateSecret();
-        }
+        if($user->is('admin')) { $user->generateSecret(); }
         $user->save();
         if (UserMeta::getMeta(Auth::id())->save_activity == 'TRUE') {
             $agent = new Agent();
@@ -204,8 +202,8 @@ class LoginController extends Controller
                 return redirect(route('login'))->with(['danger' => __('messages.login.inactive')]);
             }
         } else {
-            return redirect(url('/login'));
-            // return view('intro');
+            // return redirect(url('/login'));
+            return view('intro');
         }
     }
 
@@ -271,4 +269,5 @@ class LoginController extends Controller
             $this->username() => [__('auth.failed')],
         ]);
     }
+
 }

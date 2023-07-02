@@ -28,6 +28,7 @@ class CreatePagesTable extends Migration
             $table->tinyInteger('public')->default(0);
             $table->timestamps();
         });
+
     }
 
     /**

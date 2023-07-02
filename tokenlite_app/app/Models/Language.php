@@ -11,16 +11,16 @@ class Language extends Model
      *
      * @var string
      */
-    protected $table = 'languages';
+   protected $table = 'languages';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = ['name', 'label', 'short', 'code'];
+	/**
+	 * The attributes that are mass assignable.
+	 *
+	 * @var array
+	 */
+	protected $fillable = ['name', 'label', 'short', 'code'];
 
-    /**
+	/**
      *
      * Relation with user
      *

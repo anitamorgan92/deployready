@@ -1,12 +1,3 @@
-@php
-    use Carbon\Carbon;
-
-    $timezone = get_setting('site_timezone', 'UTC');
-    $today_date = now()->timezone($timezone);
-    $start_date = Carbon::parse($ico->start_date, $timezone);
-    $end_date   = Carbon::parse($ico->end_date, $timezone);
-@endphp
-
 @extends('layouts.admin')
 @section('title', 'ICO/STO Stage')
 
@@ -55,18 +46,18 @@
                                 {{-- Stage Details Form --}}
                                 <div class="input-item input-with-label">
                                     <label class="input-item-label">Stage Title/Name
-                                        @if($today_date->gte($start_date) && $today_date->lte($end_date) && gws('actived_stage') == $ico->id && $ico->status != 'paused')
-                                        <span class="badge badge-success">Running</span>
-                                        @elseif($today_date->gte($start_date) && $today_date->lte($end_date) && $ico->status == 'paused')
-                                        <span class="badge badge-purple">Paused</span>
-                                        @elseif($today_date->gte($start_date) && $today_date->lte($end_date) && $ico->status != 'paused')
-                                        <span class="badge badge-secondary">Inactive</span>
-                                        @elseif($start_date->gt($today_date) && $today_date->lt($end_date))
-                                        <span class="badge badge-warning">Upcoming</span>
-                                        @elseif($start_date->gt($today_date) && $today_date->lt($end_date))
-                                        <span class="badge badge-info">Completed</span>
+                                        @if((date('Y-m-d H:i:s') >= $ico->start_date) && (date('Y-m-d H:i:s') <= $ico->end_date) && (get_setting('actived_stage') == $ico->id) && ($ico->status != 'paused'))
+                                        <span class="ucap badge badge-success ml-2">Running</span>
+                                        @elseif((date('Y-m-d H:i:s') >= $ico->start_date && date('Y-m-d H:i:s') <= $ico->end_date) && ($ico->status == 'paused'))
+                                        <span class="ucap badge badge-purple ml-2">Paused</span>
+                                        @elseif((date('Y-m-d H:i:s') >= $ico->start_date && date('Y-m-d H:i:s') <= $ico->end_date) && ($ico->status != 'paused'))
+                                        <span class="ucap badge badge-secondary ml-2">Inactive</span>
+                                        @elseif($ico->start_date > date('Y-m-d H:i:s') && date('Y-m-d H:i:s') < $ico->end_date)
+                                        <span class="ucap badge badge-warning ml-2">Upcoming</span>
+                                        @elseif(($ico->start_date > date('Y-m-d H:i:s')) && (date('Y-m-d H:i:s') < $ico->end_date))
+                                        <span class="ucap badge badge-info ml-2">Completed</span>
                                         @else
-                                        <span class="badge badge-danger">Expired</span>
+                                        <span class="ucap badge badge-danger ml-2">Expired</span>
                                         @endif
                                     </label>
                                    <div class="input-wrap">
@@ -87,9 +78,9 @@
                                         <div class="input-item input-with-label">
                                             <label class="input-item-label">Base Token Price</label>
                                            <div class="input-wrap">
-                                            <input class="input-bordered" type="number" min="0" name="base_price" value="{{ _format(['number' => $ico->base_price, 'decimal' => 8]) }}" required>
+                                            <input class="input-bordered" type="number" min="0" name="base_price" value="{{ $ico->base_price }}" required>
                                             </div>
-                                            <span class="input-note">Define your token rate. Usually <strong>0.015 {{ base_currency(true) }}</strong> per token. <em class="ti ti-help-alt" title="Support up-to 8 decimals but recommended to use up-to 6 decimals." data-toggle="tooltip"></em></span>
+                                            <span class="input-note">Define your token rate. Usually $0.25 {{ base_currency(true) }} per token.</span>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
@@ -99,14 +90,14 @@
                                                 <div class="col">
                                                     <div class="relative">
                                                        <div class="input-wrap">
-                                                        <input class="input-bordered" type="number" placeholder="Min" name="min_purchase" value="{{ $ico->min_purchase }}">
+                                                        <input class="input-bordered" type="number" placeholder="Min" name="min_purchase" min="1" value="{{ $ico->min_purchase }}">
                                                    </div>
                                                     </div>
                                                 </div>
                                                 <div class="col">
                                                     <div class="relative">
                                                        <div class="input-wrap">
-                                                        <input class="input-bordered" type="number" placeholder="Max" name="max_purchase" value="{{ $ico->max_purchase }}">
+                                                        <input class="input-bordered" type="number" placeholder="Max" name="max_purchase" min="1" max="{{$ico->total_tokens}}" value="{{ $ico->max_purchase }}">
                                                     </div>
                                                     </div>
                                                 </div>
@@ -122,7 +113,7 @@
                                                 <div class="input-item input-with-label">
                                                     <label class="input-item-label">Soft Cap</label>
                                                    <div class="input-wrap">
-                                                    <input class="input-bordered" type="number" name="soft_cap" value="{{ ($ico->soft_cap > 1 ? $ico->soft_cap : '') }}">
+                                                    <input class="input-bordered" type="number" name="soft_cap" value="{{ ($ico->soft_cap > 1 ? $ico->soft_cap : '') }}" max="{{$ico->total_tokens}}">
                                                </div>
                                                 </div>
                                             </div>
@@ -130,7 +121,7 @@
                                                 <div class="input-item input-with-label">
                                                     <label class="input-item-label">Hard Cap</label>
                                                    <div class="input-wrap">
-                                                    <input class="input-bordered" type="number" name="hard_cap" value="{{ ($ico->hard_cap > 1 ? $ico->hard_cap : '') }}">
+                                                    <input class="input-bordered" type="number" name="hard_cap" value="{{ ($ico->hard_cap > 1 ? $ico->hard_cap : '') }}" max="{{$ico->total_tokens}}">
                                                 </div>
                                                 </div>
                                             </div>
@@ -240,8 +231,8 @@
                                                     <div class="input-item input-with-label">
                                                         <label class="input-item-label">Token Price</label>
                                                         <div class="input-wrap">
-                                                            <input class="input-bordered" type="text" min="0" name="ptire_{{ $i }}_token_price" value="{{ _format(['number' => $pd->$tire->price, 'decimal' => 8]) }}">
-                                                            <span class="input-note">Base Price: <span>{{ _format(['number' => $ico->base_price, 'decimal' => 8]) .' '.base_currency(true) }}</span> <em class="ti ti-help-alt" title="Support up-to 8 decimals but recommended to use up-to 6 decimals." data-toggle="tooltip"></em></span>
+                                                            <input class="input-bordered" type="text" min="0" name="ptire_{{ $i }}_token_price" value="{{ $pd->$tire->price }}">
+                                                            <span class="input-note">Base Price: <span>{{ $ico->base_price.' '.base_currency(true) }}</span></span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -290,7 +281,7 @@
                                                             </div>
                                                             <div class="col-5 col-sm-5">
                                                                 <div class="input-wrap">
-                                                                    <input class="input-bordered time-picker" type="text" name="ptire_{{ $i }}_end_time" value="{{ stage_time($pd->$tire->end_date) }}">
+                                                                    <input class="input-bordered time-picker" type="text" name="ptire_{{ $i }}_end_time" value="{{ stage_time($bonuses->base->end_date, 'end') }}">
                                                                     <span class="input-icon input-icon-right time-picker-icon"><em class="ti ti-alarm-clock"></em></span>
                                                                 </div>
                                                             </div>

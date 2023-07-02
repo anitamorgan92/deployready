@@ -10,8 +10,8 @@
 |
 */
 
-if (application_installed()) {
-    Route::get('/install/final', function () {
+if(application_installed()){
+    Route::get('/install/final', function(){
         return redirect('/');
     });
 }
@@ -23,7 +23,7 @@ Route::get('/locale', 'PublicController@set_lang')->name('language');
 // Authenticates Routes
 Route::get('/auth/{service}', 'Auth\SocialAuthController@redirect')->name('social.login');
 Route::get('/auth/{service}/callback', 'Auth\SocialAuthController@callback')->name('social.login.callback');
-Route::post('/auth/social/register', 'Auth\SocialAuthController@register')->name('social.register');
+Route::post( '/auth/social/register', 'Auth\SocialAuthController@register' )->name('social.register');
 
 // Authenticates Routes
 Auth::routes();
@@ -33,11 +33,11 @@ Route::get('verify/{id}/{token}', 'Auth\VerifyController@verify')->name('verify.
 Route::get('verify/success', 'Auth\LoginController@verified')->name('verified');
 Route::get('register/success', 'Auth\LoginController@registered')->name('registered');
 Route::any('log-out', 'Auth\LoginController@logout')->name('log-out');
-// Google 2FA Routes
+// Google 2FA Routes 
 Route::get('/login/2fa', 'Auth\SocialAuthController@show_2fa_form')->middleware('auth')->name('auth.2fa');
 Route::get('/login/2fa/reset', 'Auth\SocialAuthController@show_2fa_reset_form')->name('auth.2fa.reset');
 Route::post('/login/2fa/reset', 'Auth\SocialAuthController@reset_2fa');
-Route::post('/login/2fa', function () {
+Route::post('/login/2fa', function(){
     return redirect()->route('home');
 })->middleware(['auth', 'g2fa']);
 
@@ -46,7 +46,7 @@ Route::get('admin/login', 'Auth\LoginController@showLoginForm')->name('admin.log
 Route::post('admin/login', 'Auth\LoginController@login');
 Route::post('admin/logout', 'Auth\LoginController@logout')->name('admin.logout');
 Route::get('admin/login/2fa', 'Auth\SocialAuthController@show_2fa_form')->middleware('auth')->name('admin.auth.2fa');
-Route::post('admin/login/2fa', function () {
+Route::post('admin/login/2fa', function(){
     return redirect()->route('home');
 })->middleware(['auth', 'g2fa']);
 // }
@@ -83,7 +83,7 @@ Route::prefix('user')->middleware(['auth', 'user', 'verify_user', 'g2fa'])->name
     });
 });
 
-Route::prefix('admin')->middleware(['auth', 'admin', 'verify_user', 'g2fa', 'ico'])->name('admin.')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'admin', 'g2fa', 'ico'])->name('admin.')->group(function () {
     Route::get('/', 'Admin\AdminController@index')->name('home');
     Route::any('/system-info', 'Admin\AdminController@system_info')->name('system');
     Route::any('/apps-register', 'Admin\SettingController@app_register')->name('niolite');
@@ -91,7 +91,6 @@ Route::prefix('admin')->middleware(['auth', 'admin', 'verify_user', 'g2fa', 'ico
     Route::get('/profile/activity', 'Admin\AdminController@activity')->middleware('ico')->name('profile.activity');
     Route::get('/password/confirm/{token}', 'Admin\AdminController@password_confirm')->name('password.confirm');
     Route::get('/transactions/{state?}', 'Admin\TransactionController@index')->middleware('ico')->name('transactions');
-    Route::get('/check-transaction/online', 'Admin\TransactionController@checkStatus')->middleware('ico')->name('transactions.check');
     Route::get('/stages/settings', 'Admin\IcoController@settings')->middleware('ico')->name('stages.settings');
     Route::get('/pages', 'Admin\PageController@index')->middleware('ico')->name('pages');
     Route::get('/settings', 'Admin\SettingController@index')->middleware(['ico', 'super_admin'])->name('settings');
@@ -146,9 +145,8 @@ Route::prefix('admin')->middleware(['auth', 'admin', 'verify_user', 'g2fa', 'ico
         Route::post('/pages/update', 'Admin\PageController@update')->name('pages.update')->middleware('demo_user');
         Route::post('/settings/update', 'Admin\SettingController@update')->middleware(['super_admin','demo_user'])->name('settings.update');
         // Settings UpdateMeta v1.1.0
-        Route::post('/settings/meta/update', 'Admin\SettingController@update_meta')->middleware(['super_admin','demo_user'])->name('settings.meta.update');
+        Route::post('/settings/meta/update', 'Admin\SettingController@update_meta')->middleware(['super_admin','demo_user'])->name('settings.meta.update'); 
         Route::post('/settings/email/update', 'Admin\EmailSettingController@update')->middleware(['super_admin', 'demo_user'])->name('settings.email.update');
-        Route::post('/settings/email/test', 'Admin\EmailSettingController@sendTestEmail')->middleware(['super_admin', 'demo_user'])->name('settings.email.test');
         Route::post('/settings/email/template/update', 'Admin\EmailSettingController@update_template')->middleware(['super_admin', 'demo_user'])->name('settings.email.template.update');
         Route::post('/languages', 'Admin\LanguageController@language_action')->middleware(['ico', 'demo_user'])->name('lang.action'); // v1.1.3
         Route::post('/languages/translate', 'Admin\LanguageController@language_action')->middleware(['ico', 'demo_user'])->name('lang.translate.action'); // v1.1.3

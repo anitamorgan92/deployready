@@ -13,9 +13,9 @@ use App\Http\Controllers\Controller;
 
 class BankController extends Controller
 {
-    public function update_transaction(Request $request)
-    {
-        $response['msg'] = 'info';
+	public function update_transaction(Request $request)
+	{
+		$response['msg'] = 'info';
         $response['message'] = __('messages.nothing');
         if ($request->input('action') == 'confirm') {
             $validator = Validator::make($request->all(), [
@@ -46,17 +46,7 @@ class BankController extends Controller
             $response['message'] = $msg;
         } else {
             $action = $request->input('action');
-            $tnxns = Transaction::where('id', $request->input('trnx_id'))->where('user', auth()->user()->id)->first();
-
-            if (empty($tnxns)) {
-                $response['msg'] = 'error';
-                $response['message'] = __("messages.trnx.notfound");
-                if ($request->ajax()) {
-                    return response()->json($response);
-                }
-                return back()->with([$response['msg'] => $response['message']]);
-            }
-
+            $tnxns = Transaction::where('id', $request->input('trnx_id'))->first();
             $_old_status = $tnxns->status;
             if ($_old_status == 'canceled' || $_old_status == 'deleted') {
                 $response['msg'] = 'warning';
@@ -92,18 +82,15 @@ class BankController extends Controller
             return response()->json($response);
         }
         return back()->with([$response['msg'] => $response['message']]);
-    }
+	}
 
-    public function email_notify(Request $request)
-    {
+    public function email_notify(Request $request) {
         $tnx_id = isset($request->tnx) ? $request->tnx : false;
         $mail_type = isset($request->notify) ? $request->notify : false;
 
-        if ($tnx_id && $mail_type) {
-            $tnx = Transaction::where('id', $tnx_id)->where('user', auth()->user()->id)->first();
-            if (empty($tnx)) {
-                return false;
-            }
+        if($tnx_id && $mail_type) {
+            $tnx = Transaction::where('id', $tnx_id)->first();
+            if(empty($tnx)) return false;
             return ModuleHelper::enotify($tnx, $mail_type, $request);
         }
         return false;

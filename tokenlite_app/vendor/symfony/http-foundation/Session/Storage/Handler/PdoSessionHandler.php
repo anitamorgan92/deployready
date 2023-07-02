@@ -73,67 +73,57 @@ class PdoSessionHandler extends AbstractSessionHandler
     private $pdo;
 
     /**
-     * DSN string or null for session.save_path or false when lazy connection disabled.
-     *
-     * @var string|false|null
+     * @var string|false|null DSN string or null for session.save_path or false when lazy connection disabled
      */
     private $dsn = false;
 
     /**
-     * @var string|null
+     * @var string Database driver
      */
     private $driver;
 
     /**
-     * @var string
+     * @var string Table name
      */
     private $table = 'sessions';
 
     /**
-     * @var string
+     * @var string Column for session id
      */
     private $idCol = 'sess_id';
 
     /**
-     * @var string
+     * @var string Column for session data
      */
     private $dataCol = 'sess_data';
 
     /**
-     * @var string
+     * @var string Column for lifetime
      */
     private $lifetimeCol = 'sess_lifetime';
 
     /**
-     * @var string
+     * @var string Column for timestamp
      */
     private $timeCol = 'sess_time';
 
     /**
-     * Username when lazy-connect.
-     *
-     * @var string
+     * @var string Username when lazy-connect
      */
     private $username = '';
 
     /**
-     * Password when lazy-connect.
-     *
-     * @var string
+     * @var string Password when lazy-connect
      */
     private $password = '';
 
     /**
-     * Connection options when lazy-connect.
-     *
-     * @var array
+     * @var array Connection options when lazy-connect
      */
     private $connectionOptions = [];
 
     /**
-     * The strategy for locking, see constants.
-     *
-     * @var int
+     * @var int The strategy for locking, see constants
      */
     private $lockMode = self::LOCK_TRANSACTIONAL;
 
@@ -145,23 +135,17 @@ class PdoSessionHandler extends AbstractSessionHandler
     private $unlockStatements = [];
 
     /**
-     * True when the current session exists but expired according to session.gc_maxlifetime.
-     *
-     * @var bool
+     * @var bool True when the current session exists but expired according to session.gc_maxlifetime
      */
     private $sessionExpired = false;
 
     /**
-     * Whether a transaction is active.
-     *
-     * @var bool
+     * @var bool Whether a transaction is active
      */
     private $inTransaction = false;
 
     /**
-     * Whether gc() has been called.
-     *
-     * @var bool
+     * @var bool Whether gc() has been called
      */
     private $gcCalled = false;
 
@@ -195,7 +179,7 @@ class PdoSessionHandler extends AbstractSessionHandler
 
             $this->pdo = $pdoOrDsn;
             $this->driver = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
-        } elseif (\is_string($pdoOrDsn) && str_contains($pdoOrDsn, '://')) {
+        } elseif (\is_string($pdoOrDsn) && false !== strpos($pdoOrDsn, '://')) {
             $this->dsn = $this->buildDsnFromUrl($pdoOrDsn);
         } else {
             $this->dsn = $pdoOrDsn;
@@ -268,7 +252,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *
      * Can be used to distinguish between a new session and one that expired due to inactivity.
      *
-     * @return bool
+     * @return bool Whether current session expired
      */
     public function isSessionExpired()
     {
@@ -306,7 +290,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     }
 
     /**
-     * @return int|false
+     * @return bool
      */
     #[\ReturnTypeWillChange]
     public function gc($maxlifetime)
@@ -315,13 +299,13 @@ class PdoSessionHandler extends AbstractSessionHandler
         // This way, pruning expired sessions does not block them from being started while the current session is used.
         $this->gcCalled = true;
 
-        return 0;
+        return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function doDestroy(string $sessionId)
+    protected function doDestroy($sessionId)
     {
         // delete the record associated with this id
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id";
@@ -342,7 +326,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * {@inheritdoc}
      */
-    protected function doWrite(string $sessionId, string $data)
+    protected function doWrite($sessionId, $data)
     {
         $maxlifetime = (int) ini_get('session.gc_maxlifetime');
 
@@ -369,7 +353,7 @@ class PdoSessionHandler extends AbstractSessionHandler
                     $insertStmt->execute();
                 } catch (\PDOException $e) {
                     // Handle integrity violation SQLSTATE 23000 (or a subclass like 23505 in Postgres) for duplicate keys
-                    if (str_starts_with($e->getCode(), '23')) {
+                    if (0 === strpos($e->getCode(), '23')) {
                         $updateStmt->execute();
                     } else {
                         throw $e;
@@ -446,7 +430,6 @@ class PdoSessionHandler extends AbstractSessionHandler
 
         if (false !== $this->dsn) {
             $this->pdo = null; // only close lazy-connection
-            $this->driver = null;
         }
 
         return true;
@@ -504,36 +487,14 @@ class PdoSessionHandler extends AbstractSessionHandler
         $driver = $driverAliasMap[$params['scheme']] ?? $params['scheme'];
 
         // Doctrine DBAL supports passing its internal pdo_* driver names directly too (allowing both dashes and underscores). This allows supporting the same here.
-        if (str_starts_with($driver, 'pdo_') || str_starts_with($driver, 'pdo-')) {
+        if (0 === strpos($driver, 'pdo_') || 0 === strpos($driver, 'pdo-')) {
             $driver = substr($driver, 4);
         }
 
-        $dsn = null;
         switch ($driver) {
             case 'mysql':
-                $dsn = 'mysql:';
-                if ('' !== ($params['query'] ?? '')) {
-                    $queryParams = [];
-                    parse_str($params['query'], $queryParams);
-                    if ('' !== ($queryParams['charset'] ?? '')) {
-                        $dsn .= 'charset='.$queryParams['charset'].';';
-                    }
-
-                    if ('' !== ($queryParams['unix_socket'] ?? '')) {
-                        $dsn .= 'unix_socket='.$queryParams['unix_socket'].';';
-
-                        if (isset($params['path'])) {
-                            $dbName = substr($params['path'], 1); // Remove the leading slash
-                            $dsn .= 'dbname='.$dbName.';';
-                        }
-
-                        return $dsn;
-                    }
-                }
-            // If "unix_socket" is not in the query, we continue with the same process as pgsql
-            // no break
             case 'pgsql':
-                $dsn ?? $dsn = 'pgsql:';
+                $dsn = $driver.':';
 
                 if (isset($params['host']) && '' !== $params['host']) {
                     $dsn .= 'host='.$params['host'].';';
@@ -650,9 +611,11 @@ class PdoSessionHandler extends AbstractSessionHandler
      * We need to make sure we do not return session data that is already considered garbage according
      * to the session.gc_maxlifetime setting because gc() is called after read() and only sometimes.
      *
-     * @return string
+     * @param string $sessionId Session ID
+     *
+     * @return string The session data
      */
-    protected function doRead(string $sessionId)
+    protected function doRead($sessionId)
     {
         if (self::LOCK_ADVISORY === $this->lockMode) {
             $this->unlockStatements[] = $this->doAdvisoryLock($sessionId);
@@ -663,7 +626,7 @@ class PdoSessionHandler extends AbstractSessionHandler
         $selectStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
         $insertStmt = null;
 
-        while (true) {
+        do {
             $selectStmt->execute();
             $sessionRows = $selectStmt->fetchAll(\PDO::FETCH_NUM);
 
@@ -698,7 +661,7 @@ class PdoSessionHandler extends AbstractSessionHandler
                 } catch (\PDOException $e) {
                     // Catch duplicate key error because other connection created the session already.
                     // It would only not be the case when the other connection destroyed the session.
-                    if (str_starts_with($e->getCode(), '23')) {
+                    if (0 === strpos($e->getCode(), '23')) {
                         // Retrieve finished session data written by concurrent connection by restarting the loop.
                         // We have to start a new transaction as a failed query will mark the current transaction as
                         // aborted in PostgreSQL and disallow further queries within it.
@@ -712,7 +675,7 @@ class PdoSessionHandler extends AbstractSessionHandler
             }
 
             return '';
-        }
+        } while (true);
     }
 
     /**

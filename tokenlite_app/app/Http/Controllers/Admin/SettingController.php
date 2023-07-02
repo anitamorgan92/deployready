@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-
 /**
  * Settings Controller
  *
@@ -30,8 +29,7 @@ class SettingController extends Controller
      * @since 1.0
      * @return void
      */
-    public function index()
-    {
+    public function index() {
         $timezones = IcoHandler::get_timezones();
         return view('admin.settings', compact('timezones'));
     }
@@ -44,8 +42,7 @@ class SettingController extends Controller
      * @since 1.0.6
      * @return void
      */
-    public function api_setting()
-    {
+    public function api_setting() {
         return view('admin.restapi');
     }
 
@@ -58,8 +55,7 @@ class SettingController extends Controller
      * @since 1.0.6
      * @return void
      */
-    public function referral_setting()
-    {
+    public function referral_setting() {
         $general = ReferralHelper::general_option();
         $advanced = ReferralHelper::advanced_option();
         return view('admin.settings-referral', compact('general', 'advanced'));
@@ -74,8 +70,7 @@ class SettingController extends Controller
      * @since 1.0
      * @return void
      */
-    public function update(Request $request)
-    {
+    public function update(Request $request) {
         $type = $request->input('type');
         $ret['msg'] = 'info';
         $ret['message'] = __('messages.nothing');
@@ -118,7 +113,7 @@ class SettingController extends Controller
                 $ret['msg'] = 'success';
                 $ret['message'] = __('messages.update.success', ['what' => 'Settings']);
             }
-        } elseif ($type == 'social_links') {
+        }elseif ($type == 'social_links') {
             $ret['msg'] = 'warning';
             $ret['message'] = __('messages.update.failed', ['what' => 'Social Links']);
 
@@ -126,7 +121,7 @@ class SettingController extends Controller
             Setting::updateValue('site_social_links', $links);
             $ret['msg'] = 'success';
             $ret['message'] = __('messages.update.success', ['what' => 'Social Links']);
-        } elseif ($type == 'general') {
+        }elseif ($type == 'general') {
             $ret['msg'] = 'warning';
             $ret['message'] = __('messages.update.failed', ['what' => 'General Settings']);
 
@@ -145,7 +140,7 @@ class SettingController extends Controller
 
             $ret['msg'] = 'success';
             $ret['message'] = __('messages.update.success', ['what' => 'General Settings']);
-        } elseif ($type == 'api_credetial') {
+        }elseif ($type == 'api_credetial') {
             $ret['msg'] = 'warning';
             $ret['message'] = __('messages.update.failed', ['what' => 'API Credentials']);
 
@@ -158,7 +153,7 @@ class SettingController extends Controller
 
             $ret['msg'] = 'success';
             $ret['message'] = __('messages.update.success', ['what' => 'API Credentials']);
-        } elseif ($type == 'custom_code') {
+        }elseif ($type == 'custom_code') {
             $ret['msg'] = 'warning';
             $ret['message'] = __('messages.update.failed', ['what' => 'Custom Code ']);
 
@@ -167,7 +162,7 @@ class SettingController extends Controller
 
             $ret['msg'] = 'success';
             $ret['message'] = __('messages.update.success', ['what' => 'Header & Footer Custom Code']);
-        } elseif ($type == 'referral') {
+        }elseif($type == 'referral') {
             $validator = Validator::make($request->all(), [
                 'referral_bonus' => 'integer|gte:0',
                 'referral_bonus_join' => 'integer|gte:0'
@@ -184,7 +179,7 @@ class SettingController extends Controller
                 $ret['msg'] = 'warning';
                 $ret['message'] = $msg;
             } else {
-                if (nio_feature() && !empty($request->input('referral_extend_bonus'))) {
+                if(nio_feature() && !empty($request->input('referral_extend_bonus'))) {
                     $extend_bonus = json_encode($request->input('referral_extend_bonus'));
                     Setting::updateValue('referral_extend_bonus', $extend_bonus);
                 }
@@ -226,9 +221,8 @@ class SettingController extends Controller
         $auth_id = auth()->id();
         $is_saved = false;
 
-        $type_key = 'default';
-        $is_page_meta = false;
-        if ($type == 'tnx_page_meta' || $type == 'kyc_page_meta' || $type == 'user_page_meta') {
+        $type_key = 'default'; $is_page_meta = false;
+        if($type == 'tnx_page_meta' || $type == 'kyc_page_meta' || $type == 'user_page_meta') {
             $type_key = str_replace('_page_meta', '', $type);
             $is_page_meta = true;
         }
@@ -239,15 +233,15 @@ class SettingController extends Controller
             $ret['msg'] = 'error';
             $ret['message'] = __('messages.update.failed', ['what' => 'Options']);
 
-            if ($meta_name=='perpage') {
+            if($meta_name=='perpage') {
                 $meta_by_name = $type_key.'_per_page';
                 $result = GlobalMeta::save_meta($meta_by_name, $meta_val, $auth_id);
                 $is_saved = true;
-            } elseif ($meta_name=='ordered') {
+            } elseif($meta_name=='ordered') {
                 $meta_by_name = $type_key.'_ordered';
                 $result = GlobalMeta::save_meta($meta_by_name, $meta_val, $auth_id);
                 $is_saved = true;
-            } elseif ($meta_name=='orderby') {
+            } elseif($meta_name=='orderby') {
                 $meta_by_name = $type_key.'_order_by';
                 $result = GlobalMeta::save_meta($meta_by_name, $meta_val, $auth_id);
                 $is_saved = true;
@@ -256,7 +250,7 @@ class SettingController extends Controller
                 $result = GlobalMeta::save_meta($meta_by_name, $meta_val, $auth_id);
                 $is_saved = true;
             }
-            if ($is_saved) {
+            if($is_saved) {
                 $ret['msg'] = 'success';
                 $ret['message'] = __('messages.update.success', ['what' => 'Options']);
             }
@@ -276,7 +270,7 @@ class SettingController extends Controller
     {
         $handle = (new IcoHandler());
         $lite = 'tok'.'enl'.'ite';
-        if ($request->isMethod('POST')) {
+        if($request->isMethod('POST')){
             $validator = Validator::make($request->all(), [
                 'name' => 'required',
                 'email' => 'required|email',
@@ -298,25 +292,24 @@ class SettingController extends Controller
             }
             return $handle->checkHelth($request);
         }
-        if (is_demo_user() || is_demo_preview()) {
+        if(is_demo_user() || is_demo_preview()) {
             $error['warning'] = (is_demo_preview()) ? __('messages.demo_preview') : __('messages.demo_user');
             return redirect()->route('admin.system')->with($error);
         }
-        if ($request->skip && $request->skip=='reg') {
-            Cookie::queue(Cookie::make('ico_nio_reg_skip', 1, 1440));
+        if($request->skip && $request->skip=='reg'){
+            Cookie::queue(Cookie::make('ico_nio_reg_skip', 1, 1440)); 
             $last = (int)get_setting('piks_ger_oin_oci', 0);
             add_setting('piks_ger_oin_oci', $last + 1);
             return redirect()->route('admin.home');
         }
-        if ($request->revoke && $request->revoke=='license') {
+        if($request->revoke && $request->revoke=='license'){
             delete_setting(['env_pcode','nio_lkey','nio_email','env_uname', 'env_ptype']);
-            add_setting($lite.'_update', time());
-            add_setting($lite.'_credible', str_random(48));
+            add_setting($lite.'_update', time()); add_setting($lite.'_credible', str_random(48)); 
             add_setting('site_api_secret', str_random(16));
             Cookie::queue(Cookie::forget('ico_nio_reg_skip'));
             return redirect()->route('admin.home');
         }
-        if ($handle->check_body() && str_contains(app_key(), $handle->find_the_path($handle->getDomain()))) {
+        if($handle->check_body() && str_contains(app_key(), $handle->find_the_path($handle->getDomain()))){
             return redirect()->route('admin.home');
         }
         return view('auth.chamber');

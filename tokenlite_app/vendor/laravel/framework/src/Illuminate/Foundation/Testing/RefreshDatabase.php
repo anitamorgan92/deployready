@@ -3,12 +3,9 @@
 namespace Illuminate\Foundation\Testing;
 
 use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Foundation\Testing\Traits\CanConfigureMigrationCommands;
 
 trait RefreshDatabase
 {
-    use CanConfigureMigrationCommands;
-
     /**
      * Define hooks to migrate the database before and after each test.
      *
@@ -19,8 +16,6 @@ trait RefreshDatabase
         $this->usingInMemoryDatabase()
                         ? $this->refreshInMemoryDatabase()
                         : $this->refreshTestDatabase();
-
-        $this->afterRefreshingDatabase();
     }
 
     /**
@@ -42,22 +37,9 @@ trait RefreshDatabase
      */
     protected function refreshInMemoryDatabase()
     {
-        $this->artisan('migrate', $this->migrateUsing());
+        $this->artisan('migrate');
 
         $this->app[Kernel::class]->setArtisan(null);
-    }
-
-    /**
-     * The parameters that should be used when running "migrate".
-     *
-     * @return array
-     */
-    protected function migrateUsing()
-    {
-        return [
-            '--seed' => $this->shouldSeed(),
-            '--seeder' => $this->seeder(),
-        ];
     }
 
     /**
@@ -68,7 +50,9 @@ trait RefreshDatabase
     protected function refreshTestDatabase()
     {
         if (! RefreshDatabaseState::$migrated) {
-            $this->artisan('migrate:fresh', $this->migrateFreshUsing());
+            $this->artisan('migrate:fresh', $this->shouldDropViews() ? [
+                '--drop-views' => true,
+            ] : []);
 
             $this->app[Kernel::class]->setArtisan(null);
 
@@ -102,7 +86,7 @@ trait RefreshDatabase
                 $dispatcher = $connection->getEventDispatcher();
 
                 $connection->unsetEventDispatcher();
-                $connection->rollBack();
+                $connection->rollback();
                 $connection->setEventDispatcher($dispatcher);
                 $connection->disconnect();
             }
@@ -121,12 +105,13 @@ trait RefreshDatabase
     }
 
     /**
-     * Perform any work that should take place once the database has finished refreshing.
+     * Determine if views should be dropped when refreshing the database.
      *
-     * @return void
+     * @return bool
      */
-    protected function afterRefreshingDatabase()
+    protected function shouldDropViews()
     {
-        // ...
+        return property_exists($this, 'dropViews')
+                            ? $this->dropViews : false;
     }
 }

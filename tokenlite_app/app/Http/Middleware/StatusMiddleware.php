@@ -27,7 +27,7 @@ class StatusMiddleware
         $text = (application_installed() ? IcoData::_message() : "<!--Install the product first. -->\n");
         /** @var Response $response */
         $response = $next($request);
-        $getContentType = (!empty($response->headers->get('Content-Type'))) ? $response->headers->get('Content-Type') : '';
+        $getContentType = (!empty($response->headers->get('Content-Type'))) ? $response->headers->get('Content-Type') : ''; 
         if ($response instanceof Response && str_contains($getContentType, 'text/html')) {
             $content = $response->getContent();
             if (($head = mb_strpos($content, "</head>")) !== false) {

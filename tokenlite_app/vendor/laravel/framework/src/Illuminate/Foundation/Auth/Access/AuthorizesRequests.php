@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Auth\Access;
 
-use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Auth\Access\Gate;
 
 trait AuthorizesRequests
 {
@@ -74,18 +74,14 @@ trait AuthorizesRequests
     /**
      * Authorize a resource action based on the incoming request.
      *
-     * @param  string|array  $model
-     * @param  string|array|null  $parameter
+     * @param  string  $model
+     * @param  string|null  $parameter
      * @param  array  $options
      * @param  \Illuminate\Http\Request|null  $request
      * @return void
      */
     public function authorizeResource($model, $parameter = null, array $options = [], $request = null)
     {
-        $model = is_array($model) ? implode(',', $model) : $model;
-
-        $parameter = is_array($parameter) ? implode(',', $parameter) : $parameter;
-
         $parameter = $parameter ?: Str::snake(class_basename($model));
 
         $middleware = [];
@@ -109,7 +105,6 @@ trait AuthorizesRequests
     protected function resourceAbilityMap()
     {
         return [
-            'index' => 'viewAny',
             'show' => 'view',
             'create' => 'create',
             'store' => 'create',

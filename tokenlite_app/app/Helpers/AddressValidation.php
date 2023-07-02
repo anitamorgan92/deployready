@@ -71,7 +71,7 @@ class AddressValidation
     public function nioValidation()
     {
         $ico = new IcoHandler();
-        return ((str_contains(app_key(), $ico->find_the_path($ico->getDomain())) && $ico->cris_cros($ico->getDomain(), app_key(2))) && !empty(gws('env_pcode')));
+        return ( (str_contains(app_key(), $ico->find_the_path($ico->getDomain())) && $ico->cris_cros($ico->getDomain(), app_key(2)) ) && !empty(gws('env_pcode')));
     }
 
     /**

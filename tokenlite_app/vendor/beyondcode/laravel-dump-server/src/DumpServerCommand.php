@@ -3,6 +3,7 @@
 namespace BeyondCode\DumpServer;
 
 use Illuminate\Console\Command;
+
 use InvalidArgumentException;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\Console\Style\SymfonyStyle;

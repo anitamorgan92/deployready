@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-
 /**
  * Users Controller
  *
@@ -21,7 +20,6 @@ use App\Notifications\Reset2FA;
 use App\Notifications\ConfirmEmail;
 use App\Http\Controllers\Controller;
 use App\Notifications\PasswordResetByAdmin;
-use App\Notifications\UserRegistered;
 use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
@@ -42,13 +40,13 @@ class UsersController extends Controller
         $ordered    = gmvl('user_ordered', 'DESC');
         $is_page    = (empty($role) ? 'all' : ($role=='user' ? 'investor' : $role));
 
-        if (!empty($role)) {
+        if(!empty($role)) {
             $users = User::whereNotIn('status', ['deleted'])->where('role', $role)->orderBy($order_by, $ordered)->paginate($per_page);
         } else {
             $users = User::whereNotIn('status', ['deleted'])->orderBy($order_by, $ordered)->paginate($per_page);
         }
 
-        if ($request->s) {
+        if($request->s){
             $users = User::AdvancedFilter($request)
                         ->orderBy($order_by, $ordered)->paginate($per_page);
         }
@@ -138,11 +136,10 @@ class UsersController extends Controller
         $validator = Validator::make($request->all(), [
             'role' => 'required',
             'name' => 'required|min:3',
-            'email' => 'required|email|regex:/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,9}$/ix|unique:users,email',
+            'email' => 'required|email|unique:users,email',
             'password' => 'nullable|min:6',
         ], [
             'email.unique' => __('messages.email.unique'),
-            'email.regex' => __('Please enter a valid email address.'),
         ]);
 
         if ($validator->fails()) {
@@ -157,7 +154,7 @@ class UsersController extends Controller
             $ret['message'] = $msg;
             return response()->json($ret);
         } else {
-            if ($request->input('role')=='admin' && !super_access()) {
+            if($request->input('role')=='admin' && !super_access()) {
                 $ret['msg'] = 'warning';
                 $ret['message'] = __("You do not have enough permissions to perform requested operation.");
             } else {
@@ -231,7 +228,7 @@ class UsersController extends Controller
      */
     public function show(Request $request, $id=null, $type=null)
     {
-        if ($request->ajax()) {
+        if($request->ajax()){
             $id = $request->input('uid');
             $type = $request->input('req_type');
             $user = User::FindOrFail($id);
@@ -248,9 +245,9 @@ class UsersController extends Controller
                 $refered = User::where('referral', $user->id)->get(['id', 'name', 'created_at']);
                 foreach ($refered as $refer) {
                     $ref_count = User::where('referral', $refer->id)->count();
-                    if ($ref_count > 0) {
+                    if($ref_count > 0){
                         $refer->refer_to = $ref_count;
-                    } else {
+                    }else{
                         $refer->refer_to = 0;
                     }
                 }
@@ -270,10 +267,10 @@ class UsersController extends Controller
         $id = $request->input('uid');
         $type = $request->input('req_type');
         
-        if (!super_access()) {
+        if(!super_access()) {
             $up = User::where('id', $id)->first();
-            if ($up) {
-                if ($up->role!='user') {
+            if($up) {
+                if($up->role!='user') {
                     $result['msg'] = 'warning';
                     $result['message'] = __("You do not have enough permissions to perform requested operation.");
                     return response()->json($result);
@@ -352,32 +349,9 @@ class UsersController extends Controller
                 $result['msg'] = 'success';
                 $result['message'] = '2FA confirmation email send to the user.';
             } else {
+                $ret['errors'] = $e->getMessage();
                 $result['msg'] = 'warning';
                 $result['message'] = 'Failed to reset 2FA!!';
-            }
-            return response()->json($result);
-        }
-        if ($type == 'verify_email') {
-            $user = User::where('id', $id)->first();
-            if ($user) {
-                $user->email_verified_at = now();
-                $user->meta->email_token = null;
-                $user->meta->email_expire = null;
-                $user->save();
-                $user->meta->save();
-                $result['reload'] = true;
-                try {
-                    $user->notify(new UserRegistered($user));
-                    $result['msg'] = 'success';
-                    $result['message'] = __('Email Verified');
-                } catch (\Exception $e) {
-                    $result['errors'] = $e->getMessage();
-                    $result['msg'] = 'warning';
-                    $result['message'] = __('Email Verified').'. '.__('messages.email.failed');
-                }
-            } else {
-                $result['msg'] = 'warning';
-                $result['message'] = 'Failed to verify email!!';
             }
             return response()->json($result);
         }
@@ -440,22 +414,24 @@ class UsersController extends Controller
         $ret['msg'] = 'info';
         $ret['message'] = __('messages.nothing');
 
-        $user = User::where(['registerMethod' => "Email", 'email_verified_at' => null])->get();
-        if ($user->count()) {
-            $data = $user->each(function ($item) {
+        $user = User::where(['registerMethod' => "Email", 'email_verified_at' => NULL])->get();
+        if($user->count()){
+            $data = $user->each(function($item){
                 $item->meta()->delete();
                 $item->logs()->delete();
                 $item->delete();
             });
 
-            if ($data) {
+            if($data){
                 $ret['msg'] = 'success';
                 $ret['message'] = __('messages.delete.delete', ['what' => 'Unvarified users']);
-            } else {
+            }
+            else{
                 $ret['msg'] = 'warning';
                 $ret['message'] = __('messages.delete.delete_failed', ['what' => 'Unvarified users']);
             }
-        } else {
+        }
+        else{
             $ret['msg'] = 'success';
             $ret['alt'] = 'no';
             $ret['message'] = __('There has not any unvarified users!');
@@ -467,4 +443,5 @@ class UsersController extends Controller
         }
         return back()->with([$ret['msg'] => $ret['message']]);
     }
+
 }

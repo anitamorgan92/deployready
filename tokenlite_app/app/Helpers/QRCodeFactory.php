@@ -20,7 +20,7 @@ use QR_Code\Types\vCard\Phone;
 /**
  * Class QRCodeFactory
  *
- * Laravel QR Code Generator
+ * Laravel QR Code Generator 
  * Copyright (C) 2019 Softnio
  *
  * @package Werneckbh\QRCodeFactory
@@ -40,7 +40,7 @@ class QRCodeFactory
      * @throws \QR_Code\Exceptions\EmptyEventSummaryException
      * @throws \QR_Code\Exceptions\InvalidEventDateException
      */
-    public function calendar(\DateTime $start, \DateTime $end, string $summary, string $description, string $location): QR_CalendarEvent
+    public function calendar (\DateTime $start, \DateTime $end, string $summary, string $description, string $location): QR_CalendarEvent
     {
         return new QR_CalendarEvent($start, $end, $summary, $description, $location);
     }
@@ -55,7 +55,7 @@ class QRCodeFactory
      * @return \QR_Code\Types\QR_EmailMessage
      * @throws \LaravelQRCode\Exceptions\EmptyTextException
      */
-    public function email(string $toEmail, string $body, string $subject): QR_EmailMessage
+    public function email (string $toEmail, string $body, string $subject): QR_EmailMessage
     {
         if (trim($toEmail) === '') {
             throw new EmptyTextException('Recipient email cannot be empty');
@@ -74,7 +74,7 @@ class QRCodeFactory
      *
      * @return \QR_Code\Types\QR_meCard
      */
-    public function meCard(string $name, string $address, string $phone, string $email): QR_meCard
+    public function meCard (string $name, string $address, string $phone, string $email): QR_meCard
     {
         return new QR_meCard($name, $address, $phone, $email);
     }
@@ -86,7 +86,7 @@ class QRCodeFactory
      *
      * @return \QR_Code\Types\QR_Phone
      */
-    public function phone(string $number): QR_Phone
+    public function phone (string $number): QR_Phone
     {
         return new QR_Phone($number);
     }
@@ -99,7 +99,7 @@ class QRCodeFactory
      *
      * @return \QR_Code\Types\QR_Sms
      */
-    public function sms(string $number, string $text): QR_Sms
+    public function sms (string $number, string $text): QR_Sms
     {
         return new QR_Sms($number, $text);
     }
@@ -112,7 +112,7 @@ class QRCodeFactory
      * @return \QR_Code\Types\QR_Text
      * @throws \LaravelQRCode\Exceptions\EmptyTextException
      */
-    public function text(string $data): QR_Text
+    public function text (string $data): QR_Text
     {
         if (trim($data) === '') {
             throw new EmptyTextException('Text cannot be empty');
@@ -130,7 +130,7 @@ class QRCodeFactory
      * @throws \LaravelQRCode\Exceptions\EmptyTextException
      * @throws \LaravelQRCode\Exceptions\MalformedUrlException
      */
-    public function url(string $url): QR_Url
+    public function url (string $url): QR_Url
     {
         if (trim($url) === '') {
             throw new EmptyTextException('Url cannot be empty');
@@ -161,7 +161,7 @@ class QRCodeFactory
      * @throws \QR_Code\Exceptions\InvalidVCardAddressEntryException
      * @throws \QR_Code\Exceptions\InvalidVCardPhoneEntryException
      */
-    public function vCard(string $firstName, string $lastName, string $title, string $email, array $addresses, array $phones): QR_VCard
+    public function vCard (string $firstName, string $lastName, string $title, string $email, array $addresses, array $phones): QR_VCard
     {
         $this->validateVCardAddresses($addresses);
         $this->validatePrefAddresses($addresses);
@@ -172,13 +172,8 @@ class QRCodeFactory
         $addressesArray = [];
         foreach ($addresses as $address) {
             $addressesArray[] = new Address(
-                strtoupper($address['type']),
-                $address['pref'] === true,
-                $address['street'],
-                $address['city'],
-                $address['state'],
-                $address['zip'],
-                $address['country']
+                strtoupper($address['type']), $address['pref'] === true, $address['street'], $address['city'],
+                $address['state'], $address['zip'], $address['country']
             );
         }
 
@@ -200,7 +195,7 @@ class QRCodeFactory
      *
      * @return \QR_Code\Types\QR_WiFi
      */
-    public function wifi(string $authType, string $ssId, string $password, bool $ssdIDisHidden) : QR_WiFi
+    public function wifi (string $authType, string $ssId, string $password, bool $ssdIDisHidden) : QR_WiFi
     {
         return new QR_WiFi($authType, $ssId, $password, $ssdIDisHidden);
     }
@@ -212,7 +207,7 @@ class QRCodeFactory
      *
      * @throws \QR_Code\Exceptions\InvalidVCardAddressEntryException
      */
-    protected function validateVCardAddresses(array $addresses) : void
+    protected function validateVCardAddresses (array $addresses) : void
     {
         $requiredKeys = ['type', 'pref', 'street', 'city', 'state', 'zip', 'country'];
 
@@ -233,7 +228,7 @@ class QRCodeFactory
      *
      * @throws \QR_Code\Exceptions\InvalidVCardAddressEntryException
      */
-    protected function validatePrefAddresses(array $addresses) : void
+    protected function validatePrefAddresses (array $addresses) : void
     {
         $preferentialAddressCount = 0;
 
@@ -257,12 +252,13 @@ class QRCodeFactory
      *
      * @throws \QR_Code\Exceptions\InvalidVCardPhoneEntryException
      */
-    protected function validateVCardPhones(array $phones) : void
+    protected function validateVCardPhones (array $phones) : void
     {
         $requiredKeys = ['type', 'number', 'cellPhone'];
         foreach ($phones as $phone) {
             $keys = array_keys($phone);
             foreach ($keys as $key) {
+
                 if (!in_array($key, $requiredKeys)) {
                     throw new InvalidVCardPhoneEntryException('Phone requires ' . $key . ' key');
                 }

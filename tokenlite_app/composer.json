@@ -8,39 +8,34 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^7.3",
+        "php": "^7.1.3",
         "ext-json": "*",
-        "ext-pdo": "*",
         "coinbase/coinbase-commerce": "^1.0",
         "coingate/coingate-php": "^3.0",
         "fideloper/proxy": "^4.0",
         "jenssegers/agent": "^2.6",
-        "laravel/browser-kit-testing": "^6.2",
-        "laravel/framework": "8.83.8",
-        "laravel/socialite": "5.2.5",
-        "laravel/tinker": "^2.0",
-        "laravel/ui": "^3.0",
+        "laravel/browser-kit-testing": "^5.1",
+        "laravel/framework": "5.7.*",
+        "laravel/socialite": "^4.0",
+        "laravel/tinker": "^1.0",
         "paypal/paypal-checkout-sdk": "^1.0",
         "pragmarx/google2fa": "^5.0",
         "softnio/laravel-installer": "^1.0",
         "softnio/qr-code-generator": "^1.0",
-        "stripe/stripe-php": "^7.123"
+        "stripe/stripe-php": "^6.40"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
         "filp/whoops": "^2.0",
         "fzaninotto/faker": "^1.4",
         "mockery/mockery": "^1.0",
-        "nunomaduro/collision": "^5.0",
-        "phpunit/phpunit": "^9.0"
+        "nunomaduro/collision": "^2.0",
+        "phpunit/phpunit": "^7.0"
     },
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true,
-        "allow-plugins": {
-            "kylekatarnls/update-helper": true
-        }
+        "sort-packages": true
     },
     "extra": {
         "laravel": {

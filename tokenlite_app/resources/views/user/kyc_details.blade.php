@@ -59,39 +59,39 @@
                 <ul class="data-details-list">
                     <li>
                         <div class="data-details-head">First Name</div>
-                        <div class="data-details-des">{!! !empty($kyc->firstName) ? $kyc->firstName : '&nbsp;' !!}</div>
+                        <div class="data-details-des">{{ $kyc->firstName }}</div>
                     </li>{{-- li --}}
                     <li>
                         <div class="data-details-head">Last Name</div>
-                        <div class="data-details-des">{!! !empty($kyc->lastName) ? $kyc->lastName : '&nbsp;' !!}</div>
+                        <div class="data-details-des">{{ $kyc->lastName }}</div>
                     </li>{{-- li --}}
                     <li>
                         <div class="data-details-head">Email Address</div>
-                        <div class="data-details-des">{!! !empty($kyc->email) ? $kyc->email : '&nbsp;' !!}</div>
+                        <div class="data-details-des">{{ $kyc->email }}</div>
                     </li>{{-- li --}}
                     <li>
                         <div class="data-details-head">Phone Number</div>
-                        <div class="data-details-des">{!! !empty($kyc->phone) ? $kyc->phone : '&nbsp;' !!}</div>
+                        <div class="data-details-des">{{ $kyc->phone }}</div>
                     </li>{{-- li --}}
                     <li>
                         <div class="data-details-head">Date of Birth</div>
-                        <div class="data-details-des">{!! !empty($kyc->dob) ? _date2sz($kyc->dob, get_setting('site_date_format')) : '&nbsp;' !!}</div>
+                        <div class="data-details-des">{{ _date($kyc->dob, get_setting('site_date_format')) }}</div>
                     </li>{{-- li --}}
                     <li>
                         <div class="data-details-head">Full Address</div>
-                        <div class="data-details-des">{!! !empty($kyc->address1) ? $kyc->address1 . ',' : '&nbsp;' !!} {!! !empty($kyc->address2) ? $kyc->address2 . ',' : '&nbsp;' !!} {!! !empty($kyc->city) ? $kyc->city . ',' : '&nbsp;' !!} {!! !empty($kyc->state) ? $kyc->state . ',' : '&nbsp;' !!} {!! !empty($kyc->zip) ? $kyc->zip . '.' : '&nbsp;' !!}</div>
+                        <div class="data-details-des">{{ $kyc->address1 }}, {{ $kyc->address2 }}, {{ $kyc->city }}, {{ $kyc->state }} {{ $kyc->zip }}.</div>
                     </li>{{-- li --}}
                     <li>
                         <div class="data-details-head">Country of Residence</div>
-                        <div class="data-details-des">{!! !empty($kyc->country) ? $kyc->country : '&nbsp;' !!}</div>
+                        <div class="data-details-des">{{ $kyc->country }}</div>
                     </li>{{-- li --}}
                      <li>
                         <div class="data-details-head">Wallet Type</div>
-                        <div class="data-details-des">{!! !empty($kyc->walletName) ? $kyc->walletName : '&nbsp;' !!}</div>
+                        <div class="data-details-des">{{ $kyc->walletName }}</div>
                     </li>{{-- li --}}
                      <li>
                         <div class="data-details-head">Wallet Address</div>
-                        <div class="data-details-des">{!! !empty($kyc->walletAddress) ? $kyc->walletAddress : '&nbsp;' !!}</div>
+                        <div class="data-details-des">{{ $kyc->walletAddress }}</div>
                     </li>{{-- li --}}
                     <li>
                         <div class="data-details-head">Telegram Username</div>

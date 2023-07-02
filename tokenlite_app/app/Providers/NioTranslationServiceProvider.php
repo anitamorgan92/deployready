@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Translation\FileLoader;
 use App\Helpers\NioTranslator;
 
-class NioTranslationServiceProvider extends ServiceProvider
+class NioTranslationServiceProvider extends ServiceProvider 
 {
     /**
      * Indicates if loading of the provider is deferred.

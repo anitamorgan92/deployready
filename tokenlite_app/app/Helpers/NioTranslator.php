@@ -1,14 +1,13 @@
-<?php
+<?php 
 namespace App\Helpers;
 
 use Illuminate\Translation\Translator;
-
 /**
  * NioTranslator
  */
 class NioTranslator extends Translator
 {
-    
+	
     /**
      * Get the translation for the given key.
      *
@@ -20,6 +19,7 @@ class NioTranslator extends Translator
      */
     public function get($key, array $replace = [], $locale = null, $fallback = true)
     {
+
         $locale = $locale ?: $this->locale;
 
         // For JSON translations, there is only one file per locale, so we will simply load that file
@@ -36,11 +36,7 @@ class NioTranslator extends Translator
 
             foreach ($locales as $locale) {
                 if (! is_null($line = $this->getLine(
-                    $namespace,
-                    $group,
-                    $locale,
-                    $item,
-                    $replace
+                    $namespace, $group, $locale, $item, $replace
                 ))) {
                     return $line ?? $key;
                 }
@@ -50,4 +46,5 @@ class NioTranslator extends Translator
         // If the line doesn't exist, we will return back the key which was requested
         return $this->makeReplacements($line ?: $key, $replace);
     }
+
 }

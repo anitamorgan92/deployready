@@ -67,7 +67,7 @@
                                         <div class="input-item input-with-label">
                                             <label class="input-item-label">Account Number</label>
                                             <div class="input-wrap">
-                                                <input class="input-bordered number" name="bank_account_number" value="{{ isset($pmData->secret->bank_account_number) ? $pmData->secret->bank_account_number : '' }}" type="number" placeholder="Enter Bank Account Number">
+                                                <input class="input-bordered required number" name="bank_account_number" value="{{ isset($pmData->secret->bank_account_number) ? $pmData->secret->bank_account_number : '' }}" type="number" placeholder="Enter Bank Account Number" required>
                                             </div>
                                         </div>
                                     </div>

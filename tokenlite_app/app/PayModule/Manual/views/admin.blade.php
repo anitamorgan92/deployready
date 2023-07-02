@@ -77,24 +77,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        @php
-                                            $network = (isset($networks[$each_cur])) ? $networks[$each_cur] : false;
-                                        @endphp
-                                        
-                                        @if(!empty($network) && is_array($network))
-                                        <div class="col-6 col-md-3 col-lg-2">
-                                            <div class="input-item input-with-label">
-                                                <label class="input-item-label">Wallet Type (Network)</label>
-                                                <div class="input-wrap">
-                                                    <select class="select select-block select-bordered" name="{{ $each_cur }}[network]" >
-                                                        @foreach($network as $type => $label)
-                                                            <option{{ (isset($pmData->secret->$each_cur->network) && $pmData->secret->$each_cur->network==$type) ? ' selected ' : '' }} value="{{ $type }}">{{ __($label) }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @endif
                                         <div class="col-6 col-md-3 col-lg-2">
                                             <div class="input-item input-with-label">
                                                 <label class="input-item-label">Confirm Number</label>
@@ -115,17 +97,9 @@
                                             </div>
                                         </div>
                                     </div>
+                                    @if($each_cur=='eth') 
                                     <div class="row">
-                                        <div class="col-6 col-md-6">
-                                            <div class="input-item input-with-label wide-max-sm">
-                                                <label class="input-item-label">Custom Note</label>
-                                                <div class="input-wrap">
-                                                    <input class="input-bordered" placeholder="Enter your custom note" type="text" name="{{ $each_cur }}[note]" value="{{ (isset($pmData->secret->$each_cur->note) ? $pmData->secret->$each_cur->note : '' ) }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @if($each_cur=='eth')
-                                        <div class="col-6 col-md-3 col-lg-2">
+                                        <div class="col-6 col-md-3">
                                             <div class="input-item input-with-label">
                                                 <label class="input-item-label">Gas Limit</label>
                                                 <div class="input-wrap">
@@ -133,7 +107,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-6 col-md-3 col-lg-2">
+                                        <div class="col-6 col-md-3">
                                             <div class="input-item input-with-label">
                                                 <label class="input-item-label">Gas price</label>
                                                 <div class="input-wrap">
@@ -141,8 +115,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        @endif
                                     </div>
+                                    @endif
                                 </div>
                                 @if (!$loop->last)
                                     <div class="sap"></div>

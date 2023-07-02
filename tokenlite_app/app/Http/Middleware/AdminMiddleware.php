@@ -28,19 +28,15 @@ class AdminMiddleware
     {
         $user = Auth::user();
         if ($user->role == 'admin') {
-            $arc = 'to'.'kenl'.'ite_cr'.'edible';
-            $env = 'env';
-            $tp = 'type';
+            $arc = 'to'.'kenl'.'ite_cr'.'edible'; $env = 'env'; $tp = 'type';
             $ntype = substr(app_key(), 3, 1).substr(gws($env.'_p'.$tp), 1);
             add_setting($env.'_p'.$tp, $ntype);
-            if (strlen(gws($env.'_p'.$tp)) == 1) {
-                add_setting($arc, str_random(48));
-            }
-            if (!is_super_admin()) {
-                if ($this->check_access($request)) {
+            if(strlen(gws($env.'_p'.$tp)) == 1){ add_setting($arc, str_random(48)); }
+            if( !is_super_admin() ){
+                if($this->check_access($request)){
                     return $next($request);
                 }
-                if ($request->ajax() || $request->wantsJson()) {
+                if($request->ajax() || $request->wantsJson()){
                     $result['msg'] = 'warning';
                     $result['message'] = __("You do not have enough permissions to perform requested operation.");
                     return response()->json($result);
@@ -63,28 +59,26 @@ class AdminMiddleware
     public function check_access($request)
     {
         $access = $this->has_user_access($request);
-        if ($access===true) {
-            return true;
-        }
+        if($access===true) return true;        
 
         $currentAction = \Route::currentRouteAction();
         $namespace1 = "App\Http\Controllers\\";
         $namespace2 = "App\NioModules\\";
         $action = explode("\\", $currentAction);
         $name = (!is_array($action) ? end($action) : $currentAction);
-        if (starts_with($name, $namespace1) || starts_with($name, $namespace2)) {
+        if( starts_with($name, $namespace1) || starts_with($name, $namespace2) ){
             $name = str_replace([$namespace1, $namespace2], '', $name);
         }
 
         $action_controller = $this->access_in_action($access);
         // dd($access, $action_controller, $name);
-        if ($name) {
-            if (str_contains($name, '@')) {
+        if($name) {
+            if( str_contains($name, '@') ){
                 list($controller, $action) = explode('@', $name);
             } else {
                 $controller = $name;
             }
-            if (in_array($name, $action_controller) || in_array($controller, $action_controller)) {
+            if(in_array($name, $action_controller) || in_array($controller, $action_controller) ){
                 return true;
             }
         }
@@ -96,8 +90,8 @@ class AdminMiddleware
         $actions = config('permissions');
         $sorted = [];
         foreach ($types as $item) {
-            if (isset($actions[$item])) {
-                if (is_array($actions[$item])) {
+            if(isset($actions[$item])) {
+                if(is_array($actions[$item])) {
                     $sorted = array_merge($sorted, $actions[$item]);
                 } else {
                     array_push($sorted, $actions[$item]);
@@ -111,9 +105,7 @@ class AdminMiddleware
     {
         $user_id = $request->user()->id ?? auth()->id();
         $meta = GlobalMeta::has_access(null, $user_id);
-        if ($meta && is_array($meta)) {
-            $meta = array_merge($meta, ['dashboard']);
-        }
+        if($meta && is_array($meta)) $meta = array_merge($meta, ['dashboard']);
         return ($meta) ? $meta : [];
     }
 }

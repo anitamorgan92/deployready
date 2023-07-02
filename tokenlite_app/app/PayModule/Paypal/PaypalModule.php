@@ -1,10 +1,10 @@
-<?php
+<?php 
 
 namespace App\PayModule\Paypal;
 
 /**
  * Paypal Module
- * @version v1.3.1
+ * @version v1.3.0
  * @since v1.0.2
  */
 
@@ -30,9 +30,8 @@ class PaypalModule implements PmInterface
 {
     const SLUG = 'paypal';
     const SUPPORT_CURRENCY = ['USD', 'GBP', 'EUR', 'RUB', 'CAD', 'AUD', 'INR', 'BRL', 'NZD', 'PLN', 'JPY', 'MYR', 'MXN', 'PHP', 'CHF', 'SGD', 'CZK', 'NOK', 'SEK', 'DKK', 'HKD', 'HUF'];
-    const NON_DECIMAL_CURRENCY = ['HUF', 'JPY', 'TWD'];
-    const VERSION = '1.3.1';
-    const APP_VERSION = '^1.3.1';
+    const VERSION = '1.3.0';
+    const APP_VERSION = '^1.2.0';
 
     /* @function routes()  @version v1.1  @since 1.0.0 */
     public function routes()
@@ -46,7 +45,7 @@ class PaypalModule implements PmInterface
     {
         $pmData = PaymentMethod::get_data(self::SLUG, true);
         $name = self::SLUG;
-        return ModuleHelper::view('Paypal.views.card', compact('pmData', 'name'));
+    	return ModuleHelper::view('Paypal.views.card', compact('pmData', 'name'));
     }
 
     public function admin_views_details()
@@ -73,18 +72,12 @@ class PaypalModule implements PmInterface
         return self::SUPPORT_CURRENCY;
     }
 
-    public function get_non_decimal_currencies()
-    {
-        return self::NON_DECIMAL_CURRENCY;
-    }
-
     public function transaction_details($transaction)
     {
         return ModuleHelper::view('Paypal.views.tnx_details', compact('transaction'));
     }
 
-    public function email_details($transaction)
-    {
+    public function email_details($transaction){
         $data = json_decode($transaction->extra);
         $pm = get_pm(self::SLUG, true);
         $pay_url = (isset($data->url) ? $data->url : null);
@@ -94,13 +87,13 @@ class PaypalModule implements PmInterface
 
     public function create_transaction(Request $request)
     {
-        $helper = new PaypalPay();
-        if (method_exists($helper, 'paypal_pay')) {
-            return $helper->paypal_pay($request);
-        }
-        $response['msg'] = 'info';
+    	$helper = new PaypalPay();
+    	if(method_exists($helper, 'paypal_pay')){
+        	return $helper->paypal_pay($request);
+    	}
+    	$response['msg'] = 'info';
         $response['message'] = __('messages.nothing');
-        return $response;
+    	return $response;
     }
 
     public function payment_address()
@@ -112,7 +105,7 @@ class PaypalModule implements PmInterface
 
     public function save_data(Request $request)
     {
-        $response['msg'] = 'info';
+    	$response['msg'] = 'info';
         $response['message'] = __('messages.nothing');
         $validator = Validator::make($request->all(), [
             'title' => 'required',
@@ -121,9 +114,9 @@ class PaypalModule implements PmInterface
 
         if ($validator->fails()) {
             if ($validator->errors()->has('title')) {
-                $message = __($validator->errors()->first(), ['attribute' => 'title']);
+                $message = __($validator->errors()->first(),['attribute' => 'title']);
             } elseif ($validator->errors()->has('details')) {
-                $message = __($validator->errors()->first(), ['attribute' => 'details']);
+                $message = __($validator->errors()->first(),['attribute' => 'details']);
             } else {
                 $message = __('messages.form.wrong');
             }
@@ -131,42 +124,42 @@ class PaypalModule implements PmInterface
             $response['msg'] = 'warning';
             $response['message'] = $message;
         } else {
-            $old = PaymentMethod::get_single_data(self::SLUG);
-            $paypal_data = [
-                'email' => $request->input('email'),
-                'sandbox' => isset($request->sandbox) ? 1 : 0,
-                'clientId' => $request->input('client_id'),
-                'clientSecret' => $request->input('client_secret'),
-                'is_active' => (isset($old->secret) ? $old->secret->is_active : 0)
-            ];
-            $pmp = PaymentMethod::where('payment_method', 'paypal')->first();
-            if (! $pmp) {
-                $pmp = new PaymentMethod();
-                $pmp->payment_method = 'paypal';
-            }
-            $pmp->title = $request->input('title');
-            $pmp->description = $request->input('details');
-            $pmp->status = isset($request->status) ? 'active' : 'inactive';
-            $pmp->data = json_encode($paypal_data);
-                
-            if ($pmp->save()) {
-                $response['msg'] = 'success';
-                $response['message'] = __('messages.update.success', ['what' => 'PayPal payment information']);
-            } else {
-                $response['msg'] = 'error';
-                $response['message'] = __('messages.update.failed', ['what' => 'PayPal payment information']);
-            }
-        }
+	        $old = PaymentMethod::get_single_data(self::SLUG);
+	        $paypal_data = [
+	            'email' => $request->input('email'),
+	            'sandbox' => isset($request->sandbox) ? 1 : 0,
+	            'clientId' => $request->input('client_id'),
+	            'clientSecret' => $request->input('client_secret'),
+	            'is_active' => (isset($old->secret) ? $old->secret->is_active : 0)
+	        ];
+	        $pmp = PaymentMethod::where('payment_method', 'paypal')->first();
+	        if (! $pmp) {
+	            $pmp = new PaymentMethod();
+	            $pmp->payment_method = 'paypal';
+	        }
+	        $pmp->title = $request->input('title');
+	        $pmp->description = $request->input('details');
+	        $pmp->status = isset($request->status) ? 'active' : 'inactive';
+	        $pmp->data = json_encode($paypal_data);
+	            
+	        if ($pmp->save()) {
+	            $response['msg'] = 'success';
+	            $response['message'] = __('messages.update.success', ['what' => 'PayPal payment information']);
+	        }else{
+	            $response['msg'] = 'error';
+	            $response['message'] = __('messages.update.failed', ['what' => 'PayPal payment information']);
+	        }
+	    }
         return $response;
     }
 
     public function demo_data()
     {
         $data = [
-            'email' => null,
+            'email' => NULL,
             'sandbox' => 0,
-            'clientId' => null,
-            'clientSecret' => null,
+            'clientId' => NULL,
+            'clientSecret' => NULL,
             'is_active' => 0
         ];
         $template = [
@@ -174,8 +167,8 @@ class PaypalModule implements PmInterface
                 'name' => 'Token Purchase - Order Placed by Online Gateway (USER)',
                 'slug' => 'order-submit-online-user',
                 'subject' => 'Order placed for Token Purchase #[[order_id]]',
-                'greeting' => 'Thank you for your contribution!',
-                'message' => "You have requested to purchase [[token_symbol]] token. Your order has been received and is now being waiting for payment. You order details are show below for your reference.\n\n[[order_details]]\n\nYour token balance will appear in your account as soon as we have confirmed your payment from [[payment_gateway]].\n\nFeel free to contact us if you have any questions.\n",
+                'greeting' => 'Thank you for your contribution! ',
+                'message' => "You have requested to purchase [[token_symbol]] token. Your order has been received and is now being waiting for payment. You order details are show below for your reference. \n\n[[order_details]]\n\nYour token balance will appear in your account as soon as we have confirmed your payment from [[payment_gateway]].\n\nFeel free to contact us if you have any questions. \n ",
                 'regards' => "true"
             ],
             'order-canceled-user' => [

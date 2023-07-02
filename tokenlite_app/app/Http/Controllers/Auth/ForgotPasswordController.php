@@ -41,7 +41,7 @@ class ForgotPasswordController extends Controller
      */
     public function sendResetLinkEmail(Request $request)
     {
-        if (recaptcha()) {
+        if(recaptcha()) {
             $this->checkReCaptcha($request->recaptcha);
         }
         try {
@@ -58,7 +58,7 @@ class ForgotPasswordController extends Controller
             ? $this->sendResetLinkResponse($request, $response)
             : $this->sendResetLinkFailedResponse($request, $response);
         } catch (\Exception $e) {
-            return back()->withErrors(__('messages.email.reset', ['email'=>get_setting('site_email')]));
+            return back()->withErrors(__('messages.email.reset',['email'=>get_setting('site_email')]));
         }
     }
 

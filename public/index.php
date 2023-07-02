@@ -10,11 +10,6 @@
 define('LARAVEL_START', microtime(true));
 define('LARAVEL_PUBLIC_PATH', __DIR__);
 
-if (file_exists(__DIR__.'/.upgrade')) {
-    echo "We are upgrading our systems. Apologies for any inconvenience.";
-    exit();
-}
-
 /*
 |--------------------------------------------------------------------------
 | Register The Auto Loader
@@ -26,15 +21,9 @@ if (file_exists(__DIR__.'/.upgrade')) {
 | loading any of our classes later on. It feels great to relax.
 |
 */
-if (version_compare(phpversion(), '7.3.0', '<')) {
+if (version_compare(phpversion(), '7.2.0', '<')) {
     header('Location:http://'.$_SERVER['HTTP_HOST'].'/error.html');
 }
-
-if (!file_exists(__DIR__.'/../tokenlite_app/vendor/autoload.php')) {
-    echo "Please upload all files and folder accordingly.";
-    exit();
-}
-
 require __DIR__.'/../tokenlite_app/vendor/autoload.php';
 
 /*

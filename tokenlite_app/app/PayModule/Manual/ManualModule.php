@@ -4,7 +4,7 @@ namespace App\PayModule\Manual;
 
 /**
  * Manual Module
- * @version v1.4.1
+ * @version v1.4.0
  * @since v1.0.2
  */
 use Auth;
@@ -26,9 +26,9 @@ use App\Helpers\TokenCalculate as TC;
 class ManualModule implements PmInterface
 {
     const SLUG = 'manual';
-    const SUPPORT_CURRENCY = ['ETH', 'BTC', 'LTC', 'XRP', 'XLM', 'BCH', 'BNB', 'USDT', 'TRX', 'USDC', 'DASH', 'WAVES', 'XMR', 'BUSD', 'ADA', 'DOGE', 'SOL', 'UNI', 'LINK', 'CAKE'];
-    const VERSION = '1.4.1';
-    const APP_VERSION = '^1.3.1';
+    const SUPPORT_CURRENCY = ['ETH', 'BTC', 'LTC', 'XRP', 'XLM', 'BCH', 'BNB', 'USDT', 'TRX', 'USDC', 'DASH', 'WAVES', 'XMR'];
+    const VERSION = '1.4.0';
+    const APP_VERSION = '^1.2.0';
 
     public function routes()
     {
@@ -36,81 +36,10 @@ class ManualModule implements PmInterface
         Route::post('/manual/notify', 'Manual\ManualController@email_notify')->name('manual.notify');
     }
 
-    public function currencies()
-    {
+    public function currencies() {
         $support_cur = self::SUPPORT_CURRENCY;
         $currencies = array_map('strtolower', $support_cur);
         return $currencies;
-    }
-
-    public function networks($code=null, $output=null)
-    {
-        $code = strtolower($code);
-        $networks = [
-            'eth' => [
-                'default' => 'Default',
-                'bep2' => 'BC Chain (BEP2)',
-                'bep20' => 'BSC Chain (BEP20)',
-            ],
-            'btc' => [
-                'default' => 'Default',
-                'bep2' => 'BC Chain (BEP2)',
-                'bep20' => 'BSC Chain (BEP20)',
-            ],
-            'ltc' => [
-                'default' => 'Default',
-                'bep2' => 'BC Chain (BEP2)',
-                'bep20' => 'BSC Chain (BEP20)',
-            ],
-            'xrp' => [
-                'default' => 'Default',
-                'bep2' => 'BC Chain (BEP2)',
-            ],
-            'bch' => [
-                'default' => 'Default',
-                'bep2' => 'BC Chain (BEP2)',
-                'bep20' => 'BSC Chain (BEP20)',
-            ],
-            'bnb' => [
-                'default' => 'Mainnet',
-                'bsc' => 'BSC Chain (BSC)',
-                'erc20' => 'ERC20',
-            ],
-            'usdt' => [
-                'default' => 'Omni Layer',
-                'bep2' => 'BC Chain (BEP2)',
-                'bep20' => 'BSC Chain (BEP20)',
-                'erc20' => 'ERC20',
-                'trc20' => 'Tron (TRC20)',
-            ],
-            'usdc' => [
-                'default' => 'Default',
-                'bep20' => 'BSC Chain (BEP20)',
-                'trc20' => 'Tron (TRC20)',
-            ],
-            'busd' => [
-                'default' => 'ERC20',
-                'bep2' => 'BC Chain (BEP2)',
-                'bep20' => 'BSC Chain (BEP20)',
-            ],
-            'ada' => [
-                'default' => 'Default',
-                'bep2' => 'BC Chain (BEP2)',
-            ],
-            'doge' => [
-                'default' => 'Default',
-                'bep20' => 'BSC Chain (BEP20)',
-            ],
-            'link' => [
-                'default' => 'Default',
-                'bep20' => 'BSC Chain (BEP20)',
-            ]
-        ];
-
-        if (isset($networks[$code])) {
-            return $networks[$code];
-        }
-        return $networks;
     }
 
     public function admin_views()
@@ -118,15 +47,14 @@ class ManualModule implements PmInterface
         $pmData = get_pm(self::SLUG, true);
         $name = self::SLUG;
         $currencies = $this->currencies();
-        return ModuleHelper::view('Manual.views.card', compact('pmData', 'name', 'currencies'));
+    	return ModuleHelper::view('Manual.views.card', compact('pmData', 'name', 'currencies'));
     }
 
     public function admin_views_details()
     {
         $pmData = get_pm(self::SLUG, true);
         $currencies = $this->currencies();
-        $networks = $this->networks();
-        return ModuleHelper::view('Manual.views.admin', compact('pmData', 'currencies', 'networks'));
+        return ModuleHelper::view('Manual.views.admin', compact('pmData', 'currencies'));
     }
 
     public function show_action()
@@ -149,7 +77,7 @@ class ManualModule implements PmInterface
         $pm = get_pm(self::SLUG);
         foreach ($currency as $cur) {
             $cur = strtolower($cur);
-            if (isset($pm->$cur) && $pm->$cur->address != null && $pm->$cur->status == 'active') {
+            if(isset($pm->$cur) && $pm->$cur->address != null && $pm->$cur->status == 'active'){
                 $active[] = strtoupper($cur);
             }
         }
@@ -158,9 +86,7 @@ class ManualModule implements PmInterface
 
     private function check_address($wallet, $type='')
     {
-        if (empty($wallet)) {
-            return false;
-        }
+        if(empty($wallet)) return false;
         return IcoHandler::validate_address($wallet, $type);
     }
 
@@ -169,8 +95,7 @@ class ManualModule implements PmInterface
         return ModuleHelper::view('Manual.views.tnx_details', compact('transaction'));
     }
 
-    public function email_details($transaction)
-    {
+    public function email_details($transaction){
         $mnl = get_pm(self::SLUG);
         $currency = strtolower($transaction->currency);
         $address = isset($mnl->$currency->address) ? $mnl->$currency->address : '~';
@@ -234,7 +159,6 @@ class ManualModule implements PmInterface
                 'amount' => round($calc_token['price']->$currency, max_decimal()),
             ];
             $address = isset(get_pm(self::SLUG)->$currency) ? get_pm(self::SLUG)->$currency->address : '';
-            $network = (isset(get_pm(self::SLUG)->$currency) && isset(get_pm(self::SLUG)->$currency->network)) ? get_pm(self::SLUG)->$currency->network : '';
             $save_data = [
                 'created_at' => Carbon::now()->toDateTimeString(),
                 'tnx_id' => set_id(rand(100, 999), 'trnx'),
@@ -259,7 +183,6 @@ class ManualModule implements PmInterface
                 'payment_to' => $address,
                 'added_by' => set_added_by('00'),
                 'details' => __('messages.trnx.purchase_token'),
-                'extra' => $network ? json_encode(['network' => $network]) : '',
                 'status' => 'pending',
             ];
             $iid = Transaction::insertGetId($save_data);
@@ -345,41 +268,36 @@ class ManualModule implements PmInterface
         $old = PaymentMethod::get_data('manual', true);
         $manual = [
             'eth' => [
-                'status' => ($old ? $old->secret->eth->status : 'inactive'),
+                'status' => ( $old ? $old->secret->eth->status : 'inactive'),
                 'address' => ($old ? $old->secret->eth->address : null),
                 'limit' => ($old ? $old->secret->eth->limit : null),
                 'price' => ($old ? $old->secret->eth->price : null),
                 'num' => 3,
                 'req' => 'no',
-                'network' => 'default',
             ],
             'btc' => [
-                'status' => ($old ? $old->secret->btc->status : 'inactive'),
+                'status' => ( $old ? $old->secret->btc->status : 'inactive'),
                 'address' => ($old ? $old->secret->btc->address : null),
                 'num' => 3,
                 'req' => 'no',
-                'network' => 'default',
             ],
             'ltc' => [
-                'status' => ($old ? $old->secret->ltc->status : 'inactive'),
+                'status' => ( $old ? $old->secret->ltc->status : 'inactive'),
                 'address' => ($old ? $old->secret->ltc->address : null),
                 'num' => 3,
                 'req' => 'no',
-                'network' => 'default',
             ],
             'bch' => [
                 'status' => 'inactive',
                 'address' => null,
                 'num' => 3,
                 'req' => 'no',
-                'network' => 'default',
             ],
             'bnb' => [
                 'status' => 'inactive',
                 'address' => null,
                 'num' => 3,
                 'req' => 'no',
-                'network' => 'default',
             ],
             'trx' => [
                 'status' => 'inactive',
@@ -398,21 +316,18 @@ class ManualModule implements PmInterface
                 'address' => null,
                 'num' => 3,
                 'req' => 'no',
-                'network' => 'default',
             ],
             'usdt' => [
                 'status' => 'inactive',
                 'address' => null,
                 'num' => 3,
                 'req' => 'no',
-                'network' => 'default',
             ],
             'usdc' => [
                 'status' => 'inactive',
                 'address' => null,
                 'num' => 3,
                 'req' => 'no',
-                'network' => 'default',
             ],
             'dash' => [
                 'status' => 'inactive',
@@ -432,52 +347,7 @@ class ManualModule implements PmInterface
                 'num' => 3,
                 'req' => 'no',
             ],
-            'busd' => [
-                'status' => 'inactive',
-                'address' => null,
-                'num' => 3,
-                'req' => 'no',
-                'network' => 'default',
-            ],
-            'ada' => [
-                'status' => 'inactive',
-                'address' => null,
-                'num' => 3,
-                'req' => 'no',
-                'network' => 'default',
-            ],
-            'doge' => [
-                'status' => 'inactive',
-                'address' => null,
-                'num' => 3,
-                'req' => 'no',
-                'network' => 'default',
-            ],
-            'sol' => [
-                'status' => 'inactive',
-                'address' => null,
-                'num' => 3,
-                'req' => 'no',
-            ],
-            'uni' => [
-                'status' => 'inactive',
-                'address' => null,
-                'num' => 3,
-                'req' => 'no',
-            ],
-            'link' => [
-                'status' => 'inactive',
-                'address' => null,
-                'num' => 3,
-                'req' => 'no',
-                'network' => 'default',
-            ],
-            'cake' => [
-                'status' => 'inactive',
-                'address' => null,
-                'num' => 3,
-                'req' => 'no',
-            ],
+
         ];
 
         if (PaymentMethod::check(self::SLUG)) {

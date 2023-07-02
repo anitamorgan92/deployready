@@ -107,10 +107,6 @@
                                                     <input name="by" class="input-radio-select" id="advs-by-user" value="usr" type="radio"{{ (isset(request()->by) && request()->by=='usr') ? ' checked' : '' }}>
                                                     <label for="advs-by-user">User</label>
                                                 </li>
-                                                <li class="input-wrap input-radio-wrap">
-                                                    <input name="by" class="input-radio-select" id="advs-by-wallet_address" value="wallet_address" type="radio"{{ (isset(request()->by) && request()->by=='wallet_address') ? ' checked' : '' }}>
-                                                    <label for="advs-by-wallet_address">Reference</label>
-                                                </li>
                                             </ul>
                                         </div>
                                     </div>
@@ -227,7 +223,7 @@
                         <div class="search-info">
                             Found <span class="search-count">{{ $trnxs->total() }}</span> Transactions{{ (request()->get('date') != 'custom') ? '.' : '' }}
                             @if (request()->get('date') == 'custom')
-                            between <span>{{ _date2sz(request()->get('from'), '', true) }}</span> to <span>{{ _date2sz(request()->get('to'), '', true) }}</span>.
+                            between <span>{{ _date(request()->get('from'), '', true) }}</span> to <span>{{ _date(request()->get('to'), '', true) }}</span>.
                             @endif
                         </div>
                         <ul class="search-opt">
@@ -307,7 +303,7 @@
                                 </div>
                             </td>
                             <td class="data-col dt-token">
-                                <span class="lead token-amount{{ $text_danger }}">{{ (starts_with($trnx->total_tokens, '-') ? '' : '+').to_num($trnx->total_tokens, 'max') }}</span>
+                                <span class="lead token-amount{{ $text_danger }}">{{ (starts_with($trnx->total_tokens, '-') ? '' : '+').$trnx->total_tokens }}</span>
                                 <span class="sub sub-symbol">{{ token('symbol') }}</span>
                             </td>
                             <td class="data-col dt-amount">
@@ -345,7 +341,7 @@
                                     @php 
                                     $extra = (is_json($trnx->extra, true) ?? $trnx->extra);
                                     @endphp
-                                    <span class="sub sub-email"><a href="{{ route('admin.transactions.view', ($extra->trnx ?? $trnx->id)) }}">{{ __("View Transaction") }}</a></span>
+                                    <span class="sub sub-email"><a href="{{ route('admin.transactions.view', ($extra->trnx ?? $trnx->id)) }}">View Transaction</a></span>
                                 @else
                                     <span class="sub sub-email">{{ set_id($trnx->user) }} <em class="fas fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="{{ isset($trnx->tnxUser) ? explode_user_for_demo($trnx->tnxUser->email, auth()->user()->type) : '' }}"></em></span> 
                                 @endif
@@ -378,10 +374,6 @@
                                                 @if($trnx->payment_method == 'bank' || $trnx->payment_method == 'manual')
                                                 <li><a href="javascript:void(0)" id="adjust_token" data-id="{{ $trnx->id }}">
                                                     <em class="far fa-check-square"></em>Approve</a></li>
-                                                @endif
-                                                @if ($trnx->payment_method == 'coinbase' && $trnx->status != 'canceled')
-                                                <li><a href="{{ route('admin.transactions.check', ['tid' => $trnx->id]) }}">
-                                                    <em class="fas fa-reply"></em>Check Status</a></li> 
                                                 @endif
                                                 @if($trnx->tnx_type != 'transfer')
                                                 <li id="canceled"><a href="javascript:void(0)" class="tnx-action" data-type="canceled" data-id="{{ $trnx->id }}">

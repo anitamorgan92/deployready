@@ -2,10 +2,10 @@
 
 namespace Laravel\BrowserKitTesting\Concerns;
 
+use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Throwable;
 
 trait InteractsWithExceptionHandling
 {
@@ -39,22 +39,21 @@ trait InteractsWithExceptionHandling
     {
         $this->previousExceptionHandler = app(ExceptionHandler::class);
 
-        $this->app->instance(ExceptionHandler::class, new class implements ExceptionHandler
-        {
+        $this->app->instance(ExceptionHandler::class, new class implements ExceptionHandler {
             public function __construct()
             {
             }
 
-            public function report(Throwable $e)
+            public function report(Exception $e)
             {
             }
 
-            public function shouldReport(Throwable $e)
+            public function shouldReport(Exception $e)
             {
                 return false;
             }
 
-            public function render($request, Throwable $e)
+            public function render($request, Exception $e)
             {
                 if ($e instanceof NotFoundHttpException) {
                     throw new NotFoundHttpException(
@@ -65,9 +64,9 @@ trait InteractsWithExceptionHandling
                 throw $e;
             }
 
-            public function renderForConsole($output, Throwable $e)
+            public function renderForConsole($output, Exception $e)
             {
-                (new ConsoleApplication)->renderThrowable($e, $output);
+                (new ConsoleApplication)->renderException($e, $output);
             }
         });
 

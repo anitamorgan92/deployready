@@ -14,7 +14,6 @@ namespace App\Helpers;
 use App\Models\IcoMeta;
 use App\Models\IcoStage;
 use App\Models\Setting;
-use Carbon\Carbon;
 
 class TokenCalculate
 {
@@ -93,10 +92,9 @@ class TokenCalculate
      */
     public function get_current_bonus($attr, $id = '')
     {
-        $id = ($id == null)? $this->stage->id : $id;
+        $id = ($id == NULL)? $this->stage->id : $id;
         $return = 0;
-        $timezone = get_setting('site_timezone', 'UTC');
-        $current_date = now()->timezone($timezone);
+        $current_date = date('Y-m-d H:i:s');
 
         $data = $this->get_bonuses($id);
         $bonuses = $bonus_only = [];
@@ -126,9 +124,7 @@ class TokenCalculate
                     $tire_opt->start_date = ($tire_opt->start_date == def_datetime('datetime_s')) ? $ico_date_s : $tire_opt->start_date;
                     $tire_opt->end_date = ($tire_opt->end_date == def_datetime('datetime_e')) ? $ico_date_e : $tire_opt->end_date;
 
-                    $tire_opt->start_date = Carbon::parse($tire_opt->start_date, $timezone);
-                    $tire_opt->end_date = Carbon::parse($tire_opt->end_date, $timezone);
-                    if ($current_date->gte($tire_opt->start_date) && $current_date->lte($tire_opt->end_date)) {
+                    if ($current_date >= $tire_opt->start_date && $current_date <= $tire_opt->end_date) {
                         $bonuses[$tire] = $tire_opt;
                         $bonus_only[$tire] = $tire_opt->amount;
                         $active_tire[$tire] = $tire;
@@ -251,7 +247,7 @@ class TokenCalculate
             'minimum' => $minimum,
         ];
 
-        if ($attr==='array') {
+        if($attr==='array') {
             return $return_price;
         } elseif (isset($return_price[$attr])) {
             return $return_price[$attr];
@@ -337,12 +333,12 @@ class TokenCalculate
         $price = $this->get_current_price();
         $cost = [];
         $base = $token * $price;
-        $cost['base'] = to_num($base, 'max');
+        $cost['base'] = $base;
 
         $currencies = Setting::active_currency();
         $decimal = (empty(token('decimal_max')) ? 6 : token('decimal_max'));
         foreach ($currencies as $code => $rate) {
-            $cost[$code] = to_num(($rate * $base), $decimal);
+            $cost[$code] = round(($rate * $base), $decimal);
         }
 
         // Bonus Calculation
@@ -359,7 +355,7 @@ class TokenCalculate
             'bonus-base' => $token_bonus_base,
             'bonus-token' => $token_bonus_amount,
         ];
-        if ($output==='array') {
+        if($output==='array') {
             return $calc;
         } elseif (isset($calc[$output])) {
             return $calc[$output];

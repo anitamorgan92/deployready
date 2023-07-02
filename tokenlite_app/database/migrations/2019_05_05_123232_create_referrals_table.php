@@ -16,9 +16,9 @@ class CreateReferralsTable extends Migration
         Schema::create('referrals', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->nullable();
-            $table->double('user_bonus')->nullable();
+            $table->integer('user_bonus')->nullable();
             $table->integer('refer_by')->nullable();
-            $table->double('refer_bonus')->nullable();
+            $table->integer('refer_bonus')->nullable();
             $table->longText('meta_data')->nullable();
             $table->timestamps();
         });

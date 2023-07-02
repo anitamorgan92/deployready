@@ -9,12 +9,12 @@ class APIController extends Controller
 {
     public function __construct()
     {
-        if ($this->hasKey() === false && !app()->runningInConsole()) {
+        if( $this->hasKey() === false && !app()->runningInConsole()){
             throw new APIException("Provide valid access key", 401);
         }
     }
     /**
-     * Check the API key
+     * Check the API key 
      */
     protected function hasKey() : bool
     {
@@ -34,9 +34,8 @@ class APIController extends Controller
         
         $bonus_data = ['base' => $base];
         if ($base > 0) {
-            $bonus_data['start'] = isset($base_dt->start_date) ? $base_dt->start_date->toDateTimeString() : $stage->start_date->toDateTimeString();
-            $bonus_data['end'] = isset($base_dt->end_date) ? $base_dt->end_date->toDateTimeString() : $stage->end_date->toDateTimeString();
-            $bonus_data['timezone'] = get_setting('site_timezone', 'UTC');
+            $bonus_data['start'] = isset($base_dt->start_date) ? $base_dt->start_date : $stage->start_date;
+            $bonus_data['end'] = isset($base_dt->end_date) ? $base_dt->end_date : $stage->end_date;
         }
         $bonus_data['amount'] = $amount;
 
@@ -81,7 +80,6 @@ class APIController extends Controller
             'price' => current_price(),
             'start' => $stage->start_date,
             'end' => $stage->end_date,
-            'timezone' => get_setting('site_timezone', 'UTC'),
             'min' => $stage->min_purchase,
             'max' => $stage->max_purchase,
             'soft' => $soft,
@@ -94,16 +92,15 @@ class APIController extends Controller
             'ico' => active_stage_status($stage),
             'total' => $token_cur,
             'total_amount' => $token_amt,
-            'total_token' => $token,
+            'total_token' => $token, 
             'sold' => $sold_cur,
             'sold_amount' => $sold_amt,
-            'sold_token' => $sold,
+            'sold_token' => $sold, 
             'progress' => sale_percent($stage),
             'price' => current_price(),
             'bonus' => $bonus_data,
             'start' => $stage->start_date,
             'end' => $stage->end_date,
-            'timezone' => get_setting('site_timezone', 'UTC'),
             'min' => $stage->min_purchase,
             'max' => $stage->max_purchase,
             'soft' => ['cap' => $soft, 'amount' => $soft_amt, 'percent' => round(ico_stage_progress('soft'), 2) ],
@@ -148,13 +145,14 @@ class APIController extends Controller
      */
     public function bonuses()
     {
+        
         $bonus_data = $this->bonus_data();
 
         $data = [
-            'success' => true,
+            'success' => true, 
             'response' => $bonus_data
         ];
-
+        
         return response()->json($data, 200, [], JSON_PRETTY_PRINT);
     }
 
@@ -165,15 +163,9 @@ class APIController extends Controller
     public function prices()
     {
         $get_price = current_price('base');
-        $prices_data = [
-            'price' => $get_price->price,
-            'min' => $get_price->min_purchase,
-            'end' => $get_price->end_date,
-            'timezone' => get_setting('site_timezone', 'UTC'),
-        ];
-
+        $prices_data = ['price' => $get_price->price, 'min' => $get_price->min_purchase, 'end' => $get_price->end_date];
         $data = [
-            'success' => true,
+            'success' => true, 
             'response' => $prices_data
         ];
         

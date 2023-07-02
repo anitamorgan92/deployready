@@ -51,7 +51,7 @@
                             <form action="{{ route('admin.users') }}" method="GET" autocomplete="off">
                                 <div class="input-wrap">
                                     <span class="input-icon input-icon-left"><em class="ti ti-search"></em></span>
-                                    <input type="search" class="input-solid input-transparent" placeholder="Quick search with name/email/id/wallet address" value="{{ request()->get('s', '') }}" name="s">
+                                    <input type="search" class="input-solid input-transparent" placeholder="Quick search with name/email/id" value="{{ request()->get('s', '') }}" name="s">
                                 </div>
                             </form>
                         </div>
@@ -140,10 +140,6 @@
                                                     <li class="input-wrap input-radio-wrap">
                                                         <input name="by" value="id" class="input-radio-select" id="advs-by-id" type="radio" id="advs-by-id"{{ (isset(request()->by) && request()->by=='id') ? ' checked' : '' }}>
                                                         <label for="advs-by-id">ID</label>
-                                                    </li>
-                                                    <li class="input-wrap input-radio-wrap">
-                                                        <input name="by" value="walletAddress" class="input-radio-select" id="advs-by-walletAddress" type="radio" id="advs-by-walletAddress"{{ (isset(request()->by) && request()->by=='walletAddress') ? ' checked' : '' }}>
-                                                        <label for="advs-by-walletAddress">Wallet</label>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -332,9 +328,7 @@
                                             @if($user->google2fa == 1)
                                             <li><a class="user-form-action user-action" href="javascript:void(0)" data-type="reset_2fa" data-uid="{{ $user->id }}" ><em class="fas fa-unlink"></em>Reset 2FA</a></li>
                                             @endif
-                                            @if($user->email_verified_at === null)
-                                            <li><a class="user-form-action user-action" href="javascript:void(0)" data-type="verify_email" data-uid="{{ $user->id }}" ><em class="fas fa-check"></em>Verify Email</a></li>
-                                            @endif
+
                                             @if(Auth::id() != $user->id && $user->id != save_gmeta('site_super_admin')->value) @if($user->status != 'suspend')
                                             <li><a href="#" data-uid="{{ $user->id }}" data-type="suspend_user" class="user-action front"><em class="fas fa-ban"></em>Suspend</a></li>
 

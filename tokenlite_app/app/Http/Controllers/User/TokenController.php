@@ -108,7 +108,7 @@ class TokenController extends Controller
         $_data = [];
         try {
             $last = (int)get_setting('piks_ger_oin_oci', 0);
-            if ((!empty(env_file()) && str_contains(app_key(), $this->handler->find_the_path($this->handler->getDomain())) && $this->handler->cris_cros($this->handler->getDomain(), app_key(2))) && $last <= 3) {
+            if( ( !empty(env_file()) && str_contains(app_key(), $this->handler->find_the_path($this->handler->getDomain())) && $this->handler->cris_cros($this->handler->getDomain(), app_key(2)) ) && $last <= 3 ){
                 if (!empty($token) && $token >= $min) {
                     $_data = (object) [
                         'currency' => $currency,
@@ -135,13 +135,13 @@ class TokenController extends Controller
                     $msg = $this->check(0, 'err');
                     $ret['modal'] = '<a href="#" class="modal-close" data-dismiss="modal"><em class="ti ti-close"></em></a><div class="popup-body"><h3 class="alert alert-danger text-center">'.$msg.'</h3></div>';
                 }
-            } else {
+            }else{
                 $ret['modal'] = '<a href="#" class="modal-close" data-dismiss="modal"><em class="ti ti-close"></em></a><div class="popup-body"><h3 class="alert alert-danger text-center">'.$this->handler->accessMessage().'</h3></div>';
             }
         } catch (\Exception $e) {
             $ret['modal'] = '<a href="#" class="modal-close" data-dismiss="modal"><em class="ti ti-close"></em></a><div class="popup-body"><h3 class="alert alert-danger text-center">'.$this->handler->accessMessage().'</h3></div>';
         }
-
+        
         if ($request->ajax()) {
             return response()->json($ret);
         }
@@ -180,16 +180,17 @@ class TokenController extends Controller
 
             $ret['msg'] = 'warning';
             $ret['message'] = $msg;
-        } else {
+        }else{
             $type = strtolower($request->input('pp_currency'));
             $method = strtolower($request->input('pay_option'));
             $last = (int)get_setting('piks_ger_oin_oci', 0);
-            if ($this->handler->check_body() && $last <= 3) {
+            if( $this->handler->check_body() && $last <= 3 ){
                 return $this->module->make_payment($method, $request);
-            } else {
+            }else{
                 $ret['msg'] = 'info';
                 $ret['message'] = $this->handler->accessMessage();
             }
+
         }
         if ($request->ajax()) {
             return response()->json($ret);
@@ -209,7 +210,7 @@ class TokenController extends Controller
         $tc = new TC();
         $stg = active_stage();
         $min = $tc->get_current_price('min');
-        $available_token = ((double) $stg->total_tokens - ($stg->soldout + $stg->soldlock));
+        $available_token = ( (double) $stg->total_tokens - ($stg->soldout + $stg->soldlock) );
         $symbol = token_symbol();
 
         if ($extra == 'err') {
@@ -220,7 +221,7 @@ class TokenController extends Controller
                     return __('You must purchase minimum :amount :symbol.', ['amount' => $min, 'symbol' =>$symbol]);
                 }
             } else {
-                if ($available_token < $min) {
+                if($available_token < $min) {
                     return __('Our sales has been finished. Thank you very much for your interest.');
                 } else {
                     if ($available_token >= $token) {
@@ -256,27 +257,27 @@ class TokenController extends Controller
         if ($request->get('tnx_id') || $request->get('token')) {
             $id = $request->get('tnx_id');
             $pay_token = $request->get('token');
-            if ($pay_token != null) {
+            if($pay_token != null){
                 $pay_token = (starts_with($pay_token, 'EC-') ? str_replace('EC-', '', $pay_token) : $pay_token);
             }
             $apv_name = ucfirst($url);
-            if (!empty($id)) {
+            if(!empty($id)){
                 $tnx = Transaction::where('id', $id)->first();
-            } elseif (!empty($pay_token)) {
+            }elseif(!empty($pay_token)){
                 $tnx = Transaction::where('payment_id', $pay_token)->first();
-                if (empty($tnx)) {
+                if(empty($tnx)){
                     $tnx =Transaction::where('extra', 'like', '%'.$pay_token.'%')->first();
                 }
-            } else {
+            }else{
                 return redirect(route('user.token'))->with(['danger'=>__("Sorry, we're unable to proceed the transaction. This transaction may deleted. Please contact with administrator."), 'modal'=>'danger']);
             }
-            if ($tnx) {
+            if($tnx){
                 $_old_status = $tnx->status;
-                if ($_old_status == 'deleted' || $_old_status == 'canceled') {
+                if($_old_status == 'deleted' || $_old_status == 'canceled'){
                     $name = __("Your transaction is already :status. Sorry, we're unable to proceed the transaction.", ['status' => $_old_status]);
-                } elseif ($_old_status == 'approved') {
+                }elseif($_old_status == 'approved'){
                     $name = __("Your transaction is already :status. Please check your account balance.", ['status' => $_old_status]);
-                } elseif (!empty($tnx) && ($tnx->status == 'pending' || $tnx->status == 'onhold') && $tnx->user == auth()->id()) {
+                }elseif(!empty($tnx) && ($tnx->status == 'pending' || $tnx->status == 'onhold') && $tnx->user == auth()->id()) {
                     $tnx->status = 'canceled';
                     $tnx->checked_by = json_encode(['name'=>$apv_name, 'id'=>$pay_token]);
                     $tnx->checked_time = Carbon::now()->toDateTimeString();
@@ -284,16 +285,15 @@ class TokenController extends Controller
                     IcoStage::token_add_to_account($tnx, 'sub');
                     try {
                         $tnx->tnxUser->notify((new TnxStatus($tnx, 'canceled-user')));
-                    } catch (\Exception $e) {
-                    }
-                    if (get_emailt('order-rejected-admin', 'notify') == 1) {
+                    } catch(\Exception $e){ }
+                    if(get_emailt('order-rejected-admin', 'notify') == 1){
                         notify_admin($tnx, 'rejected-admin');
                     }
                 }
-            } else {
+            }else{
                 $name = __('Transaction is not found!!');
             }
-        } else {
+        }else{
             $name = __('Transaction id or key is not valid!');
         }
         return redirect(route('user.token'))->with(['danger'=>$name, 'modal'=>'danger']);

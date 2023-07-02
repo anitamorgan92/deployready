@@ -12,9 +12,9 @@
         <link href="{{ asset('installer/css/style.min.css') }}" rel="stylesheet"/>
         @yield('style')
         <script>
-            window.Laravel = {{ json_encode([
-                'csrfToken' => csrf_token()
-            ]) }};
+            window.Laravel = <?php echo json_encode([
+                'csrfToken' => csrf_token(),
+            ]); ?>
         </script>
     </head>
     <body>
@@ -106,11 +106,9 @@
         <script type="text/javascript">
             var x = document.getElementById('error_alert');
             var y = document.getElementById('close_alert');
-            if (x !== null && y !== null) {
-                y.onclick = function() {
-                    x.style.display = "none";
-                };
-            }
+            y.onclick = function() {
+                x.style.display = "none";
+            };
         </script>
     </body>
 </html>
