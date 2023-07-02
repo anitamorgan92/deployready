@@ -98,7 +98,7 @@ class GlobalMeta extends Model
         $super = self::where('name', 'site_super_admin')->get();
         $users = [];
         foreach ($super as $user) {
-            if($user->value=='1'||$user->value=='access'){
+            if ($user->value=='1'||$user->value=='access') {
                 array_push($users, intval($user->pid));
             }
         }
@@ -121,7 +121,7 @@ class GlobalMeta extends Model
         }
 
         $get_access = self::where(['pid' => $user_id, 'name' => 'manage_access'])->first();
-        if(!empty($get_access)) {
+        if (!empty($get_access)) {
             $access = json_decode($get_access->extra, true);
             return self::check_access($access, $type);
         } else {
@@ -142,9 +142,9 @@ class GlobalMeta extends Model
      */
     public static function check_access($data, $type=null)
     {
-        if(in_array('as_super_admin', $data)) {
+        if (in_array('as_super_admin', $data)) {
             return true;
-        } elseif(!empty($type)) {
+        } elseif (!empty($type)) {
             return (in_array($type, $data)) ?  [$type] : [];
         }
         return array_unique($data);

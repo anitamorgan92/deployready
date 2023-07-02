@@ -41,7 +41,7 @@
                                                             <select id="bonus_applicable" class="select select-block select-bordered " name="referral_allow_join">
                                                                 <option {{ get_setting('referral_allow_join') == 'all_time' ? 'selected' : '' }} value="all_time">For All Transactions</option>
                                                                 @foreach($general->steps_join as $step)
-                                                                <option {{ (get_setting('referral_allow') == $step) ? 'selected ' : '' }}value="{{ $step }}">Max  {{ $step }} Transaction</option>
+                                                                <option {{ (get_setting('referral_allow_join') == $step) ? 'selected ' : '' }}value="{{ $step }}">Max  {{ $step }} Transaction</option>
                                                                 @endforeach
                                                             </select>
                                                         </div>

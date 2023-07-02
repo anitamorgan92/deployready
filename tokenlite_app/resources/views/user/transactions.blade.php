@@ -92,7 +92,7 @@
                         </div>
                     </td>
                     <td class="data-col dt-token">
-                        <span class="lead token-amount{{ $text_danger }}">{{ (starts_with($trnx->total_tokens, '-') ? '' : '+').$trnx->total_tokens }}</span>
+                        <span class="lead token-amount{{ $text_danger }}">{{ (starts_with($trnx->total_tokens, '-') ? '' : '+').to_num_token($trnx->total_tokens) }}</span>
                         <span class="sub sub-symbol">{{ token_symbol() }}</span>
                     </td>
                     <td class="data-col dt-amount{{ $text_danger }}">
@@ -119,7 +119,7 @@
                         @if($trnx->tnx_type == 'refund')
                             <span class="sub sub-info">{{ $trnx->details }}</span>
                             @if($extra->trnx)
-                            <span class="sub sub-view"><a href="javascript:void(0)" class="view-transaction" data-id="{{ $extra->trnx }}">View Transaction</a></span>
+                            <span class="sub sub-view"><a href="javascript:void(0)" class="view-transaction" data-id="{{ $extra->trnx }}">{{ __("View Transaction") }}</a></span>
                             @endif
                         @else
                             @if($trnx->refund != null)
@@ -131,7 +131,7 @@
                         @endif
                     </td>
                     <td class="data-col dt-type">
-                        <span class="dt-type-md badge badge-outline badge-md badge-{{ __(__status($trnx->tnx_type,'status')) }}">{{ ucfirst($trnx->tnx_type) }}</span>
+                        <span class="dt-type-md badge badge-outline badge-md badge-{{ __(__status($trnx->tnx_type,'status')) }}">{{ __(ucfirst($trnx->tnx_type)) }}</span>
                         <span class="dt-type-sm badge badge-sq badge-outline badge-md badge-{{ __(__status($trnx->tnx_type, 'status')) }}">{{ ucfirst(substr($trnx->tnx_type, 0,1)) }}</span>
                     </td>
                     <td class="data-col text-right">

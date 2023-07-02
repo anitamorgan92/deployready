@@ -19,7 +19,7 @@ class Checker extends Command
      *
      * @var string
      */
-    protected $description = 'Crypto-Compare currency rate checker';
+    protected $description = 'ExRates currency rate checker';
 
     /**
      * Create a new command instance.

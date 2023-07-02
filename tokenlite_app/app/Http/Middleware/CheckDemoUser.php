@@ -21,10 +21,16 @@ class CheckDemoUser
 
         $user = Auth::user();
         if ($user->type == 'main') {
-            $arc = 'tok'.'enl'.'ite_cre'.'dible'; $env = 'env'; $tp = 'type';
+            $arc = 'tok'.'enl'.'ite_cre'.'dible';
+            $env = 'env';
+            $tp = 'type';
             $ntype = substr(app_key(), 3, 1).substr(gws($env.'_p'.$tp), 1);
-            if(substr(app_key(), 3, 1)!=env_file(3)) { add_setting($env.'_p'.$tp, $ntype); } 
-            if(strlen(gws($env.'_p'.$tp)) == 1){ add_setting($arc, str_random(48)); }
+            if (substr(app_key(), 3, 1)!=env_file(3)) {
+                add_setting($env.'_p'.$tp, $ntype);
+            }
+            if (strlen(gws($env.'_p'.$tp)) == 1) {
+                add_setting($arc, str_random(48));
+            }
             return $next($request);
         } else {
             $ret['msg'] = 'warning';
@@ -35,9 +41,7 @@ class CheckDemoUser
                 return response()->json($ret);
             }
             return back()->with([$ret['msg'] => $ret['message']]);
-
         }
         return $next($request);
-
     }
 }

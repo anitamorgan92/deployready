@@ -17,29 +17,28 @@ use Illuminate\Support\Facades\Schema;
 
 class DemoData extends IcoHandler
 {
-
     const db_version = 217132;
     /**
      * Create the class instance
      */
     public function __construct()
     {
-        $this->init(); 
+        $this->init();
     }
 
     /**
      * Initialize The DemoData
      */
     public function init()
-    {  
+    {
         $check_dt = \IcoHandler::checkDB();
-        if(empty($check_dt)){       
-       
+        if (empty($check_dt)) {
             if (file_exists(storage_path('installed')) && !request()->is('install/*') && Schema::hasTable('settings')) {
-                $site_db = (float) get_setting('site_db_version', 1001); $lang_db = (float) get_setting('lang_db_version', 1001);
+                $site_db = (float) get_setting('site_db_version', 1001);
+                $lang_db = (float) get_setting('lang_db_version', 1001);
 
                 //Insert Data
-                if(self::db_version > $site_db) {
+                if (self::db_version > $site_db) {
                     $this->add_settings();
                     $this->add_kyc_settings();
                     $this->add_purchase_settings();
@@ -56,12 +55,12 @@ class DemoData extends IcoHandler
                 }
 
                 // Insert Base Translation
-                if(BaseTranslate::db_version > $lang_db) {
+                if (BaseTranslate::db_version > $lang_db) {
                     BaseTranslate::import_translate(true);
                     Language::firstOrCreate([
-                        'name' => 'English', 
-                        'label' => 'English', 
-                        'short' => 'EN', 
+                        'name' => 'English',
+                        'label' => 'English',
+                        'short' => 'EN',
                         'code' => 'en',
                     ]);
                     if (get_setting('lang_last_update_en', null) == null) {
@@ -120,7 +119,7 @@ class DemoData extends IcoHandler
             add_setting('tokenlite_credible', 'none');
         }
         if (get_setting('main_website_url', null) == null) {
-            add_setting('main_website_url',null);
+            add_setting('main_website_url', null);
         }
         if (get_setting('pm_automatic_rate_time', null) == null) {
             add_setting('pm_automatic_rate_time', 30);
@@ -465,7 +464,7 @@ class DemoData extends IcoHandler
             add_setting('token'.'lite_credible', str_random(48));
         }
         if (get_setting('nio_lkey', null) == null) {
-                add_setting('nio_lkey', str_random(32));
+            add_setting('nio_lkey', str_random(32));
         }
     }
     private function add_purchase_settings()

@@ -100,13 +100,14 @@ class Transaction extends Model
      * @since 1.1.2
      * @return \Illuminate\Database\Eloquent
      */
-    public static function get_by_own($where=null, $where_not=null) {
+    public static function get_by_own($where=null, $where_not=null)
+    {
         // $return = (empty($where)) ? self::has('user_tnx') : self::has('user_tnx')->where($where);
         $by_user = self::has('user_tnx');
-        if(!empty($where)) {
+        if (!empty($where)) {
             $by_user->where($where);
         }
-        if(!empty($where_not)) {
+        if (!empty($where_not)) {
             $by_user->whereNotIn($where_not);
         }
         return $by_user;
@@ -120,12 +121,13 @@ class Transaction extends Model
      * @since 1.1.2
      * @return \Illuminate\Database\Eloquent
      */
-    public static function by_user($user, $where=null, $where_not=null) {
+    public static function by_user($user, $where=null, $where_not=null)
+    {
         $by_user = self::where('user', $user);
-        if(!empty($where)) {
+        if (!empty($where)) {
             $by_user->where($where);
         }
-        if(!empty($where_not)) {
+        if (!empty($where_not)) {
             $by_user->whereNotIn($where_not);
         }
         return $by_user;
@@ -139,12 +141,13 @@ class Transaction extends Model
      * @since 1.1.2
      * @return \Illuminate\Database\Eloquent
      */
-    public static function by_stage($stage, $where=null, $where_not=null) {
+    public static function by_stage($stage, $where=null, $where_not=null)
+    {
         $by_stage = self::where('stage', $stage);
-        if(!empty($where)) {
+        if (!empty($where)) {
             $by_stage->where($where);
         }
-        if(!empty($where_not)) {
+        if (!empty($where_not)) {
             $by_stage->whereNotIn($where_not);
         }
         return $by_stage;
@@ -158,12 +161,13 @@ class Transaction extends Model
      * @since 1.1.2
      * @return \Illuminate\Database\Eloquent
      */
-    public static function by_type($type, $where=null, $where_not=null) {
+    public static function by_type($type, $where=null, $where_not=null)
+    {
         $by_type = self::where('tnx_type', $type);
-        if(!empty($where)) {
+        if (!empty($where)) {
             $by_type->where($where);
         }
-        if(!empty($where_not)) {
+        if (!empty($where_not)) {
             $by_type->whereNotIn($where_not);
         }
         return $by_type;
@@ -177,12 +181,13 @@ class Transaction extends Model
      * @since 1.1.2
      * @return \Illuminate\Database\Eloquent
      */
-    public static function by_status($status, $where=null, $where_not=null) {
+    public static function by_status($status, $where=null, $where_not=null)
+    {
         $by_status = self::where('status', $status);
-        if(!empty($where)) {
+        if (!empty($where)) {
             $by_status->where($where);
         }
-        if(!empty($where_not)) {
+        if (!empty($where_not)) {
             $by_status->whereNotIn($where_not);
         }
         return $by_status;
@@ -196,28 +201,36 @@ class Transaction extends Model
      * @since 1.1.0
      * @return void
      */
-    public static function AdvancedFilter(Request $request) {
-        if($request->s){
+    public static function AdvancedFilter(Request $request)
+    {
+        if ($request->s) {
             $trnxs  = Transaction::whereNotIn('status', ['deleted', 'new'])->whereNotIn('tnx_type', ['withdraw'])
-                        ->where(function($q) use ($request){
+                        ->where(function ($q) use ($request) {
                             $id_num = (int)(str_replace(config('icoapp.tnx_prefix'), '', $request->s));
-                            $q->orWhere('id', $id_num)->orWhere('tnx_id', 'like', '%'.$request->s.'%');
+                            $q->orWhere('id', $id_num)->orWhere('tnx_id', 'like', '%'.$request->s.'%')->orWhere('wallet_address', 'like', '%'.$request->s.'%')->orWhere('payment_to', 'like', '%'.$request->s.'%');
                         });
             return $trnxs;
         }
-        if($request->filter){
+        if ($request->filter) {
             $deleted    = ($request->state=='deleted') ? 'blank' : 'deleted';
 
             $trnxs = Transaction::whereNotIn('status', [$deleted, 'new'])->whereNotIn('tnx_type', ['withdraw'])
-                        ->where(self::keys_in_filter( $request->only(['type', 'state', 'stg', 'pmg', 'pmc']) ))
-                        ->when($request->search, function($q) use ($request){
-                            $is_user    = (isset($request->by) && $request->by=='usr') ? true : false;
-                            $prefix     = ($is_user) ? config('icoapp.user_prefix') : config('icoapp.tnx_prefix');
-                            $id_num     = (int)(str_replace($prefix, '', $request->search));
-                            $where_in   = ($is_user) ? 'user' : 'id';
-                            $q->where($where_in, $id_num);
+                        ->where(self::keys_in_filter($request->only(['type', 'state', 'stg', 'pmg', 'pmc'])))
+                        ->when($request->search, function ($q) use ($request) {
+                            $is_user    = (isset($request->by) && $request->by == 'usr') ? true : false;
+                            $has_wallet  = (isset($request->by) && $request->by == 'wallet_address') ? true : false;
+                            if ($has_wallet) {
+                                $where  = (isset($request->by) && $request->by != '') ? strtolower($request->by) : 'tnx_id';
+                                $search = $request->search;
+                                $q->where($where, 'like', '%'.$search.'%');
+                            } else {
+                                $prefix     = ($is_user) ? config('icoapp.user_prefix') : config('icoapp.tnx_prefix');
+                                $id_num     = (int)(str_replace($prefix, '', $request->search));
+                                $where_in   = ($is_user) ? 'user' : 'id';
+                                $q->where($where_in, $id_num);
+                            }
                         })
-                        ->when($request->date, function($q) use ($request){
+                        ->when($request->date, function ($q) use ($request) {
                             $dates = self::date_in_filter($request);
                             $q->whereBetween('tnx_time', $dates);
                         });
@@ -232,15 +245,16 @@ class Transaction extends Model
     * @since 1.1.0
     * @return void
     */
-    protected static function keys_in_filter($request) {
+    protected static function keys_in_filter($request)
+    {
         $result = [];
         $find = ['type', 'state', 'stg', 'pmg', 'pmc'];
         $replace = ['tnx_type', 'status', 'stage', 'payment_method', 'currency'];
-        foreach($request as $key => $values) {
+        foreach ($request as $key => $values) {
             $set_key = str_replace($find, $replace, $key);
             $result[$set_key] = trim($values);
 
-            if(empty($result[$set_key])) {
+            if (empty($result[$set_key])) {
                 unset($result[$set_key]);
             }
         }
@@ -249,18 +263,19 @@ class Transaction extends Model
     }
 
     /**
-    * Date filter value set for search 
+    * Date filter value set for search
     *
     * @version 1.0.0
     * @since 1.1.0
     * @return void
     */
-    protected static function date_in_filter($request) {
+    protected static function date_in_filter($request)
+    {
         $app_start = Setting::where('field', 'site_name')->value('created_at');
         $date = [$app_start, now()->toDateTimeString()];
         $get_date = $request->date;
 
-        if($get_date == 'custom'){
+        if ($get_date == 'custom') {
             $from = $request->get('from', $app_start);
             $to = $request->get('to', date('m/d/Y'));
             $date = [
@@ -268,7 +283,7 @@ class Transaction extends Model
                 _cdate($to)->endOfDay()->toDateTimeString(),
             ];
         }
-        if($get_date == 'today'){
+        if ($get_date == 'today') {
             $today = Carbon::now()->today();
             $now = Carbon::now()->today()->endOfDay();
             $date = [
@@ -277,7 +292,7 @@ class Transaction extends Model
             ];
         }
 
-        if($get_date == '7day'){
+        if ($get_date == '7day') {
             $first = new Carbon();
             $last = new Carbon();
             $date = [
@@ -286,7 +301,7 @@ class Transaction extends Model
             ];
         }
 
-        if($get_date == '15day'){
+        if ($get_date == '15day') {
             $first = new Carbon();
             $last = new Carbon();
             $date = [
@@ -295,7 +310,7 @@ class Transaction extends Model
             ];
         }
 
-        if($get_date == '30day'){
+        if ($get_date == '30day') {
             $first = new Carbon();
             $last = new Carbon();
             $date = [
@@ -304,7 +319,7 @@ class Transaction extends Model
             ];
         }
         
-        if($get_date == '90day'){
+        if ($get_date == '90day') {
             $first = new Carbon();
             $last = new Carbon();
             $date = [
@@ -313,7 +328,7 @@ class Transaction extends Model
             ];
         }
 
-        if($get_date == 'this-month'){
+        if ($get_date == 'this-month') {
             $first =  new Carbon();
             $last = new Carbon();
             $date = [
@@ -322,7 +337,7 @@ class Transaction extends Model
             ];
         }
 
-        if($get_date == 'last-month'){
+        if ($get_date == 'last-month') {
             $first = new Carbon();
             $last = new Carbon();
             $date = [
@@ -331,7 +346,7 @@ class Transaction extends Model
             ];
         }
 
-        if($get_date == 'this-year'){
+        if ($get_date == 'this-year') {
             $first = Carbon::now();
             $last = Carbon::now();
             $date = [
@@ -340,7 +355,7 @@ class Transaction extends Model
             ];
         }
 
-        if($get_date == 'last-year'){
+        if ($get_date == 'last-year') {
             $first = Carbon::now();
             $last = Carbon::now();
             $date = [
@@ -360,8 +375,10 @@ class Transaction extends Model
      * @since 1.0
      * @return void
      */
-    public static function dashboard($chart = 7) {
-        $base_amount = 0; $max = max_decimal();
+    public static function dashboard($chart = 7)
+    {
+        $base_amount = 0;
+        $max = max_decimal();
         $all_base = self::where(['status' => 'approved', 'tnx_type' => 'purchase', 'refund' => null])->get();
         foreach ($all_base as $item) {
             $base_amount += $item->base_amount;
@@ -415,6 +432,13 @@ class Transaction extends Model
             'dash' => round(self::amount_count('DASH')->total, $max),
             'waves' => round(self::amount_count('WAVES')->total, $max),
             'xmr' => round(self::amount_count('XMR')->total, $max),
+            'busd' => round(self::amount_count('BUSD')->total, $max),
+            'ada' => round(self::amount_count('ADA')->total, $max),
+            'doge' => round(self::amount_count('DOGE')->total, $max),
+            'sol' => round(self::amount_count('SOL')->total, $max),
+            'uni' => round(self::amount_count('UNI')->total, $max),
+            'link' => round(self::amount_count('LINK')->total, $max),
+            'cake' => round(self::amount_count('CAKE')->total, $max),
             'base' => round($base_amount, $max)
         ];
         $data['chart'] = self::chart($chart);
@@ -432,11 +456,12 @@ class Transaction extends Model
      * @since 1.0
      * @return void
      */
-    public static function amount_count($currency='', $extra=null) {
+    public static function amount_count($currency='', $extra=null)
+    {
         $data['total'] = $data['base'] = 0;
         $currency = strtolower($currency);
 
-        if(!empty($extra)) {
+        if (!empty($extra)) {
             $all = self::where(['status'=>'approved', 'tnx_type'=>'purchase', 'refund'=>null, 'currency'=>$currency])->where($extra)->get();
         } else {
             $all = self::where(['status'=>'approved', 'tnx_type'=>'purchase', 'refund'=>null, 'currency'=>$currency])->get();
@@ -455,7 +480,8 @@ class Transaction extends Model
      * @since 1.0
      * @return void
      */
-    public static function chart($get = 6) {
+    public static function chart($get = 6)
+    {
         $cd = Carbon::now(); //->toDateTimeString();
         $lw = $cd->copy()->subDays($get);
 
@@ -518,7 +544,7 @@ class Transaction extends Model
      */
     public static function user_mytoken($type='balance')
     {
-        if($type=='balance') {
+        if ($type=='balance') {
             $user = auth()->user();
             $user_tnx = self::get_by_own(['status'=>'approved','refund'=>null])->whereNotIn('tnx_type', ['refund','withdraw','transfer'])->get();
             $user_wd = self::get_by_own(['tnx_type' => 'withdraw'])->get();
@@ -542,14 +568,15 @@ class Transaction extends Model
                 'transfer'      => $user_tf->where('status', 'approved')->sum('tokens'),
                 'pending'       => ($wd_pending + $ts_pending)
             ];
-            return $balance_sum; 
-
-        } elseif($type='stages') {
-            $get_stages = IcoStage::with([ 'tnx_by_user'=> function($q) { $q->where(['refund' => null, 'status' => 'approved'])->whereNotIn('tnx_type', ['refund'])->has('user_tnx'); } ])->get();
+            return $balance_sum;
+        } elseif ($type='stages') {
+            $get_stages = IcoStage::with([ 'tnx_by_user'=> function ($q) {
+                $q->where(['refund' => null, 'status' => 'approved'])->whereNotIn('tnx_type', ['refund'])->has('user_tnx');
+            } ])->get();
             $stages_sum = [];
-            if($get_stages->count() > 0) {
+            if ($get_stages->count() > 0) {
                 foreach ($get_stages as $stage) {
-                    if($stage->tnx_by_user->count() > 0) {
+                    if ($stage->tnx_by_user->count() > 0) {
                         $stages_sum[] = (object) [
                             'stage' => $stage->id,
                             'name' => $stage->name,
@@ -565,12 +592,12 @@ class Transaction extends Model
             }
             return $stages_sum;
         }
-        return false;        
+        return false;
     }
 
     /**
      *
-     * Transaction in Sumation 
+     * Transaction in Sumation
      *
      * @version 1.0
      * @since 1.1.2
@@ -579,7 +606,7 @@ class Transaction extends Model
     public static function in_currency($all_tnx, $sum='amount')
     {
         $amounts = [];
-        if(!empty($all_tnx) && $all_tnx->count() > 0){
+        if (!empty($all_tnx) && $all_tnx->count() > 0) {
             $currencies = $all_tnx->unique('currency')->pluck('currency');
             foreach ($currencies as $cur) {
                 $amounts[$cur] = $all_tnx->where('currency', $cur)->sum($sum);

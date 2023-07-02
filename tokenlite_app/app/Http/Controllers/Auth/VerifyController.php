@@ -43,7 +43,7 @@ class VerifyController extends Controller
 
             return back()->with('resent', true);
         } catch (\Exception $e) {
-            return back()->withErrors(__('messages.email.verify',['email'=>get_setting('site_email')]));
+            return back()->withErrors(__('messages.email.verify', ['email'=>get_setting('site_email')]));
         }
     }
 
@@ -58,7 +58,7 @@ class VerifyController extends Controller
                     return redirect()->route('login');//->with('info', __('messages.verify.verified'));
                 }
                 if ($user->meta->email_token == $token) {
-                    if (_date($user->meta->email_expire, 'Y-m-d H:i:s') >= date('Y-m-d H:i:s')) {
+                    if (_date($user->meta->email_expire, 'Y-m-d H:i:s', false, false) >= date('Y-m-d H:i:s')) {
                         $user->email_verified_at = now();
                         $user->meta->email_token = null;
                         $user->meta->email_expire = null;

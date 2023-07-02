@@ -28,10 +28,11 @@ class KYC extends Model
     const KYC_STATUS = ['pending', 'approved', 'missing', 'rejected'];
 
     /*
-     * Available Wallet 
+     * Available Wallet
      */
-    const WALLETS = ['ethereum' => 'Ethereum', 'bitcoin' => 'Bitcoin', 'binance' => 'Binance', 'litecoin' => 'Litecoin', 'ripple'=> 'Ripple',
-                     'stellar'=> 'Stellar', 'tether'=> 'Tether', 'waves' => 'WAVES', 'dash' => 'DASH', 'tron' => 'TRON'];
+    const WALLETS = ['ethereum' => 'Ethereum', 'bitcoin' => 'Bitcoin', 'binance' => 'Binance', 'bitcoin-cash' => 'BitcoinCash', 'litecoin' => 'Litecoin', 'ripple'=> 'Ripple',
+                     'stellar'=> 'Stellar', 'tether'=> 'Tether', 'waves' => 'WAVES', 'monero' => 'Monero', 'dash' => 'DASH', 'tron' => 'TRON', 'binance-usd' => 'BinanceUSD',
+                     'cardano' => 'Cardano', 'dogecoin' => 'Dogecoin', 'solana' => 'Solana', 'uniswap' => 'Uniswap', 'chainlink' => 'Chainlink', 'pancakeswap' => 'PancakeSwap'];
 
     /**
      * The attributes that are mass assignable.
@@ -59,7 +60,7 @@ class KYC extends Model
             'nidcard' => __('National ID Card'),
             'driving' => __('Driver’s License'),
         ];
-        if($name) {
+        if ($name) {
             return isset($names[$name]) ? $names[$name] : null;
         }
         return $names;
@@ -93,20 +94,20 @@ class KYC extends Model
 
     public static function AdvancedFilter($request)
     {
-        if($request->s){
-            $kycs = KYC::whereNotIn('status', ['deleted'])->where(function($q) use ($request){
-                        $id_num = (int)(str_replace(config('icoapp.user_prefix'), '', $request->s));
-                        $q->orWhere('userId', $id_num)->orWhere('firstName', 'like', '%'.$request->s.'%')->orWhere('lastName', 'like', '%'.$request->s.'%');
-                    });
+        if ($request->s) {
+            $kycs = KYC::whereNotIn('status', ['deleted'])->where(function ($q) use ($request) {
+                $id_num = (int)(str_replace(config('icoapp.user_prefix'), '', $request->s));
+                $q->orWhere('userId', $id_num)->orWhere('firstName', 'like', '%'.$request->s.'%')->orWhere('lastName', 'like', '%'.$request->s.'%');
+            });
             return $kycs;
         }
 
         if ($request->filter) {
-            $kycs = KYC::whereNotIn('status', ['deleted'])->where( self::keys_in_filter($request->only(['state', 'doc'])) )
-                        ->when($request->search, function($q) use ($request){
+            $kycs = KYC::whereNotIn('status', ['deleted'])->where(self::keys_in_filter($request->only(['state', 'doc'])))
+                        ->when($request->search, function ($q) use ($request) {
                             $where  = (isset($request->by) && $request->by=='name') ? 'name' : 'userId';
                             $search = ($where=='userId') ? (int)(str_replace(config('icoapp.user_prefix'), '', $request->search)) : $request->search;
-                            if($where=='name') {
+                            if ($where=='name') {
                                 $q->where('firstName', 'like', '%'.$search.'%')->orWhere('lastName', 'like', '%'.$search.'%');
                             } else {
                                 $q->where($where, $search);
@@ -125,15 +126,16 @@ class KYC extends Model
     * @since 1.1.0
     * @return void
     */
-    protected static function keys_in_filter($request) {
+    protected static function keys_in_filter($request)
+    {
         $result = [];
         $find = ['state', 'doc'];
         $replace = ['status', 'documentType'];
-        foreach($request as $key => $value) {
+        foreach ($request as $key => $value) {
             $set_key = str_replace($find, $replace, $key);
             $val = trim($value);
 
-            if(!empty($val)) {
+            if (!empty($val)) {
                 $result[] = array($set_key, '=', $val);
             }
         }
@@ -164,7 +166,7 @@ class KYC extends Model
         $wallet_count = count($wallet);
         $custom_count = count($custom);
 
-        $check_doc = ( (get_setting('kyc_document_passport') || get_setting('kyc_document_driving') || get_setting('kyc_document_nidcard')) ? true : false );
+        $check_doc = ((get_setting('kyc_document_passport') || get_setting('kyc_document_driving') || get_setting('kyc_document_nidcard')) ? true : false);
 
         return [
             'first_name' => (field_value('kyc_firstname', 'show') && field_value('kyc_firstname', 'req')) ? 'required|string|min:2' : 'nullable',
@@ -174,7 +176,7 @@ class KYC extends Model
             'gender' => (field_value('kyc_gender', 'show') && field_value('kyc_gender', 'req')) ? 'required|string|min:2' : 'nullable',
             'telegram' => (field_value('kyc_telegram', 'show') && field_value('kyc_telegram', 'req')) ? 'required|string|min:2' : 'nullable',
 
-            'email' => auth()->guest() ? ((field_value('kyc_email', 'show') && field_value('kyc_email', 'req')) ? 'required|string|email|max:255|unique:users' : 'nullable') : 'nullable',
+            'email' => auth()->guest() ? ((field_value('kyc_email', 'show') && field_value('kyc_email', 'req')) ? 'required|string|email|regex:/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,9}$/ix|max:255|unique:users' : 'nullable') : 'nullable',
             'password' => auth()->guest() ? 'required|string|min:6' : 'nullable',
 
             'country' => (field_value('kyc_country', 'show') && field_value('kyc_country', 'req')) ? 'required|string|min:4' : 'nullable',
@@ -238,5 +240,4 @@ class KYC extends Model
             return in_array($name, $fields);
         }
     }
-
 }

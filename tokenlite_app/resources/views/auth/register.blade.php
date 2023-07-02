@@ -27,44 +27,7 @@ $check_users = \App\Models\User::count();
             <input type="text" placeholder="{{__('Your Name')}}" class="input-bordered{{ $errors->has('name') ? ' input-error' : '' }}" name="name" value="{{ old('name') }}" minlength="3" data-msg-required="{{ __('Required.') }}" data-msg-minlength="{{ __('At least :num chars.', ['num' => 3]) }}" required>
         </div>
         <div class="input-item">
-            <input type="email" placeholder="{{__('Your Email')}}" class="input-bordered{{ $errors->has('email') ? ' input-error' : '' }}" name="email" value="{{ old('email') }}" data-msg-required="{{ __('Required.') }}" data-msg-email="{{ __('Enter valid email.') }}" required>
-        </div>
-        <div class="input-item">
-            <select name="team" class="input-bordered{{ $errors->has('email') ? ' input-error' : '' }}" data-msg-required="{{ __('Required.') }}" data-msg-email="{{ __('Select your team.') }}" required>
-                <option value="">Select your team</option>
-                <option value="ArizonaCardinals">Arizona Cardinals</option>
-                <option value="AtlantaFalcons">Atlanta Falcons</option>
-                <option value="CarolinaPanthers">Carolina Panthers</option>
-                <option value="ChicagoBears">Chicago Bears</option>
-                <option value="DallasCowboys">Dallas Cowboys</option>
-                <option value="DetroitLions">Detroit Lions</option>
-                <option value="GreenBayPackers">Green Bay Packers</option>
-                <option value="LosAngelesRams">Los Angeles Rams</option>
-                <option value="MinnesotaVikings">Minnesota Vikings</option>
-                <option value="NewOrleansSaints">New Orleans Saints</option>
-                <option value="NewYorkGiants">New York Giants</option>
-                <option value="PhiladelphiaEagles">Philadelphia Eagles</option>
-                <option value="SanFrancisco49ers">San Francisco 49ers</option>
-                <option value="SeattleSeahawks">Seattle Seahawks</option>
-                <option value="TampaBayBuccaneers">Tampa Bay Buccaneers</option>
-                <option value="WashingtonFootballTeam">Washington Football Team</option>
-                <option value="BaltimoreRavens">Baltimore Ravens</option>
-                <option value="BuffaloBills">Buffalo Bills</option>
-                <option value="CincinnatiBengals">Cincinnati Bengals</option>
-                <option value="ClevelandBrowns">Cleveland Browns</option>
-                <option value="DenverBroncos">Denver Broncos</option>
-                <option value="HoustonTexans">Houston Texans</option>
-                <option value="IndianapolisColts">Indianapolis Colts</option>
-                <option value="JacksonvilleJaguars">Jacksonville Jaguars</option>
-                <option value="KansasCityChiefs">Kansas City Chiefs</option>
-                <option value="LasVegasRaiders">Las Vegas Raiders</option>
-                <option value="LosAngelesChargers">Los Angeles Chargers</option>
-                <option value="MiamiDolphins">Miami Dolphins</option>
-                <option value="NewEnglandPatriots">New England Patriots</option>
-                <option value="NewYorkJets">New York Jets</option>
-                <option value="PittsburghSteelers">Pittsburgh Steelers</option>
-                <option value="TennesseeTitans">Tennessee Titans</option>
-            </select>
+            <input type="email" placeholder="{{__('Your Email')}}" class="input-bordered{{ $errors->has('email') ? ' input-error' : '' }}" name="email" value="{{ old('email') }}"data-msg-required="{{ __('Required.') }}" data-msg-email="{{ __('Enter valid email.') }}" required>
         </div>
         <div class="input-item">
             <input type="password" placeholder="{{__('Password')}}" class="input-bordered{{ $errors->has('password') ? ' input-error' : '' }}" name="password" id="password" minlength="6" data-msg-required="{{ __('Required.') }}" data-msg-minlength="{{ __('At least :num chars.', ['num' => 6]) }}" required>

@@ -16,9 +16,9 @@ class SuperAdmin
      */
     public function handle($request, Closure $next)
     {
-        if( file_exists(storage_path('installed')) && Schema::hasTable('settings') ){
-            if(!super_access()){
-                if($request->ajax()){
+        if (file_exists(storage_path('installed')) && Schema::hasTable('settings')) {
+            if (!super_access()) {
+                if ($request->ajax()) {
                     $result['msg'] = 'warning';
                     $result['message'] = __("You do not have enough permissions to perform requested operation.");
                     return response()->json($result);

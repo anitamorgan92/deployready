@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+
 /**
  * Register Controller
  *
@@ -76,11 +77,11 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
-        if(recaptcha()) {
+        if (recaptcha()) {
             $this->checkReCaptcha($request->recaptcha);
         }
         $have_user = User::where('role', 'admin')->count();
-        if( $have_user >= 1 && ! $this->handler->check_body() ){
+        if ($have_user >= 1 && ! $this->handler->check_body()) {
             return back()->withInput()->with([
                 'warning' => $this->handler->accessMessage()
             ]);
@@ -106,11 +107,12 @@ class RegisterController extends Controller
         $term = get_page('terms', 'status') == 'active' ? 'required' : 'nullable';
         return Validator::make($data, [
             'name' => ['required', 'string', 'min:3', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'regex:/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,9}$/ix', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
             'terms' => [$term],
         ], [
             'terms.required' => __('messages.agree'),
+            'email.regex' => __('Please enter a valid email address.'),
             'email.unique' => 'The email address you have entered is already registered. Did you <a href="' . route('password.request') . '">forget your login</a> information?',
         ]);
     }
@@ -141,7 +143,7 @@ class RegisterController extends Controller
             }
             $user->email_verified_at = $email_verified;
             $refer_blank = true;
-            if(is_active_referral_system()) {
+            if (is_active_referral_system()) {
                 if (Cookie::has('ico_nio_ref_by')) {
                     $ref_id = (int) Cookie::get('ico_nio_ref_by');
                     $ref_user = User::where('id', $ref_id)->where('email_verified_at', '!=', null)->first();
@@ -158,7 +160,7 @@ class RegisterController extends Controller
                     }
                 }
             }
-            if($user->role=='user' && $refer_blank==true) {
+            if ($user->role=='user' && $refer_blank==true) {
                 $this->create_referral_or_not($user->id);
             }
             
@@ -190,7 +192,8 @@ class RegisterController extends Controller
      * @since 1.1.2
      * @return \App\Models\User
      */
-    protected function create_referral_or_not($user, $refer=0) {
+    protected function create_referral_or_not($user, $refer=0)
+    {
         Referral::create([ 'user_id' => $user, 'user_bonus' => 0, 'refer_by' => $refer, 'refer_bonus' => 0 ]);
     }
 }

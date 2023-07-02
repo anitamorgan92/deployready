@@ -48,7 +48,7 @@ class EmailTemplate extends Model
         $template = self::where('slug', $name)->orWhere('id', $name)->first();
         if (!$template) {
             $template = IcoData::default_email_template($name);
-            if(!$template) {
+            if (!$template) {
                 $template = (object) [
                     'name' => str_replace('-', ' ', $name),
                     'slug' => $name,

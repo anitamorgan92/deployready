@@ -3,6 +3,7 @@
 @section('content')
 @php 
 $base_cur = base_currency();
+$sm_class = strlen($stage->stage->total_tokens) > 12 ? ' sm' : '';
 @endphp
 <div class="page-content">
 	<div class="container">
@@ -16,7 +17,7 @@ $base_cur = base_currency();
                             <h6 class="tile-title">Token Sale - {{ $stage->stage->name }}</h6>
                         </div>
                         <div class="tile-data">
-                            <span class="tile-data-number">{{ to_num($stage->stage->total_tokens, 0, ',', false) }}</span>
+                            <span class="tile-data-number{{ $sm_class }}">{{ to_num_token($stage->stage->total_tokens) }}</span>
                             <span class="tile-data-status tile-data-active" title="Sales %" data-toggle="tooltip" data-placement="right">{{ $stage->trnxs->percent }}%</span>
                         </div>
                         <div class="tile-footer">
@@ -33,7 +34,6 @@ $base_cur = base_currency();
             </div>
             <div class="col-lg-4 col-md-6">
                 <div class="card height-auto">
-                    <button class="interact-button">TEST ME BABY ONE MORE TIME</button>
                     <div class="card-innr">
                         <ul class="tile-nav nav">
                             <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#view-kycs">KYC</a></li>
@@ -45,7 +45,7 @@ $base_cur = base_currency();
                                     <h6 class="tile-title">Total Users</h6>
                                 </div>
                                 <div class="tile-data">
-                                    <span class="tile-data-number">{{ to_num($users->all, 0, ',', false) }}</span>
+                                    <span class="tile-data-number{{ $sm_class }}">{{ to_num($users->all, 0, ',', false) }}</span>
                                     <span class="tile-data-status tile-data-active" title="Verified" data-toggle="tooltip" data-placement="right">{{ $users->verified }}%</span>
                                 </div>
                                 <div class="tile-footer">
@@ -63,7 +63,7 @@ $base_cur = base_currency();
                                     <h6 class="tile-title">Total KYC</h6>
                                 </div>
                                 <div class="tile-data">
-                                    <span class="tile-data-number">{{ to_num($users->kyc_submit, 0, ',', false) }}</span>
+                                    <span class="tile-data-number{{ $sm_class }}">{{ to_num($users->kyc_submit, 0, ',', false) }}</span>
                                     <span class="tile-data-status tile-data-active" title="Approved" data-toggle="tooltip" data-placement="right">{{ $users->kyc_approved }}%</span>
                                 </div>
                                 <div class="tile-footer">
@@ -157,7 +157,7 @@ $base_cur = base_currency();
                                     </td>
                                     <td class="d-none d-sm-table-cell">
                                         <h5 class="lead mb-1{{ ($tnx->tnx_type=='refund') ? ' text-danger' : '' }}">
-                                            {{ (starts_with($tnx->total_tokens, '-') ? '' : '+').to_round($tnx->total_tokens, 'min') }}
+                                            {{ (starts_with($tnx->total_tokens, '-') ? '' : '+').to_num($tnx->total_tokens, 'max') }}
                                         </h5>
                                         <span class="sub ucap">{{ to_num($tnx->amount, 'max').' '.$tnx->currency }}</span>
                                     </td>
@@ -250,7 +250,7 @@ $base_cur = base_currency();
                             <div class="fake-class">
                                 <div class="chart-phase">
                                     <div class="phase-status-total">
-                                        <span class="lead">{{ to_num($stage->stage->total_tokens, 0, ',', false) }}</span>
+                                        <span class="lead{{ $sm_class }}">{{ to_num_token($stage->stage->total_tokens) }}</span>
                                         <span class="sub">{{ token_symbol() }}</span>
                                     </div>
                                     <div class="chart-tokensale-s2">
@@ -275,5 +275,6 @@ $base_cur = base_currency();
     theme_color = {base:"<?=theme_color('base')?>", text: "<?=theme_color('text')?>", heading: "<?=theme_color('heading')?>"},
 	phase_data = [{{ round($stage->stage->soldout, 2) }}, {{ (($stage->stage->total_tokens - $stage->stage->soldout) > 0 ? round(($stage->stage->total_tokens - $stage->stage->soldout), 2) : 0) }}];
 </script>
+
 <script src="{{ asset('assets/js/admin.chart.js') }}"></script>
 @endpush

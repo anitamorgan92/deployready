@@ -88,6 +88,7 @@
         },
         "start": "2019-04-12 23:57:00",
         "end": "2019-05-31 00:45:00",
+        "timezone": "{{ get_setting('site_timezone', 'UTC') }}",
         "min": 100,
         "max": 10000,
         "soft": {

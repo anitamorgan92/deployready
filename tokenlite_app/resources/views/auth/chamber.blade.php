@@ -51,7 +51,6 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-8">
-                                    <button class="interact-button">test me baby</button>
                                     <h4 class="text-primary">Enter your purchase details</h4>
                                     <form class="validate-modern register-product" action="{{ url()->current() }}" method="POST">
                                         {!! (!nio_status() && !empty(app_key(2)) && gws('env_pcode')) ? '<p class="alert alert-xs alert-warning">Your purchase code is invalid or already used in another domain.</p>' : '' !!}

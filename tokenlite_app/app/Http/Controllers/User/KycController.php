@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\User;
+
 /**
  * Kyc Controller
  *
@@ -23,14 +24,14 @@ use Illuminate\Support\Facades\Hash;
 
 class KycController extends Controller
 {
-    // Enable recaptcha to the public form 
+    // Enable recaptcha to the public form
     use ReCaptcha;
 
     private $supported_ext = ['jpeg', 'jpg', 'png', 'pdf'];
 
     public function __construct()
     {
-        if( application_installed()){
+        if (application_installed()) {
             if (get_setting('kyc_before_email') == '1' && !auth()->guest()) {
                 return $this->middleware('verified')->except(['index']);
             }
@@ -77,7 +78,7 @@ class KycController extends Controller
      */
     public function get_documents($id, $doc)
     {
-        if(Auth::user()->id != KYC::FindOrFail($id)->userId){
+        if (Auth::user()->id != KYC::FindOrFail($id)->userId) {
             return abort(401);
         }
 
@@ -149,6 +150,7 @@ class KycController extends Controller
     {
         $type = $request->documentType;
         $validator = Validator::make($request->all(), KYC::rules(), [
+            'email.regex' => __('Please enter a valid email address.'),
             'document_one.required' => __('messages.kyc.forms.document', ['NAME' => KYC::documents($type ?? 'Document')]),
             'document_two.required' => __('messages.kyc.forms.document', ['NAME' => __('National ID Card Back-Side')]),
             'document_image_hand.required' => __('messages.kyc.forms.document', ['NAME' => __('Document on Hand')]),
@@ -203,7 +205,7 @@ class KycController extends Controller
                 $user = User::create([
                     'name' =>  $firstname . ' ' . $lastname,
                     'email' => $request->input('email'),
-                    'password' => Hash::make( $request->input('password')),
+                    'password' => Hash::make($request->input('password')),
                     'lastLogin' => date('Y-m-d H:i:s'),
                     'type' => 'user',
                     'registerMethod' => 'KYC',
@@ -245,13 +247,13 @@ class KycController extends Controller
             $is_valid = (field_value('kyc_wallet', 'show') && !empty($request->input('wallet_address'))) ? IcoHandler::validate_address($request->input('wallet_address'), $request->input('wallet_name')) : true;
             if ($is_valid) {
                 if ($kyc_submit->save()) {
-                    try{
+                    try {
                         $user->notify(new KycStatus($kyc_submit));
                         // Notification::send($user, new KycStatus($kyc_submit));
                         $ret['msg'] = 'success';
                         $ret['message'] = __('messages.kyc.forms.submitted');
                         $ret['link'] = route('user.kyc') . '?thank_you=true';
-                    }catch(\Exception $e){
+                    } catch (\Exception $e) {
                         $ret['msg'] = 'success';
                         $ret['message'] = __('messages.kyc.forms.submitted');
                         $ret['link'] = route('user.kyc') . '?thank_you=true';

@@ -111,7 +111,7 @@ $TST = $token_stages;
                     </div>
                     @if($opt->cta)
                     <div class="col-md-4 text-md-right">
-                        <a href="{{ (!empty($opt->cta_route) && has_route($opt->cta_route)) ? route($opt->cta_route) : 'javascript:void(0)' }}" class="btn btn-primary btn-sm btn-sm-min{{ $opt->cta_class }}"{!! (($opt->cta_daction) ? ' data-action="'.$opt->cta_daction.'"' : '').(($opt->cta_dtype) ? ' data-type="'.$opt->cta_dtype.'"' : '') !!}>{{ $opt->cta }}</a>
+                        <a href="{{ (!empty($opt->cta_route) && has_route($opt->cta_route)) ? route($opt->cta_route) : 'javascript:void(0)' }}" class="btn btn-primary btn-sm btn-sm-min{{ $opt->cta_class }}"{!! (($opt->cta_daction) ? ' data-action="'.$opt->cta_daction.'"' : '').(($opt->cta_dtype) ? ' data-type="'.$opt->cta_dtype.'"' : '') !!}>{{ __($opt->cta) }}</a>
                     </div>
                     @endif
                 </div>

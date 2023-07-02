@@ -6,6 +6,7 @@ use Exception;
 use App\Exceptions\APIException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -32,10 +33,10 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param  \Exception  $exception
+     * @param  \Throwable  $exception
      * @return void
      */
-    public function report(Exception $exception)
+    public function report(Throwable $exception)
     {
         parent::report($exception);
     }
@@ -44,13 +45,13 @@ class Handler extends ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
+     * @param  \Throwable  $exception
      * @return \Illuminate\Http\Response
      */
-    public function render($request, Exception $exception)
+    public function render($request, Throwable $exception)
     {
-        // HTTP API Errors 
-        if( $exception instanceof APIException ) {
+        // HTTP API Errors
+        if ($exception instanceof APIException) {
             $json = [
                 'success' => false,
                 'error' => [
@@ -65,38 +66,34 @@ class Handler extends ExceptionHandler
         $migrations = $this->getMigrations();
         $dbMigrations = $this->getExecutedMigrations();
         $need_update = count($migrations) - count($dbMigrations);
-        
-        if($request->ajax() || $request->wantsJson()){
+
+        if ($request->ajax() || $request->wantsJson()) {
             $response = [
-                'msg' => 'error', 
+                'msg' => 'error',
                 'message' => 'Something is wrong!',
                 'errors' => $exception->getMessage()
             ];
             return response()->json($response, 200, [], JSON_PRETTY_PRINT);
         }
-        if($exception instanceof QueryException)
-        {
-            if($need_update > 0){
+        if ($exception instanceof QueryException) {
+            if ($need_update > 0) {
                 return response()->view('errors.db_error', compact('check_dt', 'need_update'));
             }
 
             $check_dt = \IcoHandler::checkDB();
-            if(empty($check_dt)){
+            if (empty($check_dt)) {
                 $heading = 'Something is wrong in Database!';
                 $message = 'Please re-check your database connection, tables and columns etc.';
                 return response()->view('errors.custom', ['heading'=>$heading, 'message'=>$message, 'need_update' => $need_update]);
-            }
-            else{
+            } else {
                 $migrations = $this->getMigrations();
                 $dbMigrations = $this->getExecutedMigrations();
                 $need_update = count($migrations) - count($dbMigrations);
                 return response()->view('errors.db_error', compact('check_dt', 'need_update'));
             }
-            
         }
-        if($exception instanceof \PDOException)
-        {
-            if($need_update > 0){
+        if ($exception instanceof \PDOException) {
+            if ($need_update > 0) {
                 return response()->view('errors.db_error', compact('check_dt', 'need_update'));
             }
             $heading = 'Unable to Connect Database!';
