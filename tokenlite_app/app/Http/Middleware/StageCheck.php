@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Carbon\Carbon;
 use Closure;
 
 class StageCheck
@@ -15,12 +16,16 @@ class StageCheck
      */
     public function handle($request, Closure $next)
     {
-        $current_date = date('Y-m-d H:i:s');
-        if ($current_date >= active_stage()->start_date && $current_date <= active_stage()->end_date) {
+        $timezone = get_setting('site_timezone', 'UTC');
+        $current_date = now()->timezone($timezone);
+        $start_date = Carbon::parse(active_stage()->start_date, $timezone);
+        $end_date   = Carbon::parse(active_stage()->end_date, $timezone);
+        
+        if ($current_date->gte($start_date) && $current_date->lte($end_date)) {
             return $next($request);
-        } elseif (active_stage()->start_date >= $current_date && $current_date <= active_stage()->end_date) {
+        } elseif ($start_date->gte($current_date) && $current_date->lte($end_date)) {
             return $next($request);
-        } elseif ($current_date > active_stage()->end_date && active_stage()->soldout > 0) {
+        } elseif ($current_date->gt($end_date) && active_stage()->soldout > 0) {
             $chk_stg = ['info' => __('messages.stage.completed')];
             return redirect(route('user.home'))->with($chk_stg);
         } else {

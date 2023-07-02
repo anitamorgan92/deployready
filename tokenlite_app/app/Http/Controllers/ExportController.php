@@ -31,8 +31,8 @@ class ExportController extends Controller
             abort(404);
         }
 
-        if(!is_super_admin()){
-            if($request->ajax){
+        if (!is_super_admin()) {
+            if ($request->ajax) {
                 $result['msg'] = 'warning';
                 $result['message'] = "You do not have permission to download.";
                 return response()->json($result);
@@ -90,50 +90,47 @@ class ExportController extends Controller
         $order_by = gmvl('tnx_order_by', 'id');
         $ordered  = gmvl('tnx_ordered', 'DESC');
         $trans = Transaction::whereNotIn('status', ['deleted', 'new'])->whereNotIn('tnx_type', ['withdraw'])->orderBy($order_by, $ordered)->get();
-        if($request->s){
+        if ($request->s) {
             $trans  = Transaction::AdvancedFilter($request)
                                 ->orderBy($order_by, $ordered)->get();
         }
-        if($request->filter){
+        if ($request->filter) {
             $trans = Transaction::AdvancedFilter($request)
                                 ->orderBy($order_by, $ordered)->get();
         }
 
-        if($type == 'entire'){
+        if ($type == 'entire') {
             $head = ['tnx_id', 'total_tokens', 'tokens', 'bonus_on_base', 'bonus_on_token', 'total_bonus', 'tnx_type', 'status', 'stage', 'user', 'amount', 'currency', 'receive_amount', 'receive_currency', 'base_amount', 'base_currency', 'payment_method', 'tnx_time', 'checked_time', 'details'];
 
-            $callback = function() use ($trans, $head)
-            {
+            $callback = function () use ($trans, $head) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $head);
 
-                foreach($trans as $item) {
+                foreach ($trans as $item) {
                     fputcsv($file, [$item->tnx_id, $item->total_tokens, $item->tokens, $item->bonus_on_base, $item->bonus_on_token, $item->total_bonus, $item->tnx_type, $item->status, (get_stage($item->stage, 'name')), (get_user($item->user, 'email')), $item->amount, $item->currency, $item->receive_amount, $item->receive_currency, $item->base_amount, $item->base_currency, $item->payment_method, $item->tnx_time, $item->checked_time, $item->details]);
                 }
                 fclose($file);
             };
-        } elseif($type == 'compact') {
+        } elseif ($type == 'compact') {
             $head = ['tnx_id', 'total_tokens', 'user', 'tnx_type', 'status'];
 
-            $callback = function() use ($trans, $head)
-            {
+            $callback = function () use ($trans, $head) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $head);
 
-                foreach($trans as $item) {
+                foreach ($trans as $item) {
                     fputcsv($file, [$item->tnx_id, $item->total_tokens, (get_user($item->user, 'email')), $item->tnx_type, $item->status]);
                 }
                 fclose($file);
             };
-       } else{
+        } else {
             $head = ['tnx_id', 'total_tokens', 'amount', 'status', 'tnx_type', 'stage',  'user', 'tnx_time', 'checked_time' ];
 
-            $callback = function() use ($trans, $head)
-            {
+            $callback = function () use ($trans, $head) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $head);
 
-                foreach($trans as $item) {
+                foreach ($trans as $item) {
                     fputcsv($file, [$item->tnx_id, $item->total_tokens, $item->amount, $item->status, $item->tnx_type, (get_stage($item->stage, 'name')), (get_user($item->user, 'email')), $item->tnx_time, $item->checked_time ]);
                 }
                 fclose($file);
@@ -163,7 +160,7 @@ class ExportController extends Controller
         $order_by   = (gmvl('user_order_by', 'id')=='token') ? 'tokenBalance' : gmvl('user_order_by', 'id');
         $ordered    = gmvl('user_ordered', 'DESC');
         $items = User::whereNotIn('status', ['deleted'])->orderBy($order_by, $ordered)->get();
-        if($request->s){
+        if ($request->s) {
             $items = User::AdvancedFilter($request)
                         ->orderBy($order_by, $ordered)->get();
         }
@@ -173,41 +170,38 @@ class ExportController extends Controller
                         ->orderBy($order_by, $ordered)->get();
         }
 
-        if($type == 'entire'){
+        if ($type == 'entire') {
             $head = ['name', 'email', 'wallet_type', 'wallet_address', 'token', 'contributed', 'status', 'nationality', 'mobile', 'dob', 'referral', 'register_method', 'join_at'];
 
-            $callback = function() use ($items, $head)
-            {
+            $callback = function () use ($items, $head) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $head);
 
-                foreach($items as $item) {
+                foreach ($items as $item) {
                     fputcsv($file, [$item->name, $item->email, $item->walletType, $item->walletAddress, $item->tokenBalance, $item->contributed, $item->status, $item->nationality, $item->mobile, $item->dateOfBirth, $item->referral, $item->registerMethod, $item->created_at]);
                 }
                 fclose($file);
             };
-        } elseif($type == 'compact') {
+        } elseif ($type == 'compact') {
             $head = ['name', 'email', 'wallet_address', 'token'];
 
-            $callback = function() use ($items, $head)
-            {
+            $callback = function () use ($items, $head) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $head);
 
-                foreach($items as $item) {
+                foreach ($items as $item) {
                     fputcsv($file, [$item->name, $item->email, $item->walletAddress, $item->tokenBalance]);
                 }
                 fclose($file);
             };
-        }else{
+        } else {
             $head = ['name', 'email', 'wallet_address', 'token', 'contributed', 'status'];
 
-            $callback = function() use ($items, $head)
-            {
+            $callback = function () use ($items, $head) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $head);
 
-                foreach($items as $item) {
+                foreach ($items as $item) {
                     fputcsv($file, [$item->name, $item->email, $item->walletAddress, $item->tokenBalance, $item->contributed, $item->status]);
                 }
                 fclose($file);
@@ -235,36 +229,34 @@ class ExportController extends Controller
             "Expires" => "0"
         );
 
-        $items = KYC::where('status','!=','deleted')->get();
-        if($request->s){
+        $items = KYC::where('status', '!=', 'deleted')->get();
+        if ($request->s) {
             $items = KYC::AdvancedFilter($request)->get();
         }
 
         if ($request->filter) {
             $items = KYC::AdvancedFilter($request)->get();
         }
-        if($type == 'entire'){
+        if ($type == 'entire') {
             $head = ['user_id', 'name', 'email', 'wallet_type', 'wallet_address', 'phone', 'dob', 'gender', 'address', 'city', 'country',  'doc_type', 'doc1', 'doc2', 'doc3', 'status'];
 
-            $callback = function() use ($items, $head)
-            {
+            $callback = function () use ($items, $head) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $head);
 
-                foreach($items as $item) {
+                foreach ($items as $item) {
                     fputcsv($file, [$item->userId, $item->firstName.' '.$item->lastName, $item->email, $item->walletName, $item->walletAddress, $item->phone, $item->dob, $item->gender, $item->address.', '.$item->address1, $item->city.'-'.$item->zip, $item->country, $item->documentType, $item->document, $item->document2,  $item->document3, $item->status]);
                 }
                 fclose($file);
             };
-        }else{
+        } else {
             $head = ['user_id','name', 'email', 'wallet_address', 'phone', 'dob', 'city', 'doc_type', 'status'];
 
-            $callback = function() use ($items, $head)
-            {
+            $callback = function () use ($items, $head) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $head);
 
-                foreach($items as $item) {
+                foreach ($items as $item) {
                     fputcsv($file, [$item->userId, $item->firstName.' '.$item->lastName, $item->email, $item->walletAddress,$item->phone, $item->dob, $item->city.'-'.$item->zip, $item->documentType,  $item->status]);
                 }
                 fclose($file);
@@ -272,5 +264,4 @@ class ExportController extends Controller
         }
         return response()->stream($callback, 200, $headers);
     }
-
 }

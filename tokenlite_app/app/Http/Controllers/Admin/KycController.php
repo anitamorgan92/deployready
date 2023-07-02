@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
 /**
  * KYC Controller
  *
@@ -23,11 +24,11 @@ class KycController extends Controller
         $per_page   = gmvl('kyc_per_page', 10);
         $ordered    = gmvl('kyc_ordered', 'DESC');
 
-        $kycs = KYC::when($status, function($q) use ($status){
+        $kycs = KYC::when($status, function ($q) use ($status) {
             $q->where('status', $status);
-        })->orderBy('created_at',  $ordered)->paginate($per_page);
+        })->orderBy('created_at', $ordered)->paginate($per_page);
 
-        if($request->s){
+        if ($request->s) {
             $kycs = KYC::AdvancedFilter($request)
                         ->orderBy('id', $ordered)->paginate($per_page);
         }
@@ -152,10 +153,14 @@ class KycController extends Controller
                         if (is_array($request->$kyc_field)) {
                             $show = $req = 0;
                             foreach ($request->$kyc_field as $val) {
-                                if ($val=='show') $show = 1;
-                                if ($val=='req') $req = 1;
+                                if ($val=='show') {
+                                    $show = 1;
+                                }
+                                if ($val=='req') {
+                                    $req = 1;
+                                }
                             }
-                            $new = array ('show' => $show, 'req' => $req);
+                            $new = array('show' => $show, 'req' => $req);
                         }
                     } else {
                         $new = 0;
@@ -164,7 +169,7 @@ class KycController extends Controller
                     $current_val = get_setting($kyc_field);
                     if ($current_val != '') {
                         $current = $current_val;
-                        if(is_json($current_val)) {
+                        if (is_json($current_val)) {
                             $current = json_decode($current_val, true);
                         }
                     } else {
@@ -214,10 +219,10 @@ class KycController extends Controller
             $id = $request->input('kyc_id');
             if ($id !== null) {
                 $kyc = KYC::FindOrFail($id);
-                $old_note = $kyc->notes != null ? $kyc->notes : '';
-                $save_note = $request->input('notes') != '' ? str_replace("\n", "<br>", $request->input('notes')) : $old_note;
-                if ($request->input('status') == 'rejected') {
-                    $save_note = !isset($request->notes) ? 'In our verification process, we found information incorrect. It would great if you resubmit the form. If face problem in submission please contact us with support team' : strip_tags($save_note);
+                $new_note = !empty($request->input('notes')) ? strip_tags(str_replace("\n", "<br>", $request->input('notes'))) : '';
+                $save_note = $new_note;
+                if ($request->input('status') != 'approved') {
+                    $save_note = !empty($new_note) ? $new_note : 'In our verification process, we found some information are incorrect. Please resubmit the application form with valid document.';
                 }
                 if ($kyc) {
                     $kyc->status = $request->input('status');
@@ -236,12 +241,12 @@ class KycController extends Controller
                     }
 
                     if ($kyc->user) {
-                        try{
+                        try {
                             $when = now()->addMinutes(1);
                             $kyc->user->notify((new KycStatus($kyc))->delay($when));
                             // Notification::send($kyc->user, new KycStatus($kyc));
                             $ret['message'] = __('messages.kyc.' . $request->input('status'));
-                        }catch(\Exception $e){
+                        } catch (\Exception $e) {
                             $ret['errors'] = $e->getMessage();
                             $ret['message'] = __('messages.kyc.' . $request->input('status')).' '.__('messages.email.failed');
                         }

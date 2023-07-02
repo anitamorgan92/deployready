@@ -39,7 +39,7 @@ $decimal_max = (token('decimal_max')) ? token('decimal_max') : 0;
 @if ($upcoming)
 <div class="alert alert-dismissible fade show alert-info" role="alert">
     <a href="javascript:void(0)" class="close" data-dismiss="alert" aria-label="close">&nbsp;</a>
-    {{ __('Sales Start at') }} - {{ _date(active_stage()->start_date) }}
+    {{ __('Sales Start at') }} - {{ _date2sz(active_stage()->start_date) }}
 </div>
 @endif
 <div class="content-area card">
@@ -96,8 +96,8 @@ $decimal_max = (token('decimal_max')) ? token('decimal_max') : 0;
 
             $input_token_purchase = '<div class="token-pay-amount payment-get">'.$input_hidden_token.'<input class="input-bordered input-with-hint token-number" type="text" id="token-number" value="" min="'.$min_token.'" max="'.$stage->max_purchase.'"><div class="token-pay-currency"><span class="input-hint input-hint-sap payment-get-cur payment-cal-cur ucap">'.$symbol.'</span></div></div>';
             $input_pay_amount = '<div class="token-pay-amount payment-from">'.$input_hidden_amount.'<input class="input-bordered input-with-hint pay-amount" type="text" id="pay-amount" value=""><div class="token-pay-currency"><span class="input-hint input-hint-sap payment-from-cur payment-cal-cur pay-currency ucap">'.$method.'</span></div></div>';
-            $input_token_purchase_num = '<div class="token-received"><div class="token-eq-sign">=</div><div class="token-received-amount"><h5 class="token-amount token-number-u">0</h5><div class="token-symbol">'.$symbol.'</div></div></div>';
-            $input_pay_amount_num = '<div class="token-received token-received-alt"><div class="token-eq-sign">=</div><div class="token-received-amount"><h5 class="token-amount pay-amount-u">0</h5><div class="token-symbol pay-currency ucap">'.$method.'</div></div></div>';
+            $input_token_purchase_num = '<div class="token-received"><div class="token-eq-sign">=</div><div class="token-received-amount"><h5 class="token-amount token-number-u">0.00</h5><div class="token-symbol">'.$symbol.'</div></div></div>';
+            $input_pay_amount_num = '<div class="token-received token-received-alt"><div class="token-eq-sign">=</div><div class="token-received-amount"><h5 class="token-amount pay-amount-u">0.00</h5><div class="token-symbol pay-currency ucap">'.$method.'</div></div></div>';
             $input_sep = '<div class="token-eq-sign"><em class="fas fa-exchange-alt"></em></div>';
             @endphp
             <div class="token-contribute">
@@ -108,7 +108,7 @@ $decimal_max = (token('decimal_max')) ? token('decimal_max') : 0;
                         <span class="note-icon">
                             <em class="fas fa-info-circle"></em>
                         </span>
-                        <span class="note-text text-light"><strong class="min-amount">{{ token_calc($min_token, 'price')->$method }}</strong> <span class="pay-currency ucap">{{ $method }}</span> (<strong class="min-token">{{ to_num($min_token, 'max', ',') }}</strong>
+                        <span class="note-text text-light"><strong class="min-amount">{{ to_num(token_calc($min_token, 'price')->$method, 'max') }}</strong> <span class="pay-currency ucap">{{ $method }}</span> (<strong class="min-token">{{ to_num_token($min_token, 0) }}</strong>
                         <span class="token-symbol ucap">{{ $symbol }}</span>) {{__('Minimum contribution amount is required.')}}</span>
                     </div>
                     <div class="note-text note-text-alert"></div>
@@ -233,7 +233,7 @@ $decimal_max = (token('decimal_max')) ? token('decimal_max') : 0;
                     <span class="card-sub-title">{{__('Current Bonus')}}</span>
                     <div class="h3 mb-0">{{ $active_bonus->amount }} %</div>
                 </div>
-                <div class="token-bonus-date">{{__('End at')}}<br>{{ _date($active_bonus->end_date, get_setting('site_date_format')) }}</div>
+                <div class="token-bonus-date">{{__('End at')}}<br>{{ _date2sz($active_bonus->end_date, get_setting('site_date_format')) }}</div>
             </div>
             @endif
         </div>

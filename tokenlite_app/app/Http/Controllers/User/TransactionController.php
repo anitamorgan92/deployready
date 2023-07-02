@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\User;
+
 /**
  * Transaction Controller
  *

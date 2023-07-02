@@ -49,9 +49,9 @@ is_array($custom) ? true : $custom = array();
                                         <div class="input-item input-with-label">
                                             <label class="input-item-label">Decimal Minimum</label>
                                             <div class="input-wrap">
-                                                <input class="input-bordered" type="number" name="token_decimal_min" value="{{ token('decimal_min') }}" min="2" max="10">
+                                                <input class="input-bordered" type="number" name="token_decimal_min" value="{{ token('decimal_min') }}" min="2" max="8">
                                             </div>
-                                            <span class="input-note">Minimum number of decimal point for calculation. 2-10 are accepted.</span>
+                                            <span class="input-note">Minimum number of decimal point for calculation. 2-8 are accepted.</span>
                                         </div>
                                     </div>
                                     <div class="col-xl-3 col-sm-6">

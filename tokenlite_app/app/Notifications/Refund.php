@@ -80,10 +80,10 @@ class Refund extends Notification
         $table .= '<tbody class="text-left">';
         
         $table .= '<tr><td width="150">Refund ID</td><td width="15">:</td><td><strong>'.$this->refund->tnx_id.'</strong></td></tr>';
-        $table .= '<tr><td>Refund Token</td><td>:</td><td><strong>'.$this->refund->total_tokens.' '.token_symbol().'</strong></td></tr>';
-        $table .= '<tr><td>Refund Amount</td><td>:</td><td><strong>'.$this->refund->amount.' '.strtoupper($this->refund->currency).'</strong></td></tr>';
+        $table .= '<tr><td>Refund Token</td><td>:</td><td><strong>'.to_num_token($this->refund->total_tokens).' '.token_symbol().'</strong></td></tr>';
+        $table .= '<tr><td>Refund Amount</td><td>:</td><td><strong>'.to_num($this->refund->amount, 'max').' '.strtoupper($this->refund->currency).'</strong></td></tr>';
         // $table .= '<tr><td>Refund Against</td><td>:</td><td>#'.$this->transaction->tnx_id.'</td></tr>';
-        if(!empty($this->refund->extra)){
+        if (!empty($this->refund->extra)) {
             $table .= '<tr><td>Refund Note</td><td>:</td><td>[[refund_note]]</td></tr>';
         }
 
@@ -93,14 +93,14 @@ class Refund extends Notification
     }
     public function order_details()
     {
-        $if_bonus = ($this->transaction->total_bonus > 0) ? ' (included bonus '.$this->transaction->total_bonus.' '.token_symbol().')' : '';
+        $if_bonus = ($this->transaction->total_bonus > 0) ? ' (included bonus '.to_num_token($this->transaction->total_bonus).' '.token_symbol().')' : '';
 
         $table = '<table class="table order">';
         $table .= '<thead><th colspan="3">Refund against order ('.$this->transaction->tnx_id.'):</th></thead>';
         $table .= '<tbody class="text-left">';
         
-        $table .= '<tr><td width="150">Total Token</td><td width="15">:</td><td><strong>'.$this->transaction->total_tokens.' '.token_symbol().'</strong>'.$if_bonus.'</td></tr>';
-        $table .= '<tr><td>Pay Amount</td><td>:</td><td><strong>'.$this->transaction->amount.' '.strtoupper($this->transaction->currency).'</strong></td></tr>';
+        $table .= '<tr><td width="150">Total Token</td><td width="15">:</td><td><strong>'.to_num_token($this->transaction->total_tokens).' '.token_symbol().'</strong>'.$if_bonus.'</td></tr>';
+        $table .= '<tr><td>Pay Amount</td><td>:</td><td><strong>'.to_num($this->transaction->amount).' '.strtoupper($this->transaction->currency).'</strong></td></tr>';
         $table .= '<tr><td>Payment Method</td><td>:</td><td>'.ucfirst($this->transaction->payment_method).'</td></tr>';
         $table .= '<tr><td>Purchase at</td><td>:</td><td>'._date($this->transaction->tnx_time).'</td></tr>';
 

@@ -13,7 +13,6 @@ use App\Notifications\TnxStatus;
 
 class ModuleHelper
 {
-
     public static function view($path, $data=[], $html = true)
     {
         View::addNamespace('pay_module', app_path('PayModule/'));
@@ -32,7 +31,7 @@ class ModuleHelper
 
 
     /**
-     * satisfy_version compare with application. 
+     * satisfy_version compare with application.
      *
      * @version 1.0
      * @since 1.1.0
@@ -41,17 +40,19 @@ class ModuleHelper
     {
         $laravel = app()->version();
         $app = app_version();
-        if( empty($requires) && $requires <= 0 ) return false;
+        if (empty($requires) && $requires <= 0) {
+            return false;
+        }
         foreach ($requires as $name => $version) {
             $fversion = self::filter_version($version);
             $operator = self::filter_version($version, true);
-            if($name == 'laravel'){
-                if(version_compare($laravel, $fversion, $operator) === false){
+            if ($name == 'laravel') {
+                if (version_compare($laravel, $fversion, $operator) === false) {
                     return false;
                 }
             }
-            if($name == 'app'){
-                if(version_compare($app, $fversion, $operator) === false){
+            if ($name == 'app') {
+                if (version_compare($app, $fversion, $operator) === false) {
                     return false;
                 }
             }
@@ -68,30 +69,44 @@ class ModuleHelper
     public static function filter_version($version, $operator = false)
     {
         $filter = str_replace(
-            ['^', '>=', '<=', '==', '>', '<', '~', '<>'], 
-            ['', '', '', '', '', '', '', ''], 
-            $version);
-        if( starts_with($version, '^') || starts_with($version, '>=') ){
-            if($operator) return '>=';
+            ['^', '>=', '<=', '==', '>', '<', '~', '<>'],
+            ['', '', '', '', '', '', '', ''],
+            $version
+        );
+        if (starts_with($version, '^') || starts_with($version, '>=')) {
+            if ($operator) {
+                return '>=';
+            }
         }
-        if( starts_with($version, '<=') ){
-            if($operator) return '<=';
+        if (starts_with($version, '<=')) {
+            if ($operator) {
+                return '<=';
+            }
         }
-        if( starts_with($version, '>') ){
-            if($operator) return '>';
+        if (starts_with($version, '>')) {
+            if ($operator) {
+                return '>';
+            }
         }
-        if( starts_with($version, '<') ){
-            if($operator) return '<';
+        if (starts_with($version, '<')) {
+            if ($operator) {
+                return '<';
+            }
         }
-        if( starts_with($version, '~') ){
-            if($operator) return '<>';
+        if (starts_with($version, '~')) {
+            if ($operator) {
+                return '<>';
+            }
         }
 
-        if($operator) return '<>';
+        if ($operator) {
+            return '<>';
+        }
         return $filter;
     }
 
-    public static function enotify($tnx, $type, $request) {
+    public static function enotify($tnx, $type, $request)
+    {
         $admin_template = isset($request->system) ? $request->system : false;
         $user_template  = isset($request->user) ? $request->user : false;
         $notify_admin   = $type.'-admin';
@@ -99,23 +114,23 @@ class ModuleHelper
         $ret['msg']     = 'warning';
         $ret['message'] = __('Unable to send email notification.');
 
-        if(!empty($tnx)) {
+        if (!empty($tnx)) {
             try {
                 $sent = false;
-                if(!empty($user_template)) {
-                    if($tnx->payment_method=='bank') {
+                if (!empty($user_template)) {
+                    if ($tnx->payment_method=='bank') {
                         $tnx->payment_to = '(as mentioned above)';
                     }
                     $tnx->tnxUser->notify((new TnxStatus($tnx, $user_template)));
                     $sent = true;
                 }
                 if (get_emailt($notify_admin, 'notify') == 1) {
-                    if(!empty($admin_template)) {
+                    if (!empty($admin_template)) {
                         notify_admin($tnx, $admin_template);
                         $sent = true;
                     }
                 }
-                if($sent==true) {
+                if ($sent==true) {
                     $ret['msg'] = 'info';
                     $ret['message'] = __('The email has been sent successfully.');
                 }

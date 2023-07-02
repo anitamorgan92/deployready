@@ -4,7 +4,7 @@ namespace App\PayModule\Bank;
 
 /**
  * Bank Module
- * @version v1.3.0
+ * @version v1.3.1
  * @since v1.0.2
  */
 
@@ -27,8 +27,8 @@ use App\Helpers\TokenCalculate as TC;
 class BankModule implements PmInterface
 {
     const SLUG = 'bank';
-    const VERSION = '1.3.0';
-    const APP_VERSION = '^1.2.0';
+    const VERSION = '1.3.1';
+    const APP_VERSION = '^1.3.1';
     const SUPPORT_CURRENCY = ['USD', 'GBP', 'EUR', 'TRY', 'RUB', 'CAD', 'AUD', 'INR', 'NGN', 'BRL', 'NZD', 'PLN', 'JPY', 'MYR', 'IDR', 'MXN', 'PHP', 'CHF', 'THB', 'SGD', 'CZK', 'NOK', 'ZAR', 'SEK', 'KES', 'NAD', 'DKK', 'HKD', 'HUF', 'PKR', 'EGP', 'CLP', 'COP', 'JMD'];
 
     public function routes()
@@ -41,7 +41,7 @@ class BankModule implements PmInterface
     {
         $pmData = PaymentMethod::get_data(self::SLUG, true);
         $name = self::SLUG;
-    	return ModuleHelper::view('Bank.views.card', compact('pmData', 'name'));
+        return ModuleHelper::view('Bank.views.card', compact('pmData', 'name'));
     }
 
     public function admin_views_details()
@@ -73,7 +73,8 @@ class BankModule implements PmInterface
         return ModuleHelper::view('Bank.views.tnx_details', compact('transaction'));
     }
 
-    public function email_details($transaction){
+    public function email_details($transaction)
+    {
         $bank = get_pm(self::SLUG);
         
         $text = '';
@@ -136,6 +137,17 @@ class BankModule implements PmInterface
             $all_currency_rate = isset($exrate['except']) ? json_encode($exrate['except']) : json_encode([]);
             $base_currency = strtolower(base_currency());
             $base_currency_rate = isset($exrate['base']) ? $exrate['base'] : 0;
+            $trnx_amount = round($calc_token['price']->$currency, 2);
+
+            if ($trnx_amount < 0.1) {
+                $ret['msg'] = 'info';
+                $ret['message'] = __('Sorry, unable to proceed. Your payment amount is very low.');
+
+                if ($request->ajax()) {
+                    return response()->json($ret);
+                }
+                return redirect(route('user.token'))->with(['info' => $ret['message']]);
+            }
 
             $trnx_data = [
                 'token' => round($token, min_decimal()),
@@ -144,7 +156,7 @@ class BankModule implements PmInterface
                 'total_bonus' => round($calc_token['bonus'], min_decimal()),
                 'total_tokens' => round($calc_token['total'], min_decimal()),
                 'base_price' => round($calc_token['price']->base, max_decimal()),
-                'amount' => round($calc_token['price']->$currency, max_decimal()),
+                'amount' => $trnx_amount,
             ];
             $save_data = [
                 'created_at' => Carbon::now()->toDateTimeString(),
@@ -202,8 +214,9 @@ class BankModule implements PmInterface
     {
         $bank = PaymentMethod::get_data(self::SLUG);
         $bank_info = [];
-        if (isset($bank->bank_account_name) && isset($bank->bank_account_number)) {
-            $bank_info[] = $bank->bank_account_name. ' (' . $bank->bank_account_number .')';
+        $bank_account = (isset($bank->bank_account_number) && !empty($bank->bank_account_number)) ? '('.$bank->bank_account_number.')' : '';
+        if (isset($bank->bank_account_name)) {
+            $bank_info[] = $bank->bank_account_name. ' '.$bank_account;
         }
         if (isset($bank->bank_name)) {
             $bank_info[] = $bank->bank_name;

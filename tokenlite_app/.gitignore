@@ -2,6 +2,8 @@
 /public/hot
 /public/storage
 /storage/*.key
+/storage/install*
+/vendor
 /.idea
 /.vscode
 /.vagrant
@@ -14,3 +16,6 @@ yarn-error.log
 /.env
 .env
 /release
+/Docs/site*
+Dockerfile
+docker-compose*

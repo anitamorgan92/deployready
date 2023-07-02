@@ -34,6 +34,12 @@ use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 
 class PaypalPay
 {
+    private $paypalModule;
+
+    public function __construct()
+    {
+        $this->paypalModule = new PaypalModule();
+    }
     /**
      * The attributes that are mass assignable.
      *
@@ -124,6 +130,18 @@ class PaypalPay
         $base_currency = strtolower(base_currency());
         $all_currency_rate = isset($exrate['except']) ? json_encode($exrate['except']) : json_encode([]);
         $base_currency_rate = isset($exrate['base']) ? $exrate['base'] : 0;
+        $trnx_amount = round($calc_token['price']->$currency, 2);
+
+        if ($trnx_amount < 0.1) {
+            $ret['msg'] = 'info';
+            $ret['message'] = __('Sorry, unable to proceed. Your payment amount is very low.');
+
+            if ($request->ajax()) {
+                return response()->json($ret);
+            }
+            return redirect(route('user.token'))->with(['info' => $ret['message']]);
+        }
+        
         $trnx_data = [
             'token' => round($token, min_decimal()),
             'bonus_on_base' => round($calc_token['bonus-base'], min_decimal()),
@@ -131,7 +149,7 @@ class PaypalPay
             'total_bonus' => round($calc_token['bonus'], min_decimal()),
             'total_tokens' => round($calc_token['total'], min_decimal()),
             'base_price' => round($calc_token['price']->base, max_decimal()),
-            'amount' => round($calc_token['price']->$currency, 2),
+            'amount' => in_array(strtoupper($currency), $this->paypalModule->get_non_decimal_currencies()) ? round($trnx_amount) : $trnx_amount,
         ];
 
         try {
@@ -173,7 +191,7 @@ class PaypalPay
                 'status' => 'pending',
             ];
             $ret['msg'] = 'success';
-            $ret['message'] = __('messages.trnx.created');;
+            $ret['message'] = __('messages.trnx.created');
             $iid = Transaction::insertGetId($save_data);
 
             if ($approvalLink) {
@@ -251,7 +269,7 @@ class PaypalPay
                         } catch (\Exception $e) {
                             $response['error'] = $e->getMessage();
                         }
-                        return redirect(route('user.token'))->with(['success' => 'Thank You, We have received your payment!', 'modal' => 'success']);
+                        return redirect(route('user.token'))->with(['success' => __('Thank You, We have received your payment!'), 'modal' => 'success']);
                     }
                 } else {
                     $tranx->save();
@@ -262,7 +280,6 @@ class PaypalPay
             } catch (\Exception $ex) {
                 return $this->payment_cancel($request);
             }
-
         } catch (\Exception $ex) {
             return $this->payment_cancel($request);
         }

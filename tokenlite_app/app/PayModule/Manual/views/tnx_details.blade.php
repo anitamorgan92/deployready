@@ -13,7 +13,9 @@ $ext_price = (!empty($pm) && isset($pm->price)) ? $pm->price : '';
 $ext_field = (!empty($pm) && isset($pm->req)) ? $pm->req : false;
 
 $_address = (!empty($pm) && isset($pm->address)) ? $pm->address : '';
+$_type = (!empty($pm) && isset($pm->network)) ? $pm->network : '';
 $_amount = to_num($transaction->amount, 'max');
+$_note = (!empty($pm) && isset($pm->note)) ? $pm->note : '';
 
 $text = strtolower(str_replace(' ', '-', $wallet_name)).':'.$_address.'?amount='.$_amount;
 $num = (!empty($pm) && isset($pm->num) && !empty($pm->num)) ? $pm->num : 3;
@@ -35,7 +37,7 @@ $num = (!empty($pm) && isset($pm->num) && !empty($pm->num)) ? $pm->num : 3;
                             @if($_address && isset($transaction->payment_to) && $transaction->payment_to != null)
                             <div class="gaps-1x"></div>
                             <div class="pay-wallet-address pay-wallet-{{ $cur }}">
-                                <h6 class="font-bold">{{ __('Payment to the following :Name Wallet Address', ['name' => $wallet_name])}}</h6>
+                                <h6 class="font-bold">{{ __('Payment to the following :Name Wallet Address', ['name' => ($_type == 'default' || empty($_type)) ? $wallet_name : $wallet_name.' ('.__(short_to_full($_type)).')' ])}}</h6>
                                 <div class="row guttar-1px guttar-vr-15px">
                                     <div class="col-sm-2">
                                         <p class="text-center text-sm-left"><img title="{{ __('Scan QR code to Payment.') }}" class="img-thumbnail" width="82" src="{{ route('public.qrgen', ['text'=>$text]) }}" alt="QR"></p>
@@ -60,6 +62,11 @@ $num = (!empty($pm) && isset($pm->num) && !empty($pm->num)) ? $pm->num : 3;
                                                     <li class="col-sm-6"><span>{{__('SET GAS PRICE:')}}</span> {{ $ext_price }} {{__('Gwei')}}</li>
                                                     @endif
                                                 </ul>
+                                            @endif
+                                            @if($_note)
+                                                <div class="input-note">
+                                                    <p><strong>{{ __($_note) }}</strong></p>
+                                                </div>
                                             @endif
                                         </div>
                                     </div>

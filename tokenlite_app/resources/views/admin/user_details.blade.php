@@ -79,7 +79,7 @@
                     </li>{{-- li --}}
                     <li>
                         <div class="data-details-head">Date of Birth</div>
-                        <div class="data-details-des">{!! $user->dateOfBirth ? _date($user->dateOfBirth) : '&nbsp;' !!}</div>
+                        <div class="data-details-des">{!! $user->dateOfBirth ? _date2sz($user->dateOfBirth) : '&nbsp;' !!}</div>
                     </li>{{-- li --}}
                     <li>
                         <div class="data-details-head">Nationality</div>

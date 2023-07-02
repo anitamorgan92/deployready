@@ -62,12 +62,6 @@
                         <div class="row">
                             <div class="col-4">
                                 <div class="input-item input-with-label">
-                                    <input id="smtp_uchk" class="mail-chk input-checkbox" type="radio" {{ email_setting('driver', env('MAIL_DRIVER', 'sendmail')) == 'sendmail' ? 'checked' : '' }} name="site_mail_driver" value="sendmail">
-                                    <label for="smtp_uchk">Send Mail</label>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="input-item input-with-label">
                                     <input id="smtp_chk" class="mail-chk input-checkbox" type="radio" {{ email_setting('driver', env('MAIL_DRIVER', 'smtp')) == 'smtp' ? 'checked' : '' }} name="site_mail_driver" value="smtp">
                                     <label for="smtp_chk">SMTP</label>
                                 </div>
@@ -159,6 +153,23 @@
 
                         <button type="submit" class="btn btn-primary"><i class="ti ti-reload"></i><span>Update</span></button>
                     </div>
+                    </div>
+                </form>
+                <div class="sap sap-gap"></div>
+                <form action="{{ route('admin.ajax.settings.email.test') }}" autocomplete="false" method="POST" id="email_settings">
+                    @csrf
+                    <label for="send_to" class="input-item-label">Test Email Address</label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-item pb-0">
+                                <div class="input-wrap">
+                                    <input type="text" name="send_to" id="send_to" class="input-bordered">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary">Send Test Email</button>
+                        </div>
                     </div>
                 </form>
             </div>

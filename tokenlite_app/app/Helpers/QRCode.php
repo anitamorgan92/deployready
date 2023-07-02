@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Facade;
  */
 class QRCode extends Facade
 {
-    protected static function getFacadeAccessor() {
+    protected static function getFacadeAccessor()
+    {
         return new QRCodeFactory();
     }
 }
