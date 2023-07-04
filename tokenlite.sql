@@ -1508,7 +1508,7 @@ CREATE TABLE `users` (
   `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(191) NOT NULL,
   `email` varchar(191) NOT NULL,
-  `email_verified_at` timestamp NULL DEFAULT NULL,
+  `email_verified_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `password` varchar(191) NOT NULL,
   `status` varchar(191) NOT NULL DEFAULT 'active',
   `registerMethod` varchar(191) DEFAULT 'Email',
